@@ -1,0 +1,98 @@
+import { Search, Menu, Scale } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { name: "Judgments", href: "/judgments" },
+    { name: "Laws of South Sudan", href: "/laws" },
+    { name: "Legal Notices", href: "/notices" },
+    { name: "Judicial Opinions", href: "/opinions" },
+    { name: "Judiciary Directory", href: "/directory" },
+    { name: "Legal Resources", href: "/resources" },
+  ];
+
+  return (
+    <header className="bg-card border-b border-border sticky top-0 z-50">
+      {/* Top Bar with News Ticker */}
+      <div className="bg-primary text-primary-foreground py-1 overflow-hidden">
+        <div className="news-ticker whitespace-nowrap text-sm">
+          Latest: New Supreme Court judgment on constitutional law published • 
+          South Sudan Gazette Issue 15/2024 now available • 
+          Practice Direction on e-filing systems updated
+        </div>
+      </div>
+
+      {/* Main Header */}
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo and Title */}
+          <div className="flex items-center space-x-3">
+            <Scale className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-xl font-bold text-foreground">
+                South Sudan Law Reports
+              </h1>
+              <p className="text-xs text-muted-foreground">Official Legal Portal</p>
+            </div>
+          </div>
+
+          {/* Search Bar - Desktop */}
+          <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search laws, cases, judgments..."
+                className="pl-10"
+              />
+            </div>
+            <Button variant="default" size="sm">
+              Search
+            </Button>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Navigation */}
+        <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block pb-4 md:pb-0`}>
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0">
+            {navItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="text-foreground hover:text-primary transition-colors duration-200 py-2 px-3 rounded-md hover:bg-secondary text-sm font-medium"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
+        </nav>
+
+        {/* Mobile Search */}
+        <div className="md:hidden pb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search laws, cases, judgments..."
+              className="pl-10"
+            />
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
