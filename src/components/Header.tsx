@@ -32,7 +32,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/ss-logo.png" alt="South Sudan Seal" className="h-10 w-10 rounded-full" />
+            <Scale className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-xl font-bold text-foreground">
                 South Sudan Law Reports
