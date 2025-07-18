@@ -27,7 +27,7 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="col-span-1 lg:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <Scale className="h-8 w-8 text-accent" />
+              <img src="/ss-logo.png" alt="South Sudan Seal" className="h-15 w-10 rounded-full" />
               <div>
                 <h3 className="text-xl font-bold">South Sudan Law Reports</h3>
                 <p className="text-sm text-primary-foreground/80">Official Legal Portal</p>
