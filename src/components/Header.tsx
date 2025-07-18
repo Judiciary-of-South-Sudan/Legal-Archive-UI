@@ -2,6 +2,7 @@ import { Search, Menu, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Link } from "react-router-dom"; // ✅ Import Link
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,7 +31,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <Scale className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-xl font-bold text-foreground">
@@ -38,7 +39,7 @@ const Header = () => {
               </h1>
               <p className="text-xs text-muted-foreground">Official Legal Portal</p>
             </div>
-          </div>
+          </Link>
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">

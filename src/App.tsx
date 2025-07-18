@@ -19,6 +19,8 @@ import CourtOfAppeal from "./pages/judgments/CourtOfAppeal";
 import HighCourt from "./pages/judgments/HighCourt";
 import Constitution from "./pages/laws/Constitution";
 import Acts from "./pages/laws/Acts";
+import JudicialOpinions from "./pages/JudicialOpinions";
+import LegalResources from "./pages/LegalResources";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,8 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/sitemap" element={<Sitemap />} />
+          <Route path="/opinions" element={<JudicialOpinions />} />
+          <Route path="/resources" element={<LegalResources />} />
           <Route path="/judgments/supreme-court" element={<SupremeCourt />} />
           <Route path="/judgments/court-of-appeal" element={<CourtOfAppeal />} />
           <Route path="/judgments/high-court" element={<HighCourt />} />
