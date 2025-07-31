@@ -45,9 +45,10 @@ const Hero = () => {
             <Button size="lg" variant="secondary" className="text-primary">
               Search Legal Database
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
+            <Button size="lg" className="bg-transparent border border-white text-white hover:bg-white hover:text-primary hover:shadow-md transition-all">
               Browse Latest Judgments
             </Button>
+
           </div>
         </div>
 
