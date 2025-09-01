@@ -13,7 +13,7 @@ const Header = () => {
     { name: "Legal Notices", href: "/notices" },
     { name: "Judicial Opinions", href: "/opinions" },
     { name: "Judiciary Directory", href: "/directory" },
-    { name: "Legal Resources", href: "/resources" },
+    { name: "Citizen's Guide", href: "/resources" },
   ];
 
   return (
