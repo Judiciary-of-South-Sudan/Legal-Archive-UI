@@ -56,7 +56,7 @@ const Footer = () => {
 
           {/* Legal Sections */}
           <div>
-            <h4 className="font-semibold mb-4">Legal Resources</h4>
+            <h4 className="font-semibold mb-4">Citizen's Guide</h4>
             <ul className="space-y-2">
               {legalSections.map((link) => (
                 <li key={link.name}>
