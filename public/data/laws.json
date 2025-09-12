@@ -1,0 +1,69 @@
+[
+  {
+    "id": "constitution-2011",
+    "title": "Transitional Constitution of South Sudan (2011)",
+    "type": "Constitution",
+    "year": 2011,
+    "category": "Constitutional Law",
+    "status": "Active",
+    "sections": 242,
+    "lastAmended": "2018",
+    "summary": "The supreme law establishing the framework of government and rights.",
+    "pdfUrl": "/pdfs/SouthSudanConstitution.pdf",
+    "htmlUrl": "",
+    "frbrUri": "akn/ss/act/constitution/2011"
+  },
+  {
+    "id": "penal-code-2008",
+    "title": "Penal Code Act (2008)",
+    "type": "Act",
+    "year": 2008,
+    "category": "Criminal Law",
+    "status": "Active",
+    "sections": 356,
+    "lastAmended": "2020",
+    "summary": "Defines criminal offences and penalties.",
+    "pdfUrl": "/pdfs/penal-code-2008.pdf",
+    "htmlUrl": "",
+    "frbrUri": "akn/ss/act/penal-code/2008"
+  },
+  {
+    "id": "civil-procedure-2007",
+    "title": "Civil Procedure Act (2007)",
+    "type": "Act",
+    "year": 2007,
+    "category": "Civil Law",
+    "status": "Active",
+    "sections": 189,
+    "lastAmended": "2019",
+    "summary": "Governs civil court procedures and legal processes.",
+    "pdfUrl": "/pdfs/civil-procedure-2007.pdf",
+    "htmlUrl": ""
+  },
+  {
+    "id": "companies-2012",
+    "title": "Companies Act (2012)",
+    "type": "Act",
+    "year": 2012,
+    "category": "Commercial Law",
+    "status": "Active",
+    "sections": 278,
+    "lastAmended": "2021",
+    "summary": "Regulates company formation, management, and dissolution.",
+    "pdfUrl": "/pdfs/companies-2012.pdf",
+    "htmlUrl": ""
+  },
+  {
+    "id": "marriage-2003",
+    "title": "Marriage Act (2003)",
+    "type": "Act",
+    "year": 2003,
+    "category": "Family Law",
+    "status": "Active",
+    "sections": 145,
+    "lastAmended": "2017",
+    "summary": "Governs marriage, divorce, and family relations.",
+    "pdfUrl": "/pdfs/marriage-2003.pdf",
+    "htmlUrl": ""
+  }
+]
