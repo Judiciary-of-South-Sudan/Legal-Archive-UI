@@ -33,7 +33,7 @@ const LegalResources = () => {
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-6 text-blue-800">Legal Resources</h1>
+        <h1 className="text-3xl font-bold mb-6 text-blue-800">Citizen's Guide</h1>
         <p className="text-muted-foreground mb-6">
           Browse a curated list of foundational legal documents and references relevant to law, governance, and civic awareness in South Sudan.
         </p>
