@@ -19,6 +19,7 @@ const AdminUploadNotice: React.FC = () => {
   const createMutation = useCreateNotice();
 
   const [formData, setFormData] = useState({
+    noticeNumber: '',
     title: '',
     type: 'Notice',
     publicationDate: '',
@@ -27,11 +28,14 @@ const AdminUploadNotice: React.FC = () => {
     department: '',
     gazetteIssue: '',
     effectiveDate: '',
-    expiryDate: '',
     summary: '',
-    keywords: '',
+    tags: '',
+    fullText: '',
+    relatedLaws: '',
+    amendsLaws: '',
     jurisdiction: 'South Sudan',
     language: 'English',
+    status: '',
   });
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -57,6 +61,7 @@ const AdminUploadNotice: React.FC = () => {
 
     try {
       const payload: CreateLegalNoticeRequest = {
+        noticeNumber: formData.noticeNumber || undefined,
         title: formData.title,
         type: formData.type,
         publicationDate: formData.publicationDate || undefined,
@@ -65,17 +70,21 @@ const AdminUploadNotice: React.FC = () => {
         department: formData.department || undefined,
         gazetteIssue: formData.gazetteIssue || undefined,
         effectiveDate: formData.effectiveDate || undefined,
-        expiryDate: formData.expiryDate || undefined,
         summary: formData.summary || undefined,
-        keywords: formData.keywords ? formData.keywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        fullText: formData.fullText || undefined,
+        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendsLaws: formData.amendsLaws ? formData.amendsLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         jurisdiction: formData.jurisdiction,
         language: formData.language,
+        status: formData.status || undefined,
       };
 
       const created = await createMutation.mutateAsync(payload) as LegalNotice;
 
-      if (pdfFile && created?.id) {
-        await noticeService.uploadNoticePdf(created.id, pdfFile);
+      if (pdfFile && (created?.id || created?.frbrUri)) {
+        const uploadKey = created.id ?? created.frbrUri;
+        await noticeService.uploadNoticePdf(uploadKey, pdfFile);
         toast.success('Legal notice and PDF uploaded successfully');
       } else {
         toast.success('Legal notice created successfully');
@@ -107,6 +116,11 @@ const AdminUploadNotice: React.FC = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2">
+                  <Label htmlFor="noticeNumber">Notice Number</Label>
+                  <Input id="noticeNumber" name="noticeNumber" value={formData.noticeNumber} onChange={handleInputChange} />
+                </div>
+
                 <div className="md:col-span-2">
                   <Label htmlFor="title">Title *</Label>
                   <Input id="title" name="title" value={formData.title} onChange={handleInputChange} required />
@@ -156,19 +170,29 @@ const AdminUploadNotice: React.FC = () => {
                   <Input id="effectiveDate" name="effectiveDate" type="date" value={formData.effectiveDate} onChange={handleInputChange} />
                 </div>
 
-                <div>
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
-                  <Input id="expiryDate" name="expiryDate" type="date" value={formData.expiryDate} onChange={handleInputChange} />
-                </div>
-
                 <div className="md:col-span-2">
                   <Label htmlFor="summary">Summary</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                  <Input id="keywords" name="keywords" value={formData.keywords} onChange={handleInputChange} />
+                  <Label htmlFor="fullText">Full Text</Label>
+                  <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="relatedLaws">Related Laws (comma-separated)</Label>
+                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="amendsLaws">Amends Laws (comma-separated)</Label>
+                  <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">

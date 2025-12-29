@@ -9,17 +9,22 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useGetJudgments, useGetJudgmentsByCourtLevel } from "@/hooks/useJudgments";
+import { Link } from 'react-router-dom';
 
 const Judgments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [courtLevel, setCourtLevel] = useState<string>("all");
+  const [category, setCategory] = useState<string>("all");
   const [page, setPage] = useState(0);
   const size = 10;
 
-  // Fetch judgments based on court level filter
-  const { data: judgmentsData, isLoading, error } = courtLevel === "all"
-    ? useGetJudgments({ page, size, sort: 'judgmentDate,desc' })
-    : useGetJudgmentsByCourtLevel(courtLevel, { page, size, sort: 'judgmentDate,desc' });
+  // Call both hooks unconditionally to obey hooks rules. The court-level hook is disabled when courtLevel === 'all'
+  const allQuery = useGetJudgments({ page, size, sort: 'judgmentDate,desc' });
+  const courtQuery = useGetJudgmentsByCourtLevel(courtLevel === 'all' ? '' : courtLevel, { page, size, sort: 'judgmentDate,desc' });
+
+  const judgmentsData = courtLevel === 'all' ? allQuery.data : courtQuery.data;
+  const isLoading = courtLevel === 'all' ? allQuery.isLoading : courtQuery.isLoading;
+  const error = courtLevel === 'all' ? allQuery.error : courtQuery.error;
 
   const judgments = judgmentsData?.content || [];
   const totalPages = judgmentsData?.totalPages || 1;
@@ -65,7 +70,7 @@ const Judgments = () => {
                   <SelectItem value="High Court">High Court</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
@@ -109,8 +114,8 @@ const Judgments = () => {
         ) : (
           <>
             <div className="space-y-6">
-              {judgments.map((judgment) => (
-                <Card key={judgment.id} className="hover:shadow-lg transition-shadow">
+              {judgments.map((judgment, idx) => (
+                <Card key={judgment.frbrUri || judgment.caseNumber || idx} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -131,13 +136,13 @@ const Judgments = () => {
                       <div className="flex gap-2 ml-4">
                         <Button size="sm" variant="outline">
                           <Eye className="h-4 w-4 mr-1" />
-                          View ({judgment.viewCount || 0})
+                          View
                         </Button>
                         {judgment.pdfUrl && (
                           <Button size="sm" variant="outline" asChild>
                             <a href={judgment.pdfUrl} target="_blank" rel="noreferrer">
                               <Download className="h-4 w-4 mr-1" />
-                              PDF ({judgment.downloadCount || 0})
+                              PDF
                             </a>
                           </Button>
                         )}
@@ -176,11 +181,11 @@ const Judgments = () => {
                       <p className="text-sm font-medium text-primary mb-2">Verdict: {judgment.verdict}</p>
                     )}
 
-                    {judgment.keywords && judgment.keywords.length > 0 && (
+                    {judgment.tags && judgment.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {judgment.keywords.map((keyword, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {keyword}
+                        {judgment.tags.map((tag, idx2) => (
+                          <Badge key={idx2} variant="outline" className="text-xs">
+                            {tag}
                           </Badge>
                         ))}
                       </div>
@@ -188,11 +193,13 @@ const Judgments = () => {
 
                     <div className="flex items-center justify-between mt-4">
                       <div className="text-xs text-muted-foreground">
-                        Last updated: {new Date(judgment.updatedAt).toLocaleDateString()}
+                        {judgment.jurisdiction ? `Jurisdiction: ${judgment.jurisdiction}` : (judgment.language ? `Language: ${judgment.language}` : '')}
                       </div>
-                      <Button variant="ghost" size="sm" className="text-primary">
-                        View Full Details <ChevronRight className="h-4 w-4 ml-1" />
-                      </Button>
+                      <Link to={`/judgments/${judgment.frbrUri || judgment.caseNumber || ''}`}>
+                        <Button variant="ghost" size="sm" className="text-primary">
+                          View Full Details <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

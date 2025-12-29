@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,56 +9,67 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, Gavel } from 'lucide-react';
-import { useCreateJudgment } from '@/hooks/useJudgments';
-import { toast } from 'sonner';
+import { useGetJudgmentById, useUpdateJudgment } from '@/hooks/useJudgments';
 import apiClient from '@/lib/apiClient';
-import { CreateJudgmentRequest, Judgment } from '@/types/api';
+import { CreateJudgmentRequest } from '@/types/api';
+import { toast } from 'sonner';
 
-const AdminUploadJudgment: React.FC = () => {
+interface EditJudgmentForm {
+  caseName: string;
+  caseNumber?: string;
+  courtName: string;
+  courtLevel?: string;
+  judges?: string; // comma separated
+  judgmentDate?: string;
+  caseType?: string;
+  verdict?: string;
+  summary?: string;
+  keywords?: string;
+  jurisdiction?: string;
+  language?: string;
+}
+
+const EditJudgment: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const createMutation = useCreateJudgment();
+  const { data: judgment, isLoading } = useGetJudgmentById(id || '');
+  const updateMutation = useUpdateJudgment();
 
-  const [formData, setFormData] = useState({
-    caseName: '',
-    caseNumber: '',
-    courtName: '',
-    courtLevel: 'High Court',
-    judges: '',
-    judgmentDate: '',
-    caseType: '',
-    verdict: '',
-    summary: '',
-    // renamed keywords -> tags (comma-separated in UI)
-    tags: '',
-    // new fields to match backend DTO
-    parties: '',
-    fullText: '',
-    citedLaws: '',
-    citedCases: '',
-    jurisdiction: 'South Sudan',
-    language: 'English',
-  });
-
+  const [formData, setFormData] = useState<EditJudgmentForm | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (judgment) {
+      setFormData({
+        caseName: judgment.caseName || '',
+        caseNumber: judgment.caseNumber || '',
+        courtName: judgment.courtName || '',
+        courtLevel: judgment.courtLevel || 'High Court',
+        judges: (judgment.judges || []).join(', '),
+        judgmentDate: judgment.judgmentDate ? judgment.judgmentDate.split('T')[0] : '',
+        caseType: judgment.caseType || '',
+        verdict: judgment.verdict || '',
+        summary: judgment.summary || '',
+        keywords: (judgment.keywords || []).join(', '),
+        jurisdiction: judgment.jurisdiction || 'South Sudan',
+        language: judgment.language || 'English',
+      });
+    }
+  }, [judgment]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
+    if (!formData) return;
+    const { name, value } = e.target as HTMLInputElement;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0]);
-    }
-  };
+  const handleSelectChange = (name: string, value: string) => setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsUploading(true);
+    if (!id || !formData) return;
+    setIsSaving(true);
 
     try {
       const payload: CreateJudgmentRequest = {
@@ -71,49 +82,49 @@ const AdminUploadJudgment: React.FC = () => {
         caseType: formData.caseType || undefined,
         verdict: formData.verdict || undefined,
         summary: formData.summary || undefined,
-        // send tags (was keywords)
-        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        parties: formData.parties || undefined,
-        fullText: formData.fullText || undefined,
-        citedLaws: formData.citedLaws ? formData.citedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        citedCases: formData.citedCases ? formData.citedCases.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        jurisdiction: formData.jurisdiction,
-        language: formData.language,
+        keywords: formData.keywords ? formData.keywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        jurisdiction: formData.jurisdiction || undefined,
+        language: formData.language || undefined,
       };
 
-      const created = await createMutation.mutateAsync(payload) as Judgment;
+      await updateMutation.mutateAsync({ id, data: payload });
 
-      if (pdfFile && (created?.id || created?.frbrUri)) {
+      if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        // use id or frbrUri as fallback for upload route
-        const uploadKey = created.id ?? created.frbrUri;
-        await apiClient.post(`/upload/judgment/${uploadKey}`, fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        toast.success('Judgment and PDF uploaded successfully');
-      } else {
-        toast.success('Judgment created successfully');
+        await apiClient.post(`/upload/judgment/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        toast.success('PDF uploaded');
       }
 
       navigate('/admin/dashboard');
     } catch (err: unknown) {
-      // narrow unknown to extract possible message safely
       const error = err as { response?: { data?: { message?: string } } };
-      console.error('Upload error:', err);
-      toast.error(error?.response?.data?.message || 'Failed to upload judgment');
+      console.error('Update failed', err);
+      toast.error(error?.response?.data?.message || 'Failed to update judgment');
     } finally {
-      setIsUploading(false);
+      setIsSaving(false);
     }
   };
+
+  if (isLoading || !formData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2">Loading...</span>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Upload New Judgment</h1>
-          <p className="text-muted-foreground">Add a new court judgment to the archive</p>
+          <h1 className="text-3xl font-bold">Edit Judgment</h1>
         </div>
 
         <Card>
@@ -168,32 +179,12 @@ const AdminUploadJudgment: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="parties">Parties</Label>
-                  <Input id="parties" name="parties" value={formData.parties} onChange={handleInputChange} />
+                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                  <Input id="keywords" name="keywords" value={formData.keywords} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="fullText">Full Text</Label>
-                  <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Label htmlFor="tags">Tags (comma-separated)</Label>
-                  <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
-                </div>
-
-                <div>
-                  <Label htmlFor="citedLaws">Cited Laws (comma-separated)</Label>
-                  <Input id="citedLaws" name="citedLaws" value={formData.citedLaws} onChange={handleInputChange} />
-                </div>
-
-                <div>
-                  <Label htmlFor="citedCases">Cited Cases (comma-separated)</Label>
-                  <Input id="citedCases" name="citedCases" value={formData.citedCases} onChange={handleInputChange} />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Label htmlFor="pdfFile">PDF Document</Label>
+                  <Label htmlFor="pdfFile">Replace PDF</Label>
                   <div className="mt-2">
                     <Input id="pdfFile" type="file" accept=".pdf" onChange={handleFileChange} className="cursor-pointer" />
                     {pdfFile && (
@@ -207,16 +198,16 @@ const AdminUploadJudgment: React.FC = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? (
+                <Button type="submit" disabled={isSaving}>
+                  {isSaving ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading...
+                      Saving...
                     </>
                   ) : (
                     <>
                       <Upload className="mr-2 h-4 w-4" />
-                      Upload Judgment
+                      Save Changes
                     </>
                   )}
                 </Button>
@@ -233,5 +224,5 @@ const AdminUploadJudgment: React.FC = () => {
   );
 };
 
-export default AdminUploadJudgment;
+export default EditJudgment;
 
