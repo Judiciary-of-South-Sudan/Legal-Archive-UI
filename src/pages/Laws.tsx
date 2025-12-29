@@ -9,6 +9,7 @@ import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useGetLaws, useGetLawCategories, useGetRecentLaws } from "@/hooks/useLaws";
+import { Link } from 'react-router-dom';
 
 const Laws = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,8 +72,8 @@ const Laws = () => {
             ) : (
               <>
                 <div className="space-y-4">
-                  {laws.map((law) => (
-                    <Card key={law.id} className="hover:shadow-lg transition-shadow">
+                  {laws.map((law, idx) => (
+                    <Card key={law.frbrUri || law.id || law.title || idx} className="hover:shadow-lg transition-shadow">
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
@@ -89,12 +90,12 @@ const Laws = () => {
                           </div>
                           <div className="flex gap-2 ml-4">
                             <Button size="sm" variant="outline">
-                              <Eye className="h-4 w-4 mr-1" /> View ({law.viewCount || 0})
+                              <Eye className="h-4 w-4 mr-1" /> View
                             </Button>
                             {law.pdfUrl && (
                               <Button size="sm" variant="outline" asChild>
                                 <a href={law.pdfUrl} target="_blank" rel="noreferrer">
-                                  <Download className="h-4 w-4 mr-1" /> PDF ({law.downloadCount || 0})
+                                  <Download className="h-4 w-4 mr-1" /> PDF
                                 </a>
                               </Button>
                             )}
@@ -126,11 +127,11 @@ const Laws = () => {
                           <p className="text-foreground mb-3 line-clamp-3">{law.summary}</p>
                         )}
 
-                        {law.keywords && law.keywords.length > 0 && (
+                        {law.tags && law.tags.length > 0 && (
                           <div className="flex flex-wrap gap-1 mb-3">
-                            {law.keywords.map((keyword, idx) => (
+                            {law.tags.map((tag, idx) => (
                               <Badge key={idx} variant="outline" className="text-xs">
-                                {keyword}
+                                {tag}
                               </Badge>
                             ))}
                           </div>
@@ -138,11 +139,13 @@ const Laws = () => {
 
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-muted-foreground">
-                            Last updated: {new Date(law.updatedAt).toLocaleDateString()}
+                            {law.lastAmended ? `Last amended: ${new Date(law.lastAmended).toLocaleDateString()}` : (law.enactmentDate ? `Enacted: ${new Date(law.enactmentDate).toLocaleDateString()}` : '')}
                           </div>
-                          <Button variant="ghost" size="sm" className="text-primary">
-                            View Details <ChevronRight className="h-4 w-4 ml-1" />
-                          </Button>
+                          <Link to={`/laws/${law.frbrUri || law.id || ''}`}>
+                            <Button variant="ghost" size="sm" className="text-primary">
+                              View Details <ChevronRight className="h-4 w-4 ml-1" />
+                            </Button>
+                          </Link>
                         </div>
                       </CardContent>
                     </Card>
@@ -195,14 +198,16 @@ const Laws = () => {
                 View the Constitution and constitutional documents of South Sudan
               </p>
               {laws.filter(law => law.type === 'Constitution').map((law) => (
-                <Card key={law.id} className="hover:shadow-lg transition-shadow">
+                <Card key={law.frbrUri || law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <h3 className="text-xl font-semibold mb-2">{law.title}</h3>
                     <p className="text-muted-foreground mb-4">{law.summary}</p>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Eye className="h-4 w-4 mr-1" /> View
-                      </Button>
+                      <Link to={`/laws/${law.frbrUri || law.id || ''}`}>
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" /> View
+                        </Button>
+                      </Link>
                       {law.pdfUrl && (
                         <Button size="sm" variant="default" asChild>
                           <a href={law.pdfUrl} target="_blank" rel="noreferrer">
@@ -247,7 +252,7 @@ const Laws = () => {
                 Recently added or updated laws in the archive
               </p>
               {recentLaws?.map((law) => (
-                <Card key={law.id} className="hover:shadow-lg transition-shadow">
+                <Card key={law.frbrUri || law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -257,7 +262,7 @@ const Laws = () => {
                           {law.year && <Badge variant="outline">{law.year}</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Updated: {new Date(law.updatedAt).toLocaleDateString()}
+                          {law.lastAmended ? `Updated: ${new Date(law.lastAmended).toLocaleDateString()}` : (law.enactmentDate ? `Enacted: ${new Date(law.enactmentDate).toLocaleDateString()}` : '')}
                         </p>
                       </div>
                       <div className="flex gap-2 ml-4">

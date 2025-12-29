@@ -24,14 +24,20 @@ const AdminUploadLaw: React.FC = () => {
     year: new Date().getFullYear(),
     lawNumber: '',
     enactmentDate: '',
+    commencementDate: '',
     category: '',
     jurisdiction: 'South Sudan',
     issuingAuthority: '',
     ministry: '',
+    publisher: '',
     status: 'Active',
     summary: '',
-    keywords: '',
+    tags: '',
     language: 'English',
+    // new fields
+    fullText: '',
+    relatedLaws: '',
+    amendments: '',
   });
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -59,18 +65,24 @@ const AdminUploadLaw: React.FC = () => {
       // Create the law first
       const lawData = {
         ...formData,
-        keywords: formData.keywords.split(',').map(k => k.trim()).filter(k => k),
+        tags: formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         year: Number(formData.year),
+        fullText: formData.fullText || undefined,
+        publisher: formData.publisher || undefined,
+        commencementDate: formData.commencementDate || undefined,
       };
 
       const createdLaw = await createLawMutation.mutateAsync(lawData);
 
       // Upload PDF if provided
-      if (pdfFile && createdLaw.id) {
-        const formData = new FormData();
-        formData.append('file', pdfFile);
+      if (pdfFile && (createdLaw.id || createdLaw.frbrUri)) {
+        const fd = new FormData();
+        fd.append('file', pdfFile);
 
-        await apiClient.post(`/upload/law/${createdLaw.id}`, formData, {
+        const uploadKey = createdLaw.id ?? createdLaw.frbrUri;
+        await apiClient.post(`/upload/law/${uploadKey}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
@@ -167,6 +179,17 @@ const AdminUploadLaw: React.FC = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="commencementDate">Commencement Date</Label>
+                  <Input
+                    id="commencementDate"
+                    name="commencementDate"
+                    type="date"
+                    value={formData.commencementDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div>
                   <Label htmlFor="category">Category</Label>
                   <Input
                     id="category"
@@ -204,6 +227,16 @@ const AdminUploadLaw: React.FC = () => {
                     id="ministry"
                     name="ministry"
                     value={formData.ministry}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="publisher">Publisher</Label>
+                  <Input
+                    id="publisher"
+                    name="publisher"
+                    value={formData.publisher}
                     onChange={handleInputChange}
                   />
                 </div>
@@ -249,13 +282,46 @@ const AdminUploadLaw: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
                   <Input
-                    id="keywords"
-                    name="keywords"
-                    value={formData.keywords}
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
                     onChange={handleInputChange}
                     placeholder="e.g., constitution, rights, governance"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="fullText">Full Text</Label>
+                  <Textarea
+                    id="fullText"
+                    name="fullText"
+                    value={formData.fullText}
+                    onChange={handleInputChange}
+                    rows={6}
+                    placeholder="Full text of the law (optional)"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="relatedLaws">Related Laws (comma-separated)</Label>
+                  <Input
+                    id="relatedLaws"
+                    name="relatedLaws"
+                    value={formData.relatedLaws}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="amendments">Amendments (comma-separated)</Label>
+                  <Input
+                    id="amendments"
+                    name="amendments"
+                    value={formData.amendments}
+                    onChange={handleInputChange}
+                    placeholder="e.g., Act No. 2 of 2015"
                   />
                 </div>
 
