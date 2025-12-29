@@ -1,0 +1,271 @@
+// API Response Types based on backend documentation
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+  error?: string;
+  timestamp?: string;
+}
+
+export interface PaginatedResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: { sorted: boolean };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  first: boolean;
+  numberOfElements: number;
+  size: number;
+  number: number;
+  empty: boolean;
+}
+
+// Auth Types
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  type: string;
+  username: string;
+  email: string;
+  roles: string[];
+}
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  fullName: string;
+  organization?: string;
+  position?: string;
+  roles?: string[];
+}
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  fullName: string;
+  organization?: string;
+  position?: string;
+  roles: string[];
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CurrentUser {
+  username: string;
+  authorities: string[];
+  authenticated: boolean;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}
+
+// Law Types
+export interface Law {
+  id: string;
+  title: string;
+  type: string;
+  year: number;
+  lawNumber?: string;
+  enactmentDate?: string;
+  publicationDate?: string;
+  effectiveDate?: string;
+  category?: string;
+  jurisdiction?: string;
+  issuingAuthority?: string;
+  ministry?: string;
+  status?: string;
+  summary?: string;
+  keywords?: string[];
+  tags?: string[];
+  pdfUrl?: string;
+  sourceUrl?: string;
+  relatedLaws?: string[];
+  amendments?: string[];
+  language?: string;
+  viewCount: number;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLawRequest {
+  title: string;
+  type: string;
+  year: number;
+  lawNumber?: string;
+  enactmentDate?: string;
+  publicationDate?: string;
+  effectiveDate?: string;
+  category?: string;
+  jurisdiction?: string;
+  issuingAuthority?: string;
+  ministry?: string;
+  status?: string;
+  summary?: string;
+  keywords?: string[];
+  tags?: string[];
+  pdfUrl?: string;
+  sourceUrl?: string;
+  relatedLaws?: string[];
+  amendments?: string[];
+  language?: string;
+}
+
+export interface LawStats {
+  totalLaws: number;
+  activeCount: number;
+  repealedCount: number;
+  byYear: Record<string, number>;
+  byType: Record<string, number>;
+  byCategory: Record<string, number>;
+}
+
+// Judgment Types
+export interface Judgment {
+  id: string;
+  caseNumber?: string;
+  caseName: string;
+  courtName: string;
+  courtLevel: string;
+  judges?: string[];
+  judgmentDate?: string;
+  parties?: string;
+  caseType?: string;
+  verdict?: string;
+  summary?: string;
+  legalPrinciples?: string[];
+  citedCases?: string[];
+  citedLaws?: string[];
+  keywords?: string[];
+  tags?: string[];
+  jurisdiction?: string;
+  language?: string;
+  pdfUrl?: string;
+  status?: string;
+  viewCount: number;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJudgmentRequest {
+  caseNumber?: string;
+  caseName: string;
+  courtName: string;
+  courtLevel: string;
+  judges?: string[];
+  judgmentDate?: string;
+  parties?: string;
+  caseType?: string;
+  verdict?: string;
+  summary?: string;
+  legalPrinciples?: string[];
+  citedCases?: string[];
+  citedLaws?: string[];
+  keywords?: string[];
+  tags?: string[];
+  jurisdiction?: string;
+  language?: string;
+  pdfUrl?: string;
+  status?: string;
+}
+
+// Legal Notice Types
+export interface LegalNotice {
+  id: string;
+  noticeNumber?: string;
+  title: string;
+  type: string;
+  publicationDate?: string;
+  issuingAuthority: string;
+  ministry?: string;
+  department?: string;
+  gazetteIssue?: string;
+  effectiveDate?: string;
+  expiryDate?: string;
+  summary?: string;
+  applicableLaws?: string[];
+  keywords?: string[];
+  tags?: string[];
+  jurisdiction?: string;
+  language?: string;
+  pdfUrl?: string;
+  status?: string;
+  viewCount: number;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLegalNoticeRequest {
+  noticeNumber?: string;
+  title: string;
+  type: string;
+  publicationDate?: string;
+  issuingAuthority: string;
+  ministry?: string;
+  department?: string;
+  gazetteIssue?: string;
+  effectiveDate?: string;
+  expiryDate?: string;
+  summary?: string;
+  applicableLaws?: string[];
+  keywords?: string[];
+  tags?: string[];
+  jurisdiction?: string;
+  language?: string;
+  pdfUrl?: string;
+  status?: string;
+}
+
+// Judicial Opinion Types
+export interface JudicialOpinion {
+  id: string;
+  title: string;
+  authorJudge: string;
+  court?: string;
+  publicationDate?: string;
+  topic?: string;
+  summary?: string;
+  keywords?: string[];
+  tags?: string[];
+  pdfUrl?: string;
+  viewCount: number;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Query Parameters
+export interface PaginationParams {
+  page?: number;
+  size?: number;
+  sort?: string;
+}
+
+export interface SearchParams extends PaginationParams {
+  query: string;
+}
+
+export interface DateRangeParams extends PaginationParams {
+  startDate: string;
+  endDate: string;
+}
+
