@@ -28,10 +28,17 @@ const Constitution = () => {
               the framework for rule of law, human rights, and separation of powers.
             </p>
 
-            <Button variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              <span>Download PDF</span>
-            </Button>
+            <a
+              href="/pdfs/SouthSudanConstitution.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                <span>Download PDF</span>
+              </Button>
+            </a>
           </CardContent>
         </Card>
 
