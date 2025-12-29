@@ -20,6 +20,9 @@ import CourtOfAppeal from "./pages/judgments/CourtOfAppeal";
 import HighCourt from "./pages/judgments/HighCourt";
 import Constitution from "./pages/laws/Constitution";
 import Acts from "./pages/laws/Acts";
+import LawDetail from "./pages/laws/LawDetail";
+import JudgmentDetail from "./pages/judgments/JudgmentDetail";
+import NoticeDetail from "./pages/notices/NoticeDetail";
 import JudicialOpinions from "./pages/JudicialOpinions";
 import LegalResources from "./pages/LegalResources";
 import Login from "./pages/Login";
@@ -29,6 +32,9 @@ import AdminUploadLaw from "@/pages/admin/UploadLaw.tsx";
 import AdminDashboard from "@/pages/admin/Dashboard.tsx";
 import AdminUploadJudgment from "@/pages/admin/UploadJudgment.tsx";
 import AdminUploadNotice from "@/pages/admin/UploadNotice.tsx";
+import EditLaw from './pages/admin/EditLaw';
+import EditJudgment from './pages/admin/EditJudgment';
+import EditNotice from './pages/admin/EditNotice';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,8 +71,12 @@ const App = () => (
             <Route path="/judgments/supreme-court" element={<SupremeCourt />} />
             <Route path="/judgments/court-of-appeal" element={<CourtOfAppeal />} />
             <Route path="/judgments/high-court" element={<HighCourt />} />
+            <Route path="/judgments/:id" element={<JudgmentDetail />} />
             <Route path="/laws/constitution" element={<Constitution />} />
             <Route path="/laws/acts" element={<Acts />} />
+            <Route path="/laws/:id" element={<LawDetail />} />
+            <Route path="/notices" element={<LegalNotices />} />
+            <Route path="/notices/:id" element={<NoticeDetail />} />
 
             {/* Admin Routes - Protected */}
             <Route path="/admin/dashboard" element={
@@ -87,6 +97,22 @@ const App = () => (
             <Route path="/admin/upload-notice" element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminUploadNotice />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/admin/edit-law/:id" element={
+              <ProtectedRoute requireAdmin={true}>
+                <EditLaw />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/edit-judgment/:id" element={
+              <ProtectedRoute requireAdmin={true}>
+                <EditJudgment />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/edit-notice/:id" element={
+              <ProtectedRoute requireAdmin={true}>
+                <EditNotice />
               </ProtectedRoute>
             } />
 
