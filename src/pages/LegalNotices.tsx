@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { Search, Filter, Download, Eye, Calendar, FileText, Bell, Archive, Star } from "lucide-react";
+import { Download, Eye, Calendar, FileText, Bell, Archive, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Link } from 'react-router-dom';
 
 const LegalNotices = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
-  
+  const [ , ] = useState("");
+  // selectedType intentionally unused for now; placeholder for future filter UI
+  const [ , ] = useState("all");
+
   const noticeTypes = [
     { id: "appointments", name: "Judicial Appointments", count: 24, icon: Bell },
     { id: "amendments", name: "Legal Amendments", count: 18, icon: FileText },
@@ -24,58 +24,73 @@ const LegalNotices = () => {
   const sampleNotices = [
     {
       id: 1,
+      noticeNumber: "SS/NOTICE/2024/001",
       title: "Appointment of High Court Judge",
       type: "Judicial Appointment",
-      date: "2024-01-15",
-      gazetteNumber: "SS/GOV/2024/001",
-      authority: "Ministry of Justice",
+      publicationDate: "2024-01-15",
+      gazetteIssue: "SS/GOV/2024/001",
+      issuingAuthority: "Ministry of Justice",
       status: "Active",
       priority: "High",
-      description: "Official appointment of Hon. Justice Sarah Wilson to the High Court of South Sudan, effective immediately."
+      description: "Official appointment of Hon. Justice Sarah Wilson to the High Court of South Sudan, effective immediately.",
+      tags: ["appointment","judiciary"],
+      pdfUrl: "/static/sample-notice-1.pdf"
     },
     {
       id: 2,
+      noticeNumber: "SS/NOTICE/2024/002",
       title: "Amendment to Criminal Procedure Rules",
       type: "Legal Amendment",
-      date: "2024-01-10",
-      gazetteNumber: "SS/GOV/2024/002",
-      authority: "Chief Justice",
+      publicationDate: "2024-01-10",
+      gazetteIssue: "SS/GOV/2024/002",
+      issuingAuthority: "Chief Justice",
       status: "Active",
       priority: "Medium",
-      description: "Updates to criminal procedure rules regarding evidence handling and case management."
+      description: "Updates to criminal procedure rules regarding evidence handling and case management.",
+      tags: ["amendment","procedure"],
+      pdfUrl: "/static/sample-notice-2.pdf"
     },
     {
       id: 3,
+      noticeNumber: "SS/NOTICE/2024/003",
       title: "New Commercial Court Regulations",
       type: "Court Rules",
-      date: "2024-01-08",
-      gazetteNumber: "SS/GOV/2024/003",
-      authority: "Judiciary",
+      publicationDate: "2024-01-08",
+      gazetteIssue: "SS/GOV/2024/003",
+      issuingAuthority: "Judiciary",
       status: "Active",
       priority: "Medium",
-      description: "Establishment of new commercial court procedures and filing requirements for business disputes."
+      description: "Establishment of new commercial court procedures and filing requirements for business disputes.",
+      tags: ["regulation","commercial"],
+      pdfUrl: "/static/sample-notice-3.pdf"
     },
     {
       id: 4,
+      noticeNumber: "SS/NOTICE/2024/004",
       title: "Presidential Decree on Land Rights",
       type: "Presidential Proclamation",
-      date: "2024-01-05",
-      gazetteNumber: "SS/GOV/2024/004",
-      authority: "Office of the President",
+      publicationDate: "2024-01-05",
+      gazetteIssue: "SS/GOV/2024/004",
+      issuingAuthority: "Office of the President",
       status: "Active",
       priority: "High",
-      description: "New regulations governing land ownership and transfer procedures in urban areas."
+      description: "New regulations governing land ownership and transfer procedures in urban areas.",
+      tags: ["land","presidential"],
+      pdfUrl: "/static/sample-notice-4.pdf"
     },
     {
       id: 5,
+      noticeNumber: "SS/NOTICE/2024/005",
       title: "Court Fee Schedule Update",
       type: "Court Rules",
-      date: "2024-01-03",
-      gazetteNumber: "SS/GOV/2024/005",
-      authority: "Judiciary",
+      publicationDate: "2024-01-03",
+      gazetteIssue: "SS/GOV/2024/005",
+      issuingAuthority: "Judiciary",
       status: "Active",
       priority: "Low",
-      description: "Revised court filing fees and service charges effective from February 1, 2024."
+      description: "Revised court filing fees and service charges effective from February 1, 2024.",
+      tags: ["court","fees"],
+      pdfUrl: "/static/sample-notice-5.pdf"
     }
   ];
 
@@ -120,9 +135,9 @@ const LegalNotices = () => {
                         </h3>
                         <div className="flex flex-wrap gap-2 mb-3">
                           <Badge variant="secondary">{notice.type}</Badge>
-                          <Badge variant="outline">{notice.gazetteNumber}</Badge>
-                          <Badge variant="outline">{notice.authority}</Badge>
-                          <Badge 
+                          {notice.gazetteIssue && <Badge variant="outline">{notice.gazetteIssue}</Badge>}
+                          {notice.issuingAuthority && <Badge variant="outline">{notice.issuingAuthority}</Badge>}
+                          <Badge
                             className={
                               notice.priority === "High" 
                                 ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
@@ -134,27 +149,46 @@ const LegalNotices = () => {
                             {notice.priority} Priority
                           </Badge>
                         </div>
+
+                        {notice.tags && notice.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {notice.tags.map((t, i) => <Badge key={i} variant="outline" className="text-xs">{t}</Badge>)}
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-2 ml-4">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-1" />
-                          PDF
-                        </Button>
+                        <Link to={`/notices/${notice.id}`}>
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </Link>
+                        {notice.pdfUrl ? (
+                          <a href={notice.pdfUrl} target="_blank" rel="noreferrer">
+                            <Button size="sm" variant="outline">
+                              <Download className="h-4 w-4 mr-1" />
+                              PDF
+                            </Button>
+                          </a>
+                        ) : (
+                          <Link to={`/notices/${notice.id}`}>
+                            <Button size="sm" variant="outline">
+                              <Download className="h-4 w-4 mr-1" />
+                              PDF
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>Published: {notice.date}</span>
+                        <span>Published: {notice.publicationDate}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
-                        <span>Authority: {notice.authority}</span>
+                        <span>Authority: {notice.issuingAuthority}</span>
                       </div>
                     </div>
                     
@@ -231,7 +265,7 @@ const LegalNotices = () => {
                       <div className="flex-1">
                         <h4 className="font-medium">{notice.title}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {notice.type} • {notice.date}
+                          {notice.type} • {notice.publicationDate}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -255,3 +289,4 @@ const LegalNotices = () => {
 };
 
 export default LegalNotices;
+
