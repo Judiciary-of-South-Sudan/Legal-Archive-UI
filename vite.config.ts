@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   base: "/", // ✅ crucial for Netlify deployment and correct route resolution
   server: {
     host: "::",
-    port: 8080,
+    port: 5173,
   },
   plugins: [
     react(),
