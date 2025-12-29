@@ -1,48 +1,29 @@
 import { useState } from "react";
-import { Search, Filter, Download, Eye, Calendar, Gavel } from "lucide-react";
+import { Search, Filter, Download, Eye, Calendar, Gavel, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useGetJudgments, useGetJudgmentsByCourtLevel } from "@/hooks/useJudgments";
 
 const Judgments = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const sampleJudgments = [
-    {
-      id: 1,
-      title: "Republic v. John Doe",
-      court: "Supreme Court",
-      date: "2024-01-15",
-      judge: "Hon. Justice Mary Smith",
-      category: "Criminal Law",
-      citation: "[2024] SSSC 001",
-      summary: "Case involving constitutional interpretation of due process rights in criminal proceedings."
-    },
-    {
-      id: 2,
-      title: "ABC Corporation v. XYZ Limited",
-      court: "High Court",
-      date: "2024-01-10",
-      judge: "Hon. Justice Peter Johnson",
-      category: "Commercial Law",
-      citation: "[2024] SSHC 005",
-      summary: "Contract dispute regarding breach of commercial agreement and damages."
-    },
-    {
-      id: 3,
-      title: "State v. Jane Smith",
-      court: "Court of Appeal",
-      date: "2024-01-08",
-      judge: "Hon. Justice David Wilson",
-      category: "Criminal Law",
-      citation: "[2024] SSCA 002",
-      summary: "Appeal against conviction for fraud and sentencing guidelines."
-    }
-  ];
+  const [courtLevel, setCourtLevel] = useState<string>("all");
+  const [page, setPage] = useState(0);
+  const size = 10;
+
+  // Fetch judgments based on court level filter
+  const { data: judgmentsData, isLoading, error } = courtLevel === "all"
+    ? useGetJudgments({ page, size, sort: 'judgmentDate,desc' })
+    : useGetJudgmentsByCourtLevel(courtLevel, { page, size, sort: 'judgmentDate,desc' });
+
+  const judgments = judgmentsData?.content || [];
+  const totalPages = judgmentsData?.totalPages || 1;
+  const totalElements = judgmentsData?.totalElements || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -73,16 +54,15 @@ const Judgments = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select>
+              <Select value={courtLevel} onValueChange={setCourtLevel}>
                 <SelectTrigger>
                   <SelectValue placeholder="Court" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Courts</SelectItem>
-                  <SelectItem value="supreme">Supreme Court</SelectItem>
-                  <SelectItem value="appeal">Court of Appeal</SelectItem>
-                  <SelectItem value="high">High Court</SelectItem>
-                  <SelectItem value="county">County Courts</SelectItem>
+                  <SelectItem value="Supreme Court">Supreme Court</SelectItem>
+                  <SelectItem value="Court of Appeal">Court of Appeal</SelectItem>
+                  <SelectItem value="High Court">High Court</SelectItem>
                 </SelectContent>
               </Select>
               <Select>
@@ -113,60 +93,148 @@ const Judgments = () => {
         </Card>
 
         {/* Results */}
-        <div className="space-y-6">
-          {sampleJudgments.map((judgment) => (
-            <Card key={judgment.id} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {judgment.title}
-                    </h3>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge variant="secondary">{judgment.court}</Badge>
-                      <Badge variant="outline">{judgment.category}</Badge>
-                      <Badge variant="outline">{judgment.citation}</Badge>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    <Button size="sm" variant="outline">
-                      <Download className="h-4 w-4 mr-1" />
-                      PDF
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>Date: {judgment.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Gavel className="h-4 w-4" />
-                    <span>Judge: {judgment.judge}</span>
-                  </div>
-                </div>
-                
-                <p className="text-foreground">{judgment.summary}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>
+              Failed to load judgments. Please check your connection to the backend.
+            </AlertDescription>
+          </Alert>
+        )}
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-8">
-          <div className="flex gap-2">
-            <Button variant="outline" disabled>Previous</Button>
-            <Button variant="outline" className="bg-primary text-primary-foreground">1</Button>
-            <Button variant="outline">2</Button>
-            <Button variant="outline">3</Button>
-            <Button variant="outline">Next</Button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Loading judgments...</span>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="space-y-6">
+              {judgments.map((judgment) => (
+                <Card key={judgment.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">
+                          {judgment.caseName}
+                        </h3>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="secondary">{judgment.courtLevel}</Badge>
+                          {judgment.caseType && <Badge variant="outline">{judgment.caseType}</Badge>}
+                          {judgment.caseNumber && <Badge variant="outline">{judgment.caseNumber}</Badge>}
+                          {judgment.status && (
+                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                              {judgment.status}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View ({judgment.viewCount || 0})
+                        </Button>
+                        {judgment.pdfUrl && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={judgment.pdfUrl} target="_blank" rel="noreferrer">
+                              <Download className="h-4 w-4 mr-1" />
+                              PDF ({judgment.downloadCount || 0})
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-muted-foreground">
+                      {judgment.judgmentDate && (
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>Date: {new Date(judgment.judgmentDate).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                      {judgment.judges && judgment.judges.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Gavel className="h-4 w-4" />
+                          <span>Judges: {judgment.judges.join(', ')}</span>
+                        </div>
+                      )}
+                      {judgment.courtName && (
+                        <div className="flex items-center gap-2">
+                          <span>Court: {judgment.courtName}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {judgment.parties && (
+                      <p className="text-sm font-medium mb-2">Parties: {judgment.parties}</p>
+                    )}
+
+                    {judgment.summary && (
+                      <p className="text-foreground mb-3 line-clamp-3">{judgment.summary}</p>
+                    )}
+
+                    {judgment.verdict && (
+                      <p className="text-sm font-medium text-primary mb-2">Verdict: {judgment.verdict}</p>
+                    )}
+
+                    {judgment.keywords && judgment.keywords.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {judgment.keywords.map((keyword, idx) => (
+                          <Badge key={idx} variant="outline" className="text-xs">
+                            {keyword}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="text-xs text-muted-foreground">
+                        Last updated: {new Date(judgment.updatedAt).toLocaleDateString()}
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-primary">
+                        View Full Details <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {judgments.length === 0 && (
+                <div className="text-center py-12">
+                  <Gavel className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No judgments found.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-8">
+                <div className="text-sm text-muted-foreground">
+                  Showing {page * size + 1} to {Math.min((page + 1) * size, totalElements)} of {totalElements} judgments
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage(p => Math.max(0, p - 1))}
+                    disabled={page <= 0}
+                  >
+                    Previous
+                  </Button>
+                  <span className="flex items-center px-4">
+                    Page {page + 1} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage(p => p + 1)}
+                    disabled={page >= totalPages - 1}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </main>
 
       <Footer />
@@ -175,3 +243,4 @@ const Judgments = () => {
 };
 
 export default Judgments;
+

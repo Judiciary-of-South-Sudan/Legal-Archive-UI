@@ -1,27 +1,32 @@
 import { useState } from "react";
-import { Eye, Download, FileText, Calendar, BookOpen, ChevronRight } from "lucide-react";
+import { Eye, Download, FileText, Calendar, BookOpen, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useLocalLaws } from "@/hooks/useLocalLaws";
+import { useGetLaws, useGetLawCategories, useGetRecentLaws } from "@/hooks/useLaws";
 
 const Laws = () => {
-  const [q, setQ] = useState("");
-  const [year, setYear] = useState<string>("");
-  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const size = 10;
 
-  const { items, total, size, loading, error, categories } = useLocalLaws({
-    q,
-    year,
-    page,
-    size: 10,
-  });
+  // Fetch laws with pagination
+  const { data: lawsData, isLoading, error } = useGetLaws({ page, size, sort: 'year,desc' });
 
-  const maxPage = Math.max(1, Math.ceil(total / size));
+  // Fetch categories
+  const { data: categories } = useGetLawCategories();
+
+  // Fetch recent laws
+  const { data: recentLaws } = useGetRecentLaws(10);
+
+  const laws = lawsData?.content || [];
+  const totalPages = lawsData?.totalPages || 1;
+  const totalElements = lawsData?.totalElements || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,45 +49,221 @@ const Laws = () => {
           <TabsContent value="browse" className="space-y-6">
             <SearchBar
               placeholder="Search laws by title, citation, or keywords..."
-              onSearch={(query) => { setPage(1); setQ(query || ""); }}
+              onSearch={(query) => {
+                setPage(0);
+                setSearchQuery(query || "");
+              }}
             />
 
-            <div className="max-w-sm">
-              <input
-                className="border rounded px-3 py-2 w-full"
-                placeholder="Year (e.g. 2011)"
-                value={year}
-                onChange={(e) => { setPage(1); setYear(e.target.value); }}
-              />
-            </div>
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Failed to load laws. Please check your connection to the backend.
+                </AlertDescription>
+              </Alert>
+            )}
 
-            {loading && <div>Loading…</div>}
-            {error && <div className="text-red-600">Failed to load laws.json</div>}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2">Loading laws...</span>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  {laws.map((law) => (
+                    <Card key={law.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-foreground mb-2">{law.title}</h3>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Badge variant="secondary">{law.type}</Badge>
+                              {law.category && <Badge variant="outline">{law.category}</Badge>}
+                              {law.year && <Badge variant="outline">{law.year}</Badge>}
+                              {law.lawNumber && <Badge variant="outline">{law.lawNumber}</Badge>}
+                              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                                {law.status || "Active"}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <Button size="sm" variant="outline">
+                              <Eye className="h-4 w-4 mr-1" /> View ({law.viewCount || 0})
+                            </Button>
+                            {law.pdfUrl && (
+                              <Button size="sm" variant="outline" asChild>
+                                <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                                  <Download className="h-4 w-4 mr-1" /> PDF ({law.downloadCount || 0})
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-muted-foreground">
+                          {law.enactmentDate && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              <span>Enacted: {new Date(law.enactmentDate).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          {law.jurisdiction && (
+                            <div className="flex items-center gap-2">
+                              <BookOpen className="h-4 w-4" />
+                              <span>Jurisdiction: {law.jurisdiction}</span>
+                            </div>
+                          )}
+                          {law.issuingAuthority && (
+                            <div className="flex items-center gap-2">
+                              <FileText className="h-4 w-4" />
+                              <span>{law.issuingAuthority}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {law.summary && (
+                          <p className="text-foreground mb-3 line-clamp-3">{law.summary}</p>
+                        )}
+
+                        {law.keywords && law.keywords.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {law.keywords.map((keyword, idx) => (
+                              <Badge key={idx} variant="outline" className="text-xs">
+                                {keyword}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs text-muted-foreground">
+                            Last updated: {new Date(law.updatedAt).toLocaleDateString()}
+                          </div>
+                          <Button variant="ghost" size="sm" className="text-primary">
+                            View Details <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {!isLoading && laws.length === 0 && (
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No laws found.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4">
+                    <div className="text-sm text-muted-foreground">
+                      Showing {page * size + 1} to {Math.min((page + 1) * size, totalElements)} of {totalElements} laws
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(p => Math.max(0, p - 1))}
+                        disabled={page <= 0}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm">
+                        Page {page + 1} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={page >= totalPages - 1}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="constitution">
             <div className="space-y-4">
-              {items.map((law) => (
+              <p className="text-muted-foreground mb-4">
+                View the Constitution and constitutional documents of South Sudan
+              </p>
+              {laws.filter(law => law.type === 'Constitution').map((law) => (
                 <Card key={law.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold mb-2">{law.title}</h3>
+                    <p className="text-muted-foreground mb-4">{law.summary}</p>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4 mr-1" /> View
+                      </Button>
+                      {law.pdfUrl && (
+                        <Button size="sm" variant="default" asChild>
+                          <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                            <Download className="h-4 w-4 mr-1" /> Download PDF
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="categories">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categories?.map((category) => (
+                <Card key={category} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <FileText className="h-8 w-8 text-primary" />
+                      <Badge variant="secondary">{category}</Badge>
+                    </div>
+                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                      {category}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Browse laws in this category
+                    </p>
+                    <Button variant="ghost" size="sm" className="text-primary">
+                      View Laws <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="recent">
+            <div className="space-y-4">
+              <p className="text-muted-foreground mb-4">
+                Recently added or updated laws in the archive
+              </p>
+              {recentLaws?.map((law) => (
+                <Card key={law.id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">{law.title}</h3>
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{law.title}</h3>
+                        <div className="flex flex-wrap gap-2 mb-2">
                           <Badge variant="secondary">{law.type}</Badge>
-                          {law.category && <Badge variant="outline">{law.category}</Badge>}
                           {law.year && <Badge variant="outline">{law.year}</Badge>}
-                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                            {law.status ?? "Published"}
-                          </Badge>
                         </div>
+                        <p className="text-sm text-muted-foreground">
+                          Updated: {new Date(law.updatedAt).toLocaleDateString()}
+                        </p>
                       </div>
                       <div className="flex gap-2 ml-4">
-                        {law.htmlUrl && (
-                          <Button size="sm" variant="outline" asChild>
-                            <a href={law.htmlUrl} target="_blank" rel="noreferrer">
-                              <Eye className="h-4 w-4 mr-1" /> View
-                            </a>
-                          </Button>
-                        )}
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-4 w-4 mr-1" /> View
+                        </Button>
                         {law.pdfUrl && (
                           <Button size="sm" variant="outline" asChild>
                             <a href={law.pdfUrl} target="_blank" rel="noreferrer">
@@ -92,67 +273,10 @@ const Laws = () => {
                         )}
                       </div>
                     </div>
-
-                    {law.summary && (
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2"><BookOpen className="h-4 w-4" /><span>Sections: {law.sections ?? "—"}</span></div>
-                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4" /><span>Last Amended: {law.lastAmended ?? "—"}</span></div>
-                        <div className="flex items-center gap-2"><FileText className="h-4 w-4" /><span>FRBR: {law.frbrUri ?? "—"}</span></div>
-                      </div>
-                    )}
-
-                    <p className="text-foreground mb-3">{law.summary}</p>
-
-                    <div className="flex items-center justify-between">
-                      <Button variant="ghost" size="sm" className="text-primary" asChild>
-                        <a href={law.pdfUrl || law.htmlUrl || "#"} target="_blank" rel="noreferrer">
-                          View Details <ChevronRight className="h-4 w-4 ml-1" />
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              {!loading && total === 0 && <div className="text-sm text-slate-600">No laws found.</div>}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex items-center gap-2 pt-4">
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>Prev</Button>
-              <span className="text-sm">Page {page} / {maxPage}</span>
-              <Button variant="outline" size="sm" onClick={() => setPage((p) => (p < maxPage ? p + 1 : p))} disabled={page >= maxPage || total === 0}>Next</Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="constitution">
-            {/* Example: show constitution item if present */}
-            {/* You can filter items or search in useLocalLaws for title includes 'Constitution' */}
-          </TabsContent>
-
-          <TabsContent value="categories">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categories.map((c) => (
-                <Card key={c.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <FileText className="h-8 w-8 text-primary" />
-                      <Badge variant="secondary">{c.count}</Badge>
-                    </div>
-                    <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                      {c.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Browse {c.count} laws in this category
-                    </p>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="recent">
-            {/* Later you can compute recency by lastAmended/year and sort locally */}
           </TabsContent>
         </Tabs>
       </main>
