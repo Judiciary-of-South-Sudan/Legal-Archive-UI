@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,12 +12,14 @@ import PdfViewer from '@/components/PdfViewer';
 const LawDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: law, isLoading, error } = useGetLawById(id || '');
-  const incrementView = useIncrementLawView();
+  const { mutate: incrementView } = useIncrementLawView();
+  const countedViewForId = useRef<string | null>(null);
   const [showPdf, setShowPdf] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      incrementView.mutate(id);
+    if (id && countedViewForId.current !== id) {
+      countedViewForId.current = id;
+      incrementView(id);
     }
   }, [id, incrementView]);
 
