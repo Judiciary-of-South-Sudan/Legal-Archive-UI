@@ -1,21 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Download, Calendar, BookOpen } from 'lucide-react';
+import { FileText, Download, Calendar, BookOpen, ExternalLink } from 'lucide-react';
 import { useGetLawById, useIncrementLawView } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
-import PdfViewer from '@/components/PdfViewer';
 
 const LawDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: law, isLoading, error } = useGetLawById(id || '');
   const { mutate: incrementView } = useIncrementLawView();
   const countedViewForId = useRef<string | null>(null);
-  const [showPdf, setShowPdf] = useState(false);
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
@@ -60,77 +58,70 @@ const LawDetail: React.FC = () => {
     );
   }
 
+  const pdfUrl = resolveFileUrl(law.pdfUrl);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{law.title}</h1>
-          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" /> {law.enactmentDate ? new Date(law.enactmentDate).toLocaleDateString() : '-'}
-            </span>
-            <span className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" /> {law.jurisdiction || '-'}
-            </span>
-            <span className="flex items-center gap-2">
-              <FileText className="h-4 w-4" /> {law.issuingAuthority || '-'}
-            </span>
-          </div>
-        </div>
-
+      <main className="container mx-auto px-4 py-8 space-y-4">
+        {/* Metadata card */}
         <Card>
           <CardContent className="p-6">
+            <h1 className="text-3xl font-bold text-foreground mb-3">{law.title}</h1>
+
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                {law.enactmentDate ? new Date(law.enactmentDate).toLocaleDateString() : '—'}
+              </span>
+              <span className="flex items-center gap-1">
+                <BookOpen className="h-4 w-4" /> {law.jurisdiction || '—'}
+              </span>
+              <span className="flex items-center gap-1">
+                <FileText className="h-4 w-4" /> {law.issuingAuthority || '—'}
+              </span>
+            </div>
+
             {law.summary && <p className="mb-4 text-foreground">{law.summary}</p>}
 
             {law.tags && law.tags.length > 0 && (
               <div className="mb-4">
                 <h4 className="text-sm font-semibold mb-1">Tags</h4>
                 <div className="flex flex-wrap gap-2">
-                  {law.tags.map((tag, index) => (
-                    <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded">{tag}</span>
+                  {law.tags.map((tag, i) => (
+                    <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">{tag}</span>
                   ))}
                 </div>
               </div>
             )}
 
             {law.lastAmended && (
-              <div className="mb-4 text-sm text-muted-foreground">
+              <p className="mb-4 text-sm text-muted-foreground">
                 Last amended: {new Date(law.lastAmended).toLocaleDateString()}
-              </div>
+              </p>
             )}
 
-            <div className="flex items-center gap-3 mt-4">
-              {law.pdfUrl ? (
+            <div className="flex flex-wrap items-center gap-3">
+              {pdfUrl ? (
                 <>
                   <Button asChild>
-                    <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
+                    <Link to={`/laws/${id}/document`}>
+                      <ExternalLink className="h-4 w-4 mr-1" /> View Document
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <a href={pdfUrl} target="_blank" rel="noreferrer" download>
                       <Download className="h-4 w-4 mr-1" /> Download PDF
                     </a>
                   </Button>
-                  <Button variant="outline" onClick={() => setShowPdf(true)}>
-                    View PDF
-                  </Button>
                 </>
               ) : (
-                <Button variant="outline" disabled>
-                  No PDF available
-                </Button>
+                <Button variant="outline" disabled>No PDF available</Button>
               )}
-
               <Link to="/laws">
                 <Button variant="ghost">Back to Laws</Button>
               </Link>
             </div>
-
-            {showPdf && law.pdfUrl && (
-              <PdfViewer
-                url={resolveFileUrl(law.pdfUrl)!}
-                title={law.title}
-                height="80vh"
-                onClose={() => setShowPdf(false)}
-              />
-            )}
           </CardContent>
         </Card>
       </main>
