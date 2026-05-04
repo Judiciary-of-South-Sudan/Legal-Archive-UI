@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,10 +11,14 @@ import { Loader2 } from 'lucide-react';
 const JudgmentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: judgment, isLoading, error } = useGetJudgmentById(id || '');
-  const incrementView = useIncrementJudgmentView();
+  const { mutate: incrementView } = useIncrementJudgmentView();
+  const countedViewForId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (id) incrementView.mutate(id);
+    if (id && countedViewForId.current !== id) {
+      countedViewForId.current = id;
+      incrementView(id);
+    }
   }, [id, incrementView]);
 
   if (isLoading) {
@@ -91,4 +95,3 @@ const JudgmentDetail: React.FC = () => {
 };
 
 export default JudgmentDetail;
-
