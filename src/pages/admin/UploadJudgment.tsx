@@ -12,7 +12,7 @@ import { Loader2, Upload, Gavel } from 'lucide-react';
 import { useCreateJudgment } from '@/hooks/useJudgments';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient';
-import { CreateJudgmentRequest, Judgment } from '@/types/api';
+import { ApiResponse, CreateJudgmentRequest, Judgment } from '@/types/api';
 
 const AdminUploadJudgment: React.FC = () => {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ const AdminUploadJudgment: React.FC = () => {
         fd.append('file', pdfFile);
         // use id or frbrUri as fallback for upload route
         const uploadKey = created.id ?? created.frbrUri;
-        await apiClient.post(`/upload/judgment/${uploadKey}`, fd, {
+        await apiClient.post<ApiResponse<Judgment>>(`/upload/judgment/${uploadKey}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         toast.success('Judgment and PDF uploaded successfully');
@@ -234,4 +234,3 @@ const AdminUploadJudgment: React.FC = () => {
 };
 
 export default AdminUploadJudgment;
-
