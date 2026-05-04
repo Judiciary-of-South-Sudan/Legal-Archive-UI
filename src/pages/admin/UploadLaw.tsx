@@ -13,6 +13,7 @@ import { Loader2, Upload, FileText } from 'lucide-react';
 import { useCreateLaw } from '@/hooks/useLaws';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient';
+import { ApiResponse, Law } from '@/types/api';
 
 const AdminUploadLaw: React.FC = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const AdminUploadLaw: React.FC = () => {
         fd.append('file', pdfFile);
 
         const uploadKey = createdLaw.id ?? createdLaw.frbrUri;
-        await apiClient.post(`/upload/law/${uploadKey}`, fd, {
+        await apiClient.post<ApiResponse<Law>>(`/upload/law/${uploadKey}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
@@ -373,4 +374,3 @@ const AdminUploadLaw: React.FC = () => {
 };
 
 export default AdminUploadLaw;
-
