@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Upload, FileWarning } from 'lucide-react';
 import { useGetNoticeById, useUpdateNotice } from '@/hooks/useNotices';
 import apiClient from '@/lib/apiClient';
-import { CreateLegalNoticeRequest } from '@/types/api';
+import { ApiResponse, CreateLegalNoticeRequest, LegalNotice } from '@/types/api';
 import { toast } from 'sonner';
 
 interface EditNoticeForm {
@@ -95,7 +95,7 @@ const EditNotice: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post(`/upload/notice/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await apiClient.post<ApiResponse<LegalNotice>>(`/upload/notice/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('PDF uploaded');
       }
 
@@ -228,4 +228,3 @@ const EditNotice: React.FC = () => {
 };
 
 export default EditNotice;
-
