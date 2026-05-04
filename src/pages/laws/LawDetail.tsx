@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Download, Calendar, BookOpen } from 'lucide-react';
 import { useGetLawById, useIncrementLawView } from '@/hooks/useLaws';
+import { resolveFileUrl } from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
 import PdfViewer from '@/components/PdfViewer';
 
@@ -103,7 +104,7 @@ const LawDetail: React.FC = () => {
               {law.pdfUrl ? (
                 <>
                   <Button asChild>
-                    <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                    <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
                       <Download className="h-4 w-4 mr-1" /> Download PDF
                     </a>
                   </Button>
@@ -124,7 +125,7 @@ const LawDetail: React.FC = () => {
 
             {showPdf && law.pdfUrl && (
               <PdfViewer
-                url={law.pdfUrl}
+                url={resolveFileUrl(law.pdfUrl)!}
                 title={law.title}
                 height="80vh"
                 onClose={() => setShowPdf(false)}
