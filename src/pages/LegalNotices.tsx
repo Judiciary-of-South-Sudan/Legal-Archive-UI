@@ -1,103 +1,41 @@
 import { useState } from "react";
-import { Download, Eye, Calendar, FileText, Bell, Archive, Star } from "lucide-react";
+import { Download, Eye, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { useGetNotices, useSearchNotices } from "@/hooks/useNotices";
 
 const LegalNotices = () => {
-  const [ , ] = useState("");
-  // selectedType intentionally unused for now; placeholder for future filter UI
-  const [ , ] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const size = 10;
+
+  const listQuery = useGetNotices({ page, size, sort: "publicationDate,desc" });
+  const searchQueryResult = useSearchNotices({ query: searchQuery, page, size, sort: "publicationDate,desc" });
+
+  const activeQuery = searchQuery ? searchQueryResult : listQuery;
+  const noticesData = activeQuery.data;
+  const notices = noticesData?.content || [];
+  const totalPages = noticesData?.totalPages || 1;
+  const totalElements = noticesData?.totalElements || 0;
 
   const noticeTypes = [
-    { id: "appointments", name: "Judicial Appointments", count: 24, icon: Bell },
-    { id: "amendments", name: "Legal Amendments", count: 18, icon: FileText },
-    { id: "regulations", name: "Court Regulations", count: 15, icon: Archive },
-    { id: "proclamations", name: "Presidential Proclamations", count: 12, icon: Star }
-  ];
-  
-  const sampleNotices = [
-    {
-      id: 1,
-      noticeNumber: "SS/NOTICE/2024/001",
-      title: "Appointment of High Court Judge",
-      type: "Judicial Appointment",
-      publicationDate: "2024-01-15",
-      gazetteIssue: "SS/GOV/2024/001",
-      issuingAuthority: "Ministry of Justice",
-      status: "Active",
-      priority: "High",
-      description: "Official appointment of Hon. Justice Sarah Wilson to the High Court of South Sudan, effective immediately.",
-      tags: ["appointment","judiciary"],
-      pdfUrl: "/static/sample-notice-1.pdf"
-    },
-    {
-      id: 2,
-      noticeNumber: "SS/NOTICE/2024/002",
-      title: "Amendment to Criminal Procedure Rules",
-      type: "Legal Amendment",
-      publicationDate: "2024-01-10",
-      gazetteIssue: "SS/GOV/2024/002",
-      issuingAuthority: "Chief Justice",
-      status: "Active",
-      priority: "Medium",
-      description: "Updates to criminal procedure rules regarding evidence handling and case management.",
-      tags: ["amendment","procedure"],
-      pdfUrl: "/static/sample-notice-2.pdf"
-    },
-    {
-      id: 3,
-      noticeNumber: "SS/NOTICE/2024/003",
-      title: "New Commercial Court Regulations",
-      type: "Court Rules",
-      publicationDate: "2024-01-08",
-      gazetteIssue: "SS/GOV/2024/003",
-      issuingAuthority: "Judiciary",
-      status: "Active",
-      priority: "Medium",
-      description: "Establishment of new commercial court procedures and filing requirements for business disputes.",
-      tags: ["regulation","commercial"],
-      pdfUrl: "/static/sample-notice-3.pdf"
-    },
-    {
-      id: 4,
-      noticeNumber: "SS/NOTICE/2024/004",
-      title: "Presidential Decree on Land Rights",
-      type: "Presidential Proclamation",
-      publicationDate: "2024-01-05",
-      gazetteIssue: "SS/GOV/2024/004",
-      issuingAuthority: "Office of the President",
-      status: "Active",
-      priority: "High",
-      description: "New regulations governing land ownership and transfer procedures in urban areas.",
-      tags: ["land","presidential"],
-      pdfUrl: "/static/sample-notice-4.pdf"
-    },
-    {
-      id: 5,
-      noticeNumber: "SS/NOTICE/2024/005",
-      title: "Court Fee Schedule Update",
-      type: "Court Rules",
-      publicationDate: "2024-01-03",
-      gazetteIssue: "SS/GOV/2024/005",
-      issuingAuthority: "Judiciary",
-      status: "Active",
-      priority: "Low",
-      description: "Revised court filing fees and service charges effective from February 1, 2024.",
-      tags: ["court","fees"],
-      pdfUrl: "/static/sample-notice-5.pdf"
-    }
+    { id: "appointments", name: "Judicial Appointments", count: notices.filter((notice) => notice.type?.includes("Appointment")).length, icon: Bell },
+    { id: "amendments", name: "Legal Amendments", count: notices.filter((notice) => notice.type?.includes("Amendment")).length, icon: FileText },
+    { id: "regulations", name: "Court Regulations", count: notices.filter((notice) => notice.type?.includes("Regulation") || notice.type?.includes("Rule")).length, icon: Archive },
+    { id: "proclamations", name: "Presidential Proclamations", count: notices.filter((notice) => notice.type?.includes("Proclamation")).length, icon: Star },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-4">Legal Notices & Gazette</h1>
@@ -113,114 +51,162 @@ const LegalNotices = () => {
             <TabsTrigger value="gazette">Gazette Archive</TabsTrigger>
             <TabsTrigger value="recent">Recent Updates</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="notices" className="space-y-6">
-            {/* Enhanced Search */}
-            <SearchBar 
+            <SearchBar
               placeholder="Search legal notices by title, gazette number, or authority..."
-              onSearch={(query, filters) => {
-                console.log("Search:", query, filters);
+              onSearch={(query) => {
+                setPage(0);
+                setSearchQuery(query || "");
               }}
             />
 
-            {/* Enhanced Results */}
-            <div className="space-y-4">
-              {sampleNotices.map((notice) => (
-                <Card key={notice.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">
-                          {notice.title}
-                        </h3>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="secondary">{notice.type}</Badge>
-                          {notice.gazetteIssue && <Badge variant="outline">{notice.gazetteIssue}</Badge>}
-                          {notice.issuingAuthority && <Badge variant="outline">{notice.issuingAuthority}</Badge>}
-                          <Badge
-                            className={
-                              notice.priority === "High" 
-                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                                : notice.priority === "Medium"
-                                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
-                                : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-                            }
-                          >
-                            {notice.priority} Priority
-                          </Badge>
+            {activeQuery.error && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  Failed to load legal notices. Please check your connection to the backend.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {activeQuery.isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2">Loading notices...</span>
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  {notices.map((notice) => (
+                    <Card key={notice.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-foreground mb-2">
+                              {notice.title}
+                            </h3>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Badge variant="secondary">{notice.type}</Badge>
+                              {notice.gazetteIssue && <Badge variant="outline">{notice.gazetteIssue}</Badge>}
+                              {notice.issuingAuthority && <Badge variant="outline">{notice.issuingAuthority}</Badge>}
+                              {notice.status && (
+                                <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+                                  {notice.status}
+                                </Badge>
+                              )}
+                            </div>
+
+                            {notice.tags && notice.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-3">
+                                {notice.tags.map((tag, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <Link to={`/notices/${notice.id}`}>
+                              <Button size="sm" variant="outline">
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Button>
+                            </Link>
+                            {notice.pdfUrl && (
+                              <Button size="sm" variant="outline" asChild>
+                                <a href={notice.pdfUrl} target="_blank" rel="noreferrer">
+                                  <Download className="h-4 w-4 mr-1" />
+                                  PDF
+                                </a>
+                              </Button>
+                            )}
+                          </div>
                         </div>
 
-                        {notice.tags && notice.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {notice.tags.map((t, i) => <Badge key={i} variant="outline" className="text-xs">{t}</Badge>)}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-muted-foreground">
+                          {notice.publicationDate && (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4" />
+                              <span>Published: {new Date(notice.publicationDate).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            <span>Authority: {notice.issuingAuthority}</span>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2 ml-4">
-                        <Link to={`/notices/${notice.id}`}>
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
-                        </Link>
-                        {notice.pdfUrl ? (
-                          <a href={notice.pdfUrl} target="_blank" rel="noreferrer">
-                            <Button size="sm" variant="outline">
-                              <Download className="h-4 w-4 mr-1" />
-                              PDF
-                            </Button>
-                          </a>
-                        ) : (
+                        </div>
+
+                        {notice.summary && <p className="text-foreground mb-4 line-clamp-3">{notice.summary}</p>}
+
+                        <div className="flex justify-end">
                           <Link to={`/notices/${notice.id}`}>
-                            <Button size="sm" variant="outline">
-                              <Download className="h-4 w-4 mr-1" />
-                              PDF
+                            <Button variant="ghost" size="sm" className="text-primary">
+                              View Details <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                           </Link>
-                        )}
-                      </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {notices.length === 0 && (
+                    <div className="text-center py-12">
+                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">No legal notices found.</p>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Published: {notice.publicationDate}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        <span>Authority: {notice.issuingAuthority}</span>
-                      </div>
+                  )}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4">
+                    <div className="text-sm text-muted-foreground">
+                      Showing {page * size + 1} to {Math.min((page + 1) * size, totalElements)} of {totalElements} notices
                     </div>
-                    
-                    <p className="text-foreground">{notice.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((currentPage) => Math.max(0, currentPage - 1))}
+                        disabled={page <= 0}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm">
+                        Page {page + 1} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((currentPage) => currentPage + 1)}
+                        disabled={page >= totalPages - 1}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </TabsContent>
-          
+
           <TabsContent value="types">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {noticeTypes.map((type) => {
                 const IconComponent = type.icon;
                 return (
-                  <Card key={type.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                  <Card key={type.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-6 text-center">
                       <IconComponent className="h-12 w-12 text-primary mx-auto mb-4" />
-                      <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
-                        {type.name}
-                      </h3>
+                      <h3 className="font-semibold text-lg mb-2">{type.name}</h3>
                       <Badge variant="secondary" className="mb-4">{type.count} Notices</Badge>
-                      <Button variant="outline" size="sm" className="w-full">
-                        View All
-                      </Button>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
           </TabsContent>
-          
+
           <TabsContent value="gazette">
             <Card>
               <CardHeader>
@@ -230,26 +216,13 @@ const LegalNotices = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Access historical gazette publications and official government notices.
+                <p className="text-muted-foreground">
+                  Gazette entries are loaded from the same legal notice API and can be found using search or the all notices list.
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {["2024", "2023", "2022", "2021", "2020", "2019"].map((year) => (
-                    <Card key={year} className="hover:shadow-md transition-shadow cursor-pointer">
-                      <CardContent className="p-4 text-center">
-                        <h4 className="font-semibold text-lg">{year}</h4>
-                        <p className="text-sm text-muted-foreground mb-3">
-                          {Math.floor(Math.random() * 50) + 20} Publications
-                        </p>
-                        <Button variant="outline" size="sm">View Year</Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="recent">
             <Card>
               <CardHeader>
@@ -260,22 +233,23 @@ const LegalNotices = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {sampleNotices.slice(0, 3).map((notice) => (
+                  {notices.slice(0, 3).map((notice) => (
                     <div key={notice.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <h4 className="font-medium">{notice.title}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {notice.type} • {notice.publicationDate}
+                          {notice.type} {notice.publicationDate ? `- ${new Date(notice.publicationDate).toLocaleDateString()}` : ""}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <Link to={`/notices/${notice.id}`}>
                         <Button variant="outline" size="sm">
                           <Eye className="h-4 w-4 mr-1" />
                           View
                         </Button>
-                      </div>
+                      </Link>
                     </div>
                   ))}
+                  {notices.length === 0 && <p className="text-sm text-muted-foreground">No recent notices found.</p>}
                 </div>
               </CardContent>
             </Card>
@@ -289,4 +263,3 @@ const LegalNotices = () => {
 };
 
 export default LegalNotices;
-
