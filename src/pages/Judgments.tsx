@@ -8,27 +8,33 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useGetJudgments, useGetJudgmentsByCourtLevel } from "@/hooks/useJudgments";
+import { useGetJudgments, useGetJudgmentsByCaseType, useGetJudgmentsByCourtLevel, useSearchJudgments } from "@/hooks/useJudgments";
 import { Link } from 'react-router-dom';
 
 const Judgments = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [submittedSearch, setSubmittedSearch] = useState("");
   const [courtLevel, setCourtLevel] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
   const [page, setPage] = useState(0);
   const size = 10;
 
-  // Call both hooks unconditionally to obey hooks rules. The court-level hook is disabled when courtLevel === 'all'
   const allQuery = useGetJudgments({ page, size, sort: 'judgmentDate,desc' });
   const courtQuery = useGetJudgmentsByCourtLevel(courtLevel === 'all' ? '' : courtLevel, { page, size, sort: 'judgmentDate,desc' });
+  const categoryQuery = useGetJudgmentsByCaseType(category === 'all' ? '' : category, { page, size, sort: 'judgmentDate,desc' });
+  const searchQuery = useSearchJudgments({ query: submittedSearch, page, size, sort: 'judgmentDate,desc' });
 
-  const judgmentsData = courtLevel === 'all' ? allQuery.data : courtQuery.data;
-  const isLoading = courtLevel === 'all' ? allQuery.isLoading : courtQuery.isLoading;
-  const error = courtLevel === 'all' ? allQuery.error : courtQuery.error;
+  const activeQuery = submittedSearch
+    ? searchQuery
+    : category !== 'all'
+    ? categoryQuery
+    : courtLevel === 'all'
+    ? allQuery
+    : courtQuery;
 
-  const judgments = judgmentsData?.content || [];
-  const totalPages = judgmentsData?.totalPages || 1;
-  const totalElements = judgmentsData?.totalElements || 0;
+  const judgments = activeQuery.data?.content || [];
+  const totalPages = activeQuery.data?.totalPages || 1;
+  const totalElements = activeQuery.data?.totalElements || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,7 +65,11 @@ const Judgments = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Select value={courtLevel} onValueChange={setCourtLevel}>
+              <Select value={courtLevel} onValueChange={(value) => {
+                setPage(0);
+                setSubmittedSearch("");
+                setCourtLevel(value);
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Court" />
                 </SelectTrigger>
@@ -70,22 +80,29 @@ const Judgments = () => {
                   <SelectItem value="High Court">High Court</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={category} onValueChange={setCategory}>
+              <Select value={category} onValueChange={(value) => {
+                setPage(0);
+                setSubmittedSearch("");
+                setCategory(value);
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="criminal">Criminal Law</SelectItem>
-                  <SelectItem value="commercial">Commercial Law</SelectItem>
-                  <SelectItem value="family">Family Law</SelectItem>
-                  <SelectItem value="constitutional">Constitutional Law</SelectItem>
-                  <SelectItem value="civil">Civil Law</SelectItem>
+                  <SelectItem value="Criminal Law">Criminal Law</SelectItem>
+                  <SelectItem value="Commercial Law">Commercial Law</SelectItem>
+                  <SelectItem value="Family Law">Family Law</SelectItem>
+                  <SelectItem value="Constitutional Law">Constitutional Law</SelectItem>
+                  <SelectItem value="Civil Law">Civil Law</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex gap-2 mt-4">
-              <Button>
+              <Button onClick={() => {
+                setPage(0);
+                setSubmittedSearch(searchTerm.trim());
+              }}>
                 <Search className="h-4 w-4 mr-2" />
                 Search
               </Button>
@@ -98,7 +115,7 @@ const Judgments = () => {
         </Card>
 
         {/* Results */}
-        {error && (
+        {activeQuery.error && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>
               Failed to load judgments. Please check your connection to the backend.
@@ -106,7 +123,7 @@ const Judgments = () => {
           </Alert>
         )}
 
-        {isLoading ? (
+        {activeQuery.isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <span className="ml-2">Loading judgments...</span>
@@ -115,7 +132,7 @@ const Judgments = () => {
           <>
             <div className="space-y-6">
               {judgments.map((judgment, idx) => (
-                <Card key={judgment.frbrUri || judgment.caseNumber || idx} className="hover:shadow-lg transition-shadow">
+                <Card key={judgment.id || idx} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -195,7 +212,7 @@ const Judgments = () => {
                       <div className="text-xs text-muted-foreground">
                         {judgment.jurisdiction ? `Jurisdiction: ${judgment.jurisdiction}` : (judgment.language ? `Language: ${judgment.language}` : '')}
                       </div>
-                      <Link to={`/judgments/${judgment.frbrUri || judgment.caseNumber || ''}`}>
+                      <Link to={`/judgments/${judgment.id}`}>
                         <Button variant="ghost" size="sm" className="text-primary">
                           View Full Details <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
@@ -250,4 +267,3 @@ const Judgments = () => {
 };
 
 export default Judgments;
-
