@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Upload, Gavel } from 'lucide-react';
 import { useGetJudgmentById, useUpdateJudgment } from '@/hooks/useJudgments';
 import apiClient from '@/lib/apiClient';
-import { CreateJudgmentRequest } from '@/types/api';
+import { ApiResponse, CreateJudgmentRequest, Judgment } from '@/types/api';
 import { toast } from 'sonner';
 
 interface EditJudgmentForm {
@@ -92,7 +92,7 @@ const EditJudgment: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post(`/upload/judgment/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await apiClient.post<ApiResponse<Judgment>>(`/upload/judgment/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('PDF uploaded');
       }
 
@@ -225,4 +225,3 @@ const EditJudgment: React.FC = () => {
 };
 
 export default EditJudgment;
-
