@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveFileUrl } from "@/lib/apiClient";
 import { Download, Eye, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,7 +116,7 @@ const LegalNotices = () => {
                             </Link>
                             {notice.pdfUrl && (
                               <Button size="sm" variant="outline" asChild>
-                                <a href={notice.pdfUrl} target="_blank" rel="noreferrer">
+                                <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
                                   <Download className="h-4 w-4 mr-1" />
                                   PDF
                                 </a>
