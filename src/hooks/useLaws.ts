@@ -106,12 +106,8 @@ export const useDeleteLaw = () => {
   });
 };
 export const useIncrementLawView = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => lawService.incrementViewCount(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: lawKeys.detail(id) });
-    },
   });
 };
 export const useIncrementLawDownload = () => {
