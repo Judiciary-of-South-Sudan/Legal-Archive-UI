@@ -121,13 +121,8 @@ export const useDeleteJudgment = () => {
 };
 
 export const useIncrementJudgmentView = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (id: string) => judgmentService.incrementViewCount(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: judgmentKeys.detail(id) });
-    },
   });
 };
 
@@ -141,4 +136,3 @@ export const useIncrementJudgmentDownload = () => {
     },
   });
 };
-
