@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resolveFileUrl } from "@/lib/apiClient";
 import { Eye, Download, FileText, Calendar, BookOpen, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -95,7 +96,7 @@ const Laws = () => {
                             </Button>
                             {law.pdfUrl && (
                               <Button size="sm" variant="outline" asChild>
-                                <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                                <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
                                   <Download className="h-4 w-4 mr-1" /> PDF
                                 </a>
                               </Button>
@@ -211,7 +212,7 @@ const Laws = () => {
                       </Link>
                       {law.pdfUrl && (
                         <Button size="sm" variant="default" asChild>
-                          <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                          <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
                             <Download className="h-4 w-4 mr-1" /> Download PDF
                           </a>
                         </Button>
@@ -272,7 +273,7 @@ const Laws = () => {
                         </Button>
                         {law.pdfUrl && (
                           <Button size="sm" variant="outline" asChild>
-                            <a href={law.pdfUrl} target="_blank" rel="noreferrer">
+                            <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
                               <Download className="h-4 w-4 mr-1" /> PDF
                             </a>
                           </Button>
