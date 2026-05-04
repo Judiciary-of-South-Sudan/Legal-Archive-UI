@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Gavel, Download } from 'lucide-react';
 import { useGetJudgmentById, useIncrementJudgmentView } from '@/hooks/useJudgments';
+import { resolveFileUrl } from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
 
 const JudgmentDetail: React.FC = () => {
@@ -75,7 +76,7 @@ const JudgmentDetail: React.FC = () => {
             <div className="flex gap-3">
               {judgment.pdfUrl ? (
                 <Button asChild>
-                  <a href={judgment.pdfUrl} target="_blank" rel="noreferrer">
+                  <a href={resolveFileUrl(judgment.pdfUrl)} target="_blank" rel="noreferrer">
                     <Download className="h-4 w-4 mr-1" /> Download PDF
                   </a>
                 </Button>
