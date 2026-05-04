@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Upload, FileText } from 'lucide-react';
 import { useGetLawById, useUpdateLaw } from '@/hooks/useLaws';
 import apiClient from '@/lib/apiClient';
-import { CreateLawRequest } from '@/types/api';
+import { ApiResponse, CreateLawRequest, Law } from '@/types/api';
 import { toast } from 'sonner';
 
 interface EditLawForm {
@@ -95,7 +95,7 @@ const EditLaw: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post(`/upload/law/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await apiClient.post<ApiResponse<Law>>(`/upload/law/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('PDF uploaded');
       }
 
@@ -221,4 +221,3 @@ const EditLaw: React.FC = () => {
 };
 
 export default EditLaw;
-
