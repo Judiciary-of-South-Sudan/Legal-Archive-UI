@@ -40,7 +40,6 @@ const PdfViewer: React.FC<Props> = ({ url, title, height = 640, onClose, allowDo
         </div>
 
         <div className="bg-gray-50" style={{ height }}>
-          {/* Use iframe where available; object fallback for some browsers */}
           <iframe
             src={url}
             title={title || 'pdf-viewer'}
@@ -49,12 +48,6 @@ const PdfViewer: React.FC<Props> = ({ url, title, height = 640, onClose, allowDo
             className="block"
             style={{ border: 'none' }}
           />
-          {/* Fallback (will be ignored if iframe loads) */}
-          <object data={url} type="application/pdf" width="100%" height="100%">
-            <p>Your browser does not support embedded PDFs. You can
-              <a href={url} target="_blank" rel="noreferrer"> download the PDF</a> instead.
-            </p>
-          </object>
         </div>
       </div>
     </div>
