@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, FileText, Download } from 'lucide-react';
 import { useGetNoticeById } from '@/hooks/useNotices';
+import { resolveFileUrl } from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
 
 const NoticeDetail: React.FC = () => {
@@ -64,7 +65,7 @@ const NoticeDetail: React.FC = () => {
             <div className="flex gap-3">
               {notice.pdfUrl ? (
                 <Button asChild>
-                  <a href={notice.pdfUrl} target="_blank" rel="noreferrer">
+                  <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
                     <Download className="h-4 w-4 mr-1" /> Download PDF
                   </a>
                 </Button>
