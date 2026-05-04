@@ -21,7 +21,9 @@ import HighCourt from "./pages/judgments/HighCourt";
 import Constitution from "./pages/laws/Constitution";
 import Acts from "./pages/laws/Acts";
 import LawDetail from "./pages/laws/LawDetail";
+import LawDocument from "./pages/laws/LawDocument";
 import JudgmentDetail from "./pages/judgments/JudgmentDetail";
+import JudgmentDocument from "./pages/judgments/JudgmentDocument";
 import NoticeDetail from "./pages/notices/NoticeDetail";
 import JudicialOpinions from "./pages/JudicialOpinions";
 import LegalResources from "./pages/LegalResources";
@@ -72,9 +74,11 @@ const App = () => (
             <Route path="/judgments/court-of-appeal" element={<CourtOfAppeal />} />
             <Route path="/judgments/high-court" element={<HighCourt />} />
             <Route path="/judgments/:id" element={<JudgmentDetail />} />
+            <Route path="/judgments/:id/document" element={<JudgmentDocument />} />
             <Route path="/laws/constitution" element={<Constitution />} />
             <Route path="/laws/acts" element={<Acts />} />
             <Route path="/laws/:id" element={<LawDetail />} />
+            <Route path="/laws/:id/document" element={<LawDocument />} />
             <Route path="/notices" element={<LegalNotices />} />
             <Route path="/notices/:id" element={<NoticeDetail />} />
 
