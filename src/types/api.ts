@@ -79,19 +79,24 @@ export interface ChangePasswordRequest {
 // Law Types
 export interface Law {
   id: string;
+  frbrUri?: string;
   title: string;
   type: string;
   year: number;
   lawNumber?: string;
   enactmentDate?: string;
+  commencementDate?: string;
   publicationDate?: string;
   effectiveDate?: string;
+  lastAmended?: string;
   category?: string;
   jurisdiction?: string;
   issuingAuthority?: string;
   ministry?: string;
+  publisher?: string;
   status?: string;
   summary?: string;
+  fullText?: string;
   keywords?: string[];
   tags?: string[];
   pdfUrl?: string;
@@ -111,14 +116,18 @@ export interface CreateLawRequest {
   year: number;
   lawNumber?: string;
   enactmentDate?: string;
+  commencementDate?: string;
   publicationDate?: string;
   effectiveDate?: string;
+  lastAmended?: string;
   category?: string;
   jurisdiction?: string;
   issuingAuthority?: string;
   ministry?: string;
+  publisher?: string;
   status?: string;
   summary?: string;
+  fullText?: string;
   keywords?: string[];
   tags?: string[];
   pdfUrl?: string;
@@ -140,6 +149,7 @@ export interface LawStats {
 // Judgment Types
 export interface Judgment {
   id: string;
+  frbrUri?: string;
   caseNumber?: string;
   caseName: string;
   courtName: string;
@@ -150,6 +160,7 @@ export interface Judgment {
   caseType?: string;
   verdict?: string;
   summary?: string;
+  fullText?: string;
   legalPrinciples?: string[];
   citedCases?: string[];
   citedLaws?: string[];
@@ -176,6 +187,7 @@ export interface CreateJudgmentRequest {
   caseType?: string;
   verdict?: string;
   summary?: string;
+  fullText?: string;
   legalPrinciples?: string[];
   citedCases?: string[];
   citedLaws?: string[];
@@ -190,6 +202,7 @@ export interface CreateJudgmentRequest {
 // Legal Notice Types
 export interface LegalNotice {
   id: string;
+  frbrUri?: string;
   noticeNumber?: string;
   title: string;
   type: string;
@@ -201,7 +214,10 @@ export interface LegalNotice {
   effectiveDate?: string;
   expiryDate?: string;
   summary?: string;
+  fullText?: string;
   applicableLaws?: string[];
+  relatedLaws?: string[];
+  amendsLaws?: string[];
   keywords?: string[];
   tags?: string[];
   jurisdiction?: string;
@@ -226,7 +242,10 @@ export interface CreateLegalNoticeRequest {
   effectiveDate?: string;
   expiryDate?: string;
   summary?: string;
+  fullText?: string;
   applicableLaws?: string[];
+  relatedLaws?: string[];
+  amendsLaws?: string[];
   keywords?: string[];
   tags?: string[];
   jurisdiction?: string;
@@ -268,4 +287,3 @@ export interface DateRangeParams extends PaginationParams {
   startDate: string;
   endDate: string;
 }
-
