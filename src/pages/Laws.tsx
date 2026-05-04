@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import SearchBar from "@/components/SearchBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useGetLaws, useGetLawCategories, useGetRecentLaws } from "@/hooks/useLaws";
+import { useGetLaws, useGetLawCategories, useGetRecentLaws, useSearchLaws } from "@/hooks/useLaws";
 import { Link } from 'react-router-dom';
 
 const Laws = () => {
@@ -16,8 +16,9 @@ const Laws = () => {
   const [page, setPage] = useState(0);
   const size = 10;
 
-  // Fetch laws with pagination
-  const { data: lawsData, isLoading, error } = useGetLaws({ page, size, sort: 'year,desc' });
+  const listQuery = useGetLaws({ page, size, sort: 'year,desc' });
+  const searchQueryResult = useSearchLaws({ query: searchQuery, page, size, sort: 'year,desc' });
+  const activeQuery = searchQuery ? searchQueryResult : listQuery;
 
   // Fetch categories
   const { data: categories } = useGetLawCategories();
@@ -25,9 +26,9 @@ const Laws = () => {
   // Fetch recent laws
   const { data: recentLaws } = useGetRecentLaws(10);
 
-  const laws = lawsData?.content || [];
-  const totalPages = lawsData?.totalPages || 1;
-  const totalElements = lawsData?.totalElements || 0;
+  const laws = activeQuery.data?.content || [];
+  const totalPages = activeQuery.data?.totalPages || 1;
+  const totalElements = activeQuery.data?.totalElements || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,7 +57,7 @@ const Laws = () => {
               }}
             />
 
-            {error && (
+            {activeQuery.error && (
               <Alert variant="destructive">
                 <AlertDescription>
                   Failed to load laws. Please check your connection to the backend.
@@ -64,7 +65,7 @@ const Laws = () => {
               </Alert>
             )}
 
-            {isLoading ? (
+            {activeQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 <span className="ml-2">Loading laws...</span>
@@ -73,7 +74,7 @@ const Laws = () => {
               <>
                 <div className="space-y-4">
                   {laws.map((law, idx) => (
-                    <Card key={law.frbrUri || law.id || law.title || idx} className="hover:shadow-lg transition-shadow">
+                    <Card key={law.id || law.title || idx} className="hover:shadow-lg transition-shadow">
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
@@ -141,7 +142,7 @@ const Laws = () => {
                           <div className="text-xs text-muted-foreground">
                             {law.lastAmended ? `Last amended: ${new Date(law.lastAmended).toLocaleDateString()}` : (law.enactmentDate ? `Enacted: ${new Date(law.enactmentDate).toLocaleDateString()}` : '')}
                           </div>
-                          <Link to={`/laws/${law.frbrUri || law.id || ''}`}>
+                          <Link to={`/laws/${law.id}`}>
                             <Button variant="ghost" size="sm" className="text-primary">
                               View Details <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
@@ -151,7 +152,7 @@ const Laws = () => {
                     </Card>
                   ))}
 
-                  {!isLoading && laws.length === 0 && (
+                  {!activeQuery.isLoading && laws.length === 0 && (
                     <div className="text-center py-12">
                       <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-muted-foreground">No laws found.</p>
@@ -198,12 +199,12 @@ const Laws = () => {
                 View the Constitution and constitutional documents of South Sudan
               </p>
               {laws.filter(law => law.type === 'Constitution').map((law) => (
-                <Card key={law.frbrUri || law.id || law.title} className="hover:shadow-lg transition-shadow">
+                <Card key={law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <h3 className="text-xl font-semibold mb-2">{law.title}</h3>
                     <p className="text-muted-foreground mb-4">{law.summary}</p>
                     <div className="flex gap-2">
-                      <Link to={`/laws/${law.frbrUri || law.id || ''}`}>
+                      <Link to={`/laws/${law.id}`}>
                         <Button size="sm" variant="outline">
                           <Eye className="h-4 w-4 mr-1" /> View
                         </Button>
@@ -252,7 +253,7 @@ const Laws = () => {
                 Recently added or updated laws in the archive
               </p>
               {recentLaws?.map((law) => (
-                <Card key={law.frbrUri || law.id || law.title} className="hover:shadow-lg transition-shadow">
+                <Card key={law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
