@@ -21,7 +21,8 @@ const LawDetail: React.FC = () => {
       countedViewForId.current = id;
       incrementView(id);
     }
-  }, [id, incrementView]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   if (isLoading) {
     return (
