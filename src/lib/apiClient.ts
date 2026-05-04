@@ -2,6 +2,19 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
+// Strips the trailing /api segment to get the backend origin (e.g. http://localhost:8080)
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+
+/**
+ * Converts a backend-relative path like /api/files/laws/foo.pdf into an
+ * absolute URL pointing at the backend origin. Passes absolute URLs through unchanged.
+ */
+export function resolveFileUrl(path: string | null | undefined): string | undefined {
+  if (!path) return undefined;
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  return `${API_ORIGIN}${path}`;
+}
+
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
