@@ -6,12 +6,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080
 const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
 
 /**
- * Converts a backend-relative path like /api/files/laws/foo.pdf into an
- * absolute URL pointing at the backend origin. Passes absolute URLs through unchanged.
+ * Converts a backend-relative path like /api/files/laws/foo.pdf to a usable URL.
+ * In dev: returns the path as-is so Vite's proxy forwards it to the backend (same origin, no CORS).
+ * In prod: returns an absolute URL using the configured backend origin.
  */
 export function resolveFileUrl(path: string | null | undefined): string | undefined {
   if (!path) return undefined;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (import.meta.env.DEV) return path;
   return `${API_ORIGIN}${path}`;
 }
 
