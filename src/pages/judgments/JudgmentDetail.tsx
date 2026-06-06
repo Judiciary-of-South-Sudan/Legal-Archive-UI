@@ -3,16 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Gavel, Download, ExternalLink } from 'lucide-react';
+import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2 } from 'lucide-react';
 import { useGetJudgmentById, useIncrementJudgmentView } from '@/hooks/useJudgments';
 import { resolveFileUrl } from '@/lib/apiClient';
-import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const JudgmentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: judgment, isLoading, error } = useGetJudgmentById(id || '');
   const { mutate: incrementView } = useIncrementJudgmentView();
+  const { isAdmin } = useAuth();
   const countedViewForId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -60,31 +62,120 @@ const JudgmentDetail: React.FC = () => {
 
   const pdfUrl = resolveFileUrl(judgment.pdfUrl);
 
+  const statusColor =
+    judgment.status === 'Final'
+      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+      : judgment.status === 'Overturned'
+      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8 space-y-4">
-        {/* Metadata card */}
         <Card>
           <CardContent className="p-6">
-            <h1 className="text-2xl font-bold mb-3">{judgment.caseName}</h1>
-
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-              <span className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                {judgment.judgmentDate ? new Date(judgment.judgmentDate).toLocaleDateString() : '—'}
-              </span>
-              <span className="flex items-center gap-1">
-                <Gavel className="h-4 w-4" /> {judgment.courtLevel}
-              </span>
+            {/* Badges */}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {judgment.courtLevel && <Badge variant="secondary">{judgment.courtLevel}</Badge>}
+              {judgment.caseType && <Badge variant="outline">{judgment.caseType}</Badge>}
+              {judgment.status && <Badge className={statusColor}>{judgment.status}</Badge>}
+              {judgment.verdict && (
+                <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                  {judgment.verdict}
+                </Badge>
+              )}
             </div>
 
-            {judgment.summary && <p className="mb-4">{judgment.summary}</p>}
-            {judgment.verdict && (
-              <p className="mb-4 font-semibold">Verdict: {judgment.verdict}</p>
+            <h1 className="text-2xl font-bold text-foreground mb-4">{judgment.caseName}</h1>
+
+            {/* Metadata grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground mb-5">
+              {judgment.caseNumber && (
+                <span className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 shrink-0" />
+                  Case No: <span className="text-foreground font-medium">{judgment.caseNumber}</span>
+                </span>
+              )}
+              {judgment.judgmentDate && (
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  Date: <span className="text-foreground">{new Date(judgment.judgmentDate).toLocaleDateString()}</span>
+                </span>
+              )}
+              {judgment.courtName && (
+                <span className="flex items-center gap-2">
+                  <Gavel className="h-4 w-4 shrink-0" />
+                  Court: <span className="text-foreground">{judgment.courtName}</span>
+                </span>
+              )}
+              {judgment.parties && (
+                <span className="flex items-center gap-2 sm:col-span-2">
+                  <Users className="h-4 w-4 shrink-0" />
+                  Parties: <span className="text-foreground">{judgment.parties}</span>
+                </span>
+              )}
+              {judgment.judges && judgment.judges.length > 0 && (
+                <span className="flex items-center gap-2 sm:col-span-2">
+                  <Users className="h-4 w-4 shrink-0" />
+                  Judges: <span className="text-foreground">{judgment.judges.join(', ')}</span>
+                </span>
+              )}
+              {judgment.jurisdiction && (
+                <span className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 shrink-0" />
+                  Jurisdiction: <span className="text-foreground">{judgment.jurisdiction}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Summary */}
+            {judgment.summary && (
+              <p className="text-foreground mb-5 leading-relaxed">{judgment.summary}</p>
             )}
 
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Tags */}
+            {judgment.tags && judgment.tags.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold mb-2">Tags</h4>
+                <div className="flex flex-wrap gap-2">
+                  {judgment.tags.map((tag, i) => (
+                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cited laws */}
+            {judgment.citedLaws && judgment.citedLaws.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold mb-2">Cited Laws</h4>
+                <div className="flex flex-wrap gap-2">
+                  {judgment.citedLaws.map((lawId) => (
+                    <Link key={lawId} to={`/laws/${lawId}`}>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawId}</Badge>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cited cases */}
+            {judgment.citedCases && judgment.citedCases.length > 0 && (
+              <div className="mb-5">
+                <h4 className="text-sm font-semibold mb-2">Cited Cases</h4>
+                <div className="flex flex-wrap gap-2">
+                  {judgment.citedCases.map((caseId) => (
+                    <Link key={caseId} to={`/judgments/${caseId}`}>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{caseId}</Badge>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               {pdfUrl ? (
                 <>
                   <Button asChild>
@@ -100,6 +191,13 @@ const JudgmentDetail: React.FC = () => {
                 </>
               ) : (
                 <Button variant="outline" disabled>No PDF available</Button>
+              )}
+              {isAdmin() && (
+                <Link to={`/admin/edit-judgment/${id}`}>
+                  <Button variant="outline">
+                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                  </Button>
+                </Link>
               )}
               <Link to="/judgments">
                 <Button variant="ghost">Back to Judgments</Button>
