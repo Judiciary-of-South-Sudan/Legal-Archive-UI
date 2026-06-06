@@ -68,6 +68,12 @@ export const useUpdateNotice = () => {
   });
 };
 
+export const useIncrementNoticeView = () => {
+  return useMutation({
+    mutationFn: (id: string) => noticeService.incrementNoticeView(id),
+  });
+};
+
 export const useDeleteNotice = () => {
   const queryClient = useQueryClient();
 
