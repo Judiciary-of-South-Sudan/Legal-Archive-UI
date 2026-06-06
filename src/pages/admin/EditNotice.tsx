@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 
 interface EditNoticeForm {
   title: string;
+  noticeNumber?: string;
   type?: string;
   publicationDate?: string;
   issuingAuthority?: string;
@@ -23,9 +24,11 @@ interface EditNoticeForm {
   department?: string;
   gazetteIssue?: string;
   effectiveDate?: string;
-  expiryDate?: string;
   summary?: string;
-  keywords?: string;
+  tags?: string;
+  relatedLaws?: string;
+  amendsLaws?: string;
+  status?: string;
   jurisdiction?: string;
   language?: string;
 }
@@ -44,16 +47,19 @@ const EditNotice: React.FC = () => {
     if (notice) {
       setFormData({
         title: notice.title || '',
-        type: notice.type || 'Notice',
+        noticeNumber: notice.noticeNumber || '',
+        type: notice.type || 'Legal Notice',
         publicationDate: notice.publicationDate ? notice.publicationDate.split('T')[0] : '',
         issuingAuthority: notice.issuingAuthority || '',
         ministry: notice.ministry || '',
         department: notice.department || '',
         gazetteIssue: notice.gazetteIssue || '',
         effectiveDate: notice.effectiveDate ? notice.effectiveDate.split('T')[0] : '',
-        expiryDate: notice.expiryDate ? notice.expiryDate.split('T')[0] : '',
         summary: notice.summary || '',
-        keywords: (notice.keywords || []).join(', '),
+        tags: (notice.tags || []).join(', '),
+        relatedLaws: (notice.relatedLaws || []).join(', '),
+        amendsLaws: (notice.amendsLaws || []).join(', '),
+        status: notice.status || 'Active',
         jurisdiction: notice.jurisdiction || 'South Sudan',
         language: notice.language || 'English',
       });
@@ -75,6 +81,7 @@ const EditNotice: React.FC = () => {
 
     try {
       const payload: CreateLegalNoticeRequest = {
+        noticeNumber: formData.noticeNumber || undefined,
         title: formData.title,
         type: formData.type,
         publicationDate: formData.publicationDate || undefined,
@@ -83,9 +90,11 @@ const EditNotice: React.FC = () => {
         department: formData.department || undefined,
         gazetteIssue: formData.gazetteIssue || undefined,
         effectiveDate: formData.effectiveDate || undefined,
-        expiryDate: formData.expiryDate || undefined,
         summary: formData.summary || undefined,
-        keywords: formData.keywords ? formData.keywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendsLaws: formData.amendsLaws ? formData.amendsLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        status: formData.status || undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
       };
@@ -95,7 +104,7 @@ const EditNotice: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post<ApiResponse<LegalNotice>>(`/upload/notice/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await apiClient.post<ApiResponse<LegalNotice>>(`/upload/legal-notice/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
         toast.success('PDF uploaded');
       }
 
@@ -137,28 +146,37 @@ const EditNotice: React.FC = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="noticeNumber">Notice Number</Label>
+                  <Input id="noticeNumber" name="noticeNumber" value={formData.noticeNumber} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="type">Type</Label>
+                  <Select value={formData.type} onValueChange={(v) => handleSelectChange('type', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Legal Notice">Legal Notice</SelectItem>
+                      <SelectItem value="Gazette Notice">Gazette Notice</SelectItem>
+                      <SelectItem value="Statutory Instrument">Statutory Instrument</SelectItem>
+                      <SelectItem value="Regulation">Regulation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="md:col-span-2">
                   <Label htmlFor="title">Title *</Label>
                   <Input id="title" name="title" value={formData.title} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="type">Type</Label>
-                  <Select value={formData.type} onValueChange={(v) => handleSelectChange('type', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Notice">Notice</SelectItem>
-                      <SelectItem value="Gazette">Gazette</SelectItem>
-                      <SelectItem value="Circular">Circular</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="publicationDate">Publication Date</Label>
+                  <Input id="publicationDate" name="publicationDate" type="date" value={formData.publicationDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="publicationDate">Publication Date</Label>
-                  <Input id="publicationDate" name="publicationDate" type="date" value={formData.publicationDate} onChange={handleInputChange} />
+                  <Label htmlFor="effectiveDate">Effective Date</Label>
+                  <Input id="effectiveDate" name="effectiveDate" type="date" value={formData.effectiveDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
@@ -176,14 +194,41 @@ const EditNotice: React.FC = () => {
                   <Input id="department" name="department" value={formData.department} onChange={handleInputChange} />
                 </div>
 
+                <div>
+                  <Label htmlFor="gazetteIssue">Gazette Issue</Label>
+                  <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(v) => handleSelectChange('status', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Repealed">Repealed</SelectItem>
+                      <SelectItem value="Superseded">Superseded</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="md:col-span-2">
                   <Label htmlFor="summary">Summary</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                  <Input id="keywords" name="keywords" value={formData.keywords} onChange={handleInputChange} />
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="relatedLaws">Related Law IDs (comma-separated)</Label>
+                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="amendsLaws">Amends Law IDs (comma-separated)</Label>
+                  <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
