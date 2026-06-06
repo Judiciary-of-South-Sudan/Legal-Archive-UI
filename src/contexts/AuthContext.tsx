@@ -20,11 +20,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = authService.getStoredUser();
-    if (storedUser) {
-      setUser(storedUser);
-    }
-    setIsLoading(false);
+    const initAuth = async () => {
+      const storedUser = authService.getStoredUser();
+      if (!storedUser) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        await authService.getCurrentUser();
+        setUser(storedUser);
+      } catch {
+        // Token rejected by server (expired, revoked, secret rotated)
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initAuth();
   }, []);
 
   const login = async (credentials: LoginRequest) => {
