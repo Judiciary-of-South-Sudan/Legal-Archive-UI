@@ -43,9 +43,25 @@ export const authService = {
     }
   },
 
+  isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  },
+
   getStoredUser(): LoginResponse | null {
+    const token = localStorage.getItem('auth_token');
     const userJson = localStorage.getItem('auth_user');
-    return userJson ? JSON.parse(userJson) : null;
+    if (!token || !userJson) return null;
+    if (this.isTokenExpired(token)) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      return null;
+    }
+    return JSON.parse(userJson);
   },
 
   getStoredToken(): string | null {
@@ -53,7 +69,8 @@ export const authService = {
   },
 
   isAuthenticated(): boolean {
-    return !!this.getStoredToken();
+    const token = this.getStoredToken();
+    return !!token && !this.isTokenExpired(token);
   },
 
   hasRole(role: string): boolean {
