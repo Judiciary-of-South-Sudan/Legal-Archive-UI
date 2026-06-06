@@ -39,4 +39,12 @@ export const noticeService = {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<LegalNotice>>>('/legal-notices/search', { params });
     return response.data.data!;
   },
+
+  async incrementNoticeView(id: string): Promise<void> {
+    await apiClient.post(`/legal-notices/${id}/view`);
+  },
+
+  async incrementNoticeDownload(id: string): Promise<void> {
+    await apiClient.post(`/legal-notices/${id}/download`);
+  },
 };
