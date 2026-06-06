@@ -8,11 +8,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, FileText, Download, Building2, ExternalLink, Loader2 } from 'lucide-react';
 import { useGetNoticeById, useIncrementNoticeView } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
+import { useAuth } from '@/contexts/AuthContext';
+import { Pencil } from 'lucide-react';
 
 const NoticeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: notice, isLoading, error } = useGetNoticeById(id || '');
   const { mutate: incrementView } = useIncrementNoticeView();
+  const { isAdmin } = useAuth();
   const countedViewForId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -189,6 +192,13 @@ const NoticeDetail: React.FC = () => {
                 </>
               ) : (
                 <Button variant="outline" disabled>No PDF available</Button>
+              )}
+              {isAdmin() && (
+                <Link to={`/admin/edit-notice/${id}`}>
+                  <Button variant="outline">
+                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                  </Button>
+                </Link>
               )}
               <Link to="/notices">
                 <Button variant="ghost">Back to Notices</Button>
