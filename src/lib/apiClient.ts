@@ -48,7 +48,11 @@ apiClient.interceptors.response.use(
       if (error.response.status === 401) {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
-        window.location.href = '/login';
+        // Don't redirect during the startup token validation call
+        const isAuthCheck = error.config?.url?.includes('/auth/me');
+        if (!isAuthCheck) {
+          window.location.href = '/login';
+        }
       }
       const errorMessage = error.response.data?.message || error.response.data?.error || 'An error occurred';
       console.error('API Error:', errorMessage);
