@@ -25,6 +25,7 @@ import LawDocument from "./pages/laws/LawDocument";
 import JudgmentDetail from "./pages/judgments/JudgmentDetail";
 import JudgmentDocument from "./pages/judgments/JudgmentDocument";
 import NoticeDetail from "./pages/notices/NoticeDetail";
+import NoticeDocument from "./pages/notices/NoticeDocument";
 import JudicialOpinions from "./pages/JudicialOpinions";
 import LegalResources from "./pages/LegalResources";
 import Login from "./pages/Login";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/laws/:id/document" element={<LawDocument />} />
             <Route path="/notices" element={<LegalNotices />} />
             <Route path="/notices/:id" element={<NoticeDetail />} />
+            <Route path="/notices/:id/document" element={<NoticeDocument />} />
 
             {/* Admin Routes - Protected */}
             <Route path="/admin/dashboard" element={
