@@ -17,17 +17,19 @@ import { toast } from 'sonner';
 interface EditLawForm {
   title: string;
   type: string;
-  year?: number | string;
-  lawNumber?: string;
-  enactmentDate?: string;
-  category?: string;
-  jurisdiction?: string;
-  issuingAuthority?: string;
-  ministry?: string;
-  status?: string;
-  summary?: string;
-  keywords?: string; // comma-separated in form
-  language?: string;
+  year: number | string;
+  enactmentDate: string;
+  commencementDate: string;
+  category: string;
+  jurisdiction: string;
+  publisher: string;
+  status: string;
+  summary: string;
+  tags: string;
+  language: string;
+  fullText: string;
+  relatedLaws: string;
+  amendments: string;
 }
 
 const EditLaw: React.FC = () => {
@@ -46,27 +48,31 @@ const EditLaw: React.FC = () => {
         title: law.title || '',
         type: law.type || 'Act',
         year: law.year || new Date().getFullYear(),
-        lawNumber: law.lawNumber || '',
         enactmentDate: law.enactmentDate ? law.enactmentDate.split('T')[0] : '',
+        commencementDate: law.commencementDate ? law.commencementDate.split('T')[0] : '',
         category: law.category || '',
         jurisdiction: law.jurisdiction || 'South Sudan',
-        issuingAuthority: law.issuingAuthority || '',
-        ministry: law.ministry || '',
+        publisher: law.publisher || '',
         status: law.status || 'Active',
         summary: law.summary || '',
-        keywords: (law.keywords || []).join(', '),
+        tags: (law.tags || []).join(', '),
         language: law.language || 'English',
+        fullText: law.fullText || '',
+        relatedLaws: (law.relatedLaws || []).join(', '),
+        amendments: (law.amendments || []).join(', '),
       });
     }
   }, [law]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!formData) return;
-    const { name, value } = e.target as HTMLInputElement;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const handleSelectChange = (name: string, value: string) => setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]); };
+  const handleSelectChange = (name: string, value: string) =>
+    setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) setPdfFile(e.target.files[0]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,16 +84,18 @@ const EditLaw: React.FC = () => {
         title: formData.title,
         type: formData.type,
         year: Number(formData.year),
-        lawNumber: formData.lawNumber || undefined,
         enactmentDate: formData.enactmentDate || undefined,
+        commencementDate: formData.commencementDate || undefined,
         category: formData.category || undefined,
         jurisdiction: formData.jurisdiction || undefined,
-        issuingAuthority: formData.issuingAuthority || undefined,
-        ministry: formData.ministry || undefined,
+        publisher: formData.publisher || undefined,
         status: formData.status || undefined,
         summary: formData.summary || undefined,
-        keywords: formData.keywords ? formData.keywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         language: formData.language || undefined,
+        fullText: formData.fullText || undefined,
+        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -95,14 +103,15 @@ const EditLaw: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post<ApiResponse<Law>>(`/upload/law/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-        toast.success('PDF uploaded');
+        await apiClient.post<ApiResponse<Law>>(`/upload/law/${id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.success('PDF replaced');
       }
 
       navigate('/admin/dashboard');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      console.error('Update failed', err);
       toast.error(error?.response?.data?.message || 'Failed to update law');
     } finally {
       setIsSaving(false);
@@ -136,7 +145,6 @@ const EditLaw: React.FC = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* basic fields - similar to upload form */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <Label htmlFor="title">Title *</Label>
@@ -145,10 +153,8 @@ const EditLaw: React.FC = () => {
 
                 <div>
                   <Label htmlFor="type">Type *</Label>
-                  <Select value={formData.type} onValueChange={(v) => handleSelectChange('type', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <Select value={formData.type} onValueChange={v => handleSelectChange('type', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Constitution">Constitution</SelectItem>
                       <SelectItem value="Act">Act</SelectItem>
@@ -165,8 +171,52 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="lawNumber">Law Number</Label>
-                  <Input id="lawNumber" name="lawNumber" value={formData.lawNumber} onChange={handleInputChange} />
+                  <Label htmlFor="enactmentDate">Enactment Date</Label>
+                  <Input id="enactmentDate" name="enactmentDate" type="date" value={formData.enactmentDate} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="commencementDate">Commencement Date</Label>
+                  <Input id="commencementDate" name="commencementDate" type="date" value={formData.commencementDate} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Input id="category" name="category" value={formData.category} onChange={handleInputChange} placeholder="e.g., Constitutional, Criminal" />
+                </div>
+
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={v => handleSelectChange('status', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Repealed">Repealed</SelectItem>
+                      <SelectItem value="Amended">Amended</SelectItem>
+                      <SelectItem value="Draft">Draft</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="jurisdiction">Jurisdiction</Label>
+                  <Input id="jurisdiction" name="jurisdiction" value={formData.jurisdiction} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="publisher">Publisher</Label>
+                  <Input id="publisher" name="publisher" value={formData.publisher} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="language">Language</Label>
+                  <Select value={formData.language} onValueChange={v => handleSelectChange('language', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Arabic">Arabic</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="md:col-span-2">
@@ -175,8 +225,23 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                  <Input id="keywords" name="keywords" value={formData.keywords} onChange={handleInputChange} />
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="fullText">Full Text</Label>
+                  <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
+                </div>
+
+                <div>
+                  <Label htmlFor="relatedLaws">Related Law IDs (comma-separated)</Label>
+                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="amendments">Amendments (comma-separated)</Label>
+                  <Input id="amendments" name="amendments" value={formData.amendments} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
@@ -196,15 +261,9 @@ const EditLaw: React.FC = () => {
               <div className="flex gap-4">
                 <Button type="submit" disabled={isSaving}>
                   {isSaving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
                   ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
+                    <><Upload className="mr-2 h-4 w-4" />Save Changes</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
