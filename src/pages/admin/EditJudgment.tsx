@@ -16,17 +16,22 @@ import { toast } from 'sonner';
 
 interface EditJudgmentForm {
   caseName: string;
-  caseNumber?: string;
+  caseNumber: string;
   courtName: string;
-  courtLevel?: string;
-  judges?: string; // comma separated
-  judgmentDate?: string;
-  caseType?: string;
-  verdict?: string;
-  summary?: string;
-  keywords?: string;
-  jurisdiction?: string;
-  language?: string;
+  courtLevel: string;
+  judges: string;
+  judgmentDate: string;
+  parties: string;
+  caseType: string;
+  verdict: string;
+  status: string;
+  summary: string;
+  tags: string;
+  fullText: string;
+  citedLaws: string;
+  citedCases: string;
+  jurisdiction: string;
+  language: string;
 }
 
 const EditJudgment: React.FC = () => {
@@ -48,10 +53,15 @@ const EditJudgment: React.FC = () => {
         courtLevel: judgment.courtLevel || 'High Court',
         judges: (judgment.judges || []).join(', '),
         judgmentDate: judgment.judgmentDate ? judgment.judgmentDate.split('T')[0] : '',
+        parties: judgment.parties || '',
         caseType: judgment.caseType || '',
         verdict: judgment.verdict || '',
+        status: judgment.status || 'Final',
         summary: judgment.summary || '',
-        keywords: (judgment.keywords || []).join(', '),
+        tags: (judgment.tags || []).join(', '),
+        fullText: judgment.fullText || '',
+        citedLaws: (judgment.citedLaws || []).join(', '),
+        citedCases: (judgment.citedCases || []).join(', '),
         jurisdiction: judgment.jurisdiction || 'South Sudan',
         language: judgment.language || 'English',
       });
@@ -60,11 +70,13 @@ const EditJudgment: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!formData) return;
-    const { name, value } = e.target as HTMLInputElement;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const handleSelectChange = (name: string, value: string) => setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]); };
+  const handleSelectChange = (name: string, value: string) =>
+    setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) setPdfFile(e.target.files[0]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,10 +91,15 @@ const EditJudgment: React.FC = () => {
         courtLevel: formData.courtLevel,
         judges: formData.judges ? formData.judges.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         judgmentDate: formData.judgmentDate || undefined,
+        parties: formData.parties || undefined,
         caseType: formData.caseType || undefined,
         verdict: formData.verdict || undefined,
+        status: formData.status || undefined,
         summary: formData.summary || undefined,
-        keywords: formData.keywords ? formData.keywords.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        fullText: formData.fullText || undefined,
+        citedLaws: formData.citedLaws ? formData.citedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        citedCases: formData.citedCases ? formData.citedCases.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
       };
@@ -92,14 +109,15 @@ const EditJudgment: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post<ApiResponse<Judgment>>(`/upload/judgment/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-        toast.success('PDF uploaded');
+        await apiClient.post<ApiResponse<Judgment>>(`/upload/judgment/${id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        toast.success('PDF replaced');
       }
 
       navigate('/admin/dashboard');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      console.error('Update failed', err);
       toast.error(error?.response?.data?.message || 'Failed to update judgment');
     } finally {
       setIsSaving(false);
@@ -151,10 +169,8 @@ const EditJudgment: React.FC = () => {
 
                 <div>
                   <Label htmlFor="courtLevel">Court Level</Label>
-                  <Select value={formData.courtLevel} onValueChange={(v) => handleSelectChange('courtLevel', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <Select value={formData.courtLevel} onValueChange={v => handleSelectChange('courtLevel', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Supreme Court">Supreme Court</SelectItem>
                       <SelectItem value="Court of Appeal">Court of Appeal</SelectItem>
@@ -174,13 +190,84 @@ const EditJudgment: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
+                  <Label htmlFor="parties">Parties</Label>
+                  <Input id="parties" name="parties" value={formData.parties} onChange={handleInputChange} placeholder="e.g., John Doe v. State" />
+                </div>
+
+                <div>
+                  <Label htmlFor="caseType">Case Type</Label>
+                  <Select value={formData.caseType} onValueChange={v => handleSelectChange('caseType', v)}>
+                    <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Civil">Civil</SelectItem>
+                      <SelectItem value="Criminal">Criminal</SelectItem>
+                      <SelectItem value="Constitutional">Constitutional</SelectItem>
+                      <SelectItem value="Commercial">Commercial</SelectItem>
+                      <SelectItem value="Family">Family</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="verdict">Verdict</Label>
+                  <Select value={formData.verdict} onValueChange={v => handleSelectChange('verdict', v)}>
+                    <SelectTrigger><SelectValue placeholder="Select verdict" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Allowed">Allowed</SelectItem>
+                      <SelectItem value="Dismissed">Dismissed</SelectItem>
+                      <SelectItem value="Guilty">Guilty</SelectItem>
+                      <SelectItem value="Not Guilty">Not Guilty</SelectItem>
+                      <SelectItem value="Settled">Settled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={v => handleSelectChange('status', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Final">Final</SelectItem>
+                      <SelectItem value="Under Appeal">Under Appeal</SelectItem>
+                      <SelectItem value="Overturned">Overturned</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="language">Language</Label>
+                  <Select value={formData.language} onValueChange={v => handleSelectChange('language', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="English">English</SelectItem>
+                      <SelectItem value="Arabic">Arabic</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="md:col-span-2">
                   <Label htmlFor="summary">Summary</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="keywords">Keywords (comma-separated)</Label>
-                  <Input id="keywords" name="keywords" value={formData.keywords} onChange={handleInputChange} />
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="fullText">Full Text</Label>
+                  <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
+                </div>
+
+                <div>
+                  <Label htmlFor="citedLaws">Cited Law IDs (comma-separated)</Label>
+                  <Input id="citedLaws" name="citedLaws" value={formData.citedLaws} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="citedCases">Cited Case IDs (comma-separated)</Label>
+                  <Input id="citedCases" name="citedCases" value={formData.citedCases} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
@@ -200,15 +287,9 @@ const EditJudgment: React.FC = () => {
               <div className="flex gap-4">
                 <Button type="submit" disabled={isSaving}>
                   {isSaving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
                   ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
+                    <><Upload className="mr-2 h-4 w-4" />Save Changes</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
