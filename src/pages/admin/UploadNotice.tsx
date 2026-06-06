@@ -21,7 +21,7 @@ const AdminUploadNotice: React.FC = () => {
   const [formData, setFormData] = useState({
     noticeNumber: '',
     title: '',
-    type: 'Notice',
+    type: 'Legal Notice',
     publicationDate: '',
     issuingAuthority: '',
     ministry: '',
@@ -35,7 +35,7 @@ const AdminUploadNotice: React.FC = () => {
     amendsLaws: '',
     jurisdiction: 'South Sudan',
     language: 'English',
-    status: '',
+    status: 'Active',
   });
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -133,9 +133,10 @@ const AdminUploadNotice: React.FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Notice">Notice</SelectItem>
-                      <SelectItem value="Gazette">Gazette</SelectItem>
-                      <SelectItem value="Circular">Circular</SelectItem>
+                      <SelectItem value="Legal Notice">Legal Notice</SelectItem>
+                      <SelectItem value="Gazette Notice">Gazette Notice</SelectItem>
+                      <SelectItem value="Statutory Instrument">Statutory Instrument</SelectItem>
+                      <SelectItem value="Regulation">Regulation</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
