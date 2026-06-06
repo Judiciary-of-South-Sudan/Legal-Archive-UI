@@ -23,13 +23,10 @@ const AdminUploadLaw: React.FC = () => {
     title: '',
     type: 'Act',
     year: new Date().getFullYear(),
-    lawNumber: '',
     enactmentDate: '',
     commencementDate: '',
     category: '',
     jurisdiction: 'South Sudan',
-    issuingAuthority: '',
-    ministry: '',
     publisher: '',
     status: 'Active',
     summary: '',
@@ -72,6 +69,7 @@ const AdminUploadLaw: React.FC = () => {
         year: Number(formData.year),
         fullText: formData.fullText || undefined,
         publisher: formData.publisher || undefined,
+        enactmentDate: formData.enactmentDate || undefined,
         commencementDate: formData.commencementDate || undefined,
       };
 
@@ -158,17 +156,6 @@ const AdminUploadLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="lawNumber">Law Number</Label>
-                  <Input
-                    id="lawNumber"
-                    name="lawNumber"
-                    value={formData.lawNumber}
-                    onChange={handleInputChange}
-                    placeholder="e.g., Act No. 12 of 2025"
-                  />
-                </div>
-
-                <div>
                   <Label htmlFor="enactmentDate">Enactment Date</Label>
                   <Input
                     id="enactmentDate"
@@ -207,27 +194,6 @@ const AdminUploadLaw: React.FC = () => {
                     id="jurisdiction"
                     name="jurisdiction"
                     value={formData.jurisdiction}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="issuingAuthority">Issuing Authority</Label>
-                  <Input
-                    id="issuingAuthority"
-                    name="issuingAuthority"
-                    value={formData.issuingAuthority}
-                    onChange={handleInputChange}
-                    placeholder="e.g., National Legislative Assembly"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="ministry">Ministry</Label>
-                  <Input
-                    id="ministry"
-                    name="ministry"
-                    value={formData.ministry}
                     onChange={handleInputChange}
                   />
                 </div>
