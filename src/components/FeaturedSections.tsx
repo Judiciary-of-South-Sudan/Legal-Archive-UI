@@ -1,177 +1,181 @@
-import { Calendar, FileText, AlertCircle, Download } from "lucide-react";
+import { Calendar, FileText, BookOpen, Gavel, ChevronRight, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { useGetRecentJudgments } from "@/hooks/useJudgments";
+import { useGetRecentLaws } from "@/hooks/useLaws";
+import { useGetNotices } from "@/hooks/useNotices";
+import { useGetLaws } from "@/hooks/useLaws";
+import { useGetJudgments } from "@/hooks/useJudgments";
+
+const StatCard = ({ label, value, icon, href }: { label: string; value: number | undefined; icon: React.ReactNode; href: string }) => (
+  <Link to={href} className="block group">
+    <Card className="hover:shadow-md transition-shadow text-center">
+      <CardContent className="p-6">
+        <div className="flex justify-center mb-3 text-primary">{icon}</div>
+        <div className="text-3xl font-bold text-foreground mb-1">
+          {value === undefined ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : value.toLocaleString()}
+        </div>
+        <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">{label}</div>
+      </CardContent>
+    </Card>
+  </Link>
+);
 
 const FeaturedSections = () => {
-  const recentJudgments = [
-    {
-      title: "Republic v. John Doe & Others",
-      court: "Supreme Court",
-      date: "2024-01-15",
-      citation: "SSSC 001/2024",
-      subject: "Constitutional Law",
-    },
-    {
-      title: "Commercial Bank Ltd v. Ministry of Finance",
-      court: "Court of Appeal",
-      date: "2024-01-10", 
-      citation: "SSCA 045/2023",
-      subject: "Commercial Law",
-    },
-    {
-      title: "State v. Mary Jane",
-      court: "High Court",
-      date: "2024-01-08",
-      citation: "SSHC 234/2023",
-      subject: "Criminal Law",
-    },
-  ];
+  const { data: recentJudgments, isLoading: judgementsLoading } = useGetRecentJudgments(4);
+  const { data: recentLaws, isLoading: lawsLoading } = useGetRecentLaws(4);
+  const { data: recentNotices, isLoading: noticesLoading } = useGetNotices({ page: 0, size: 4, sort: "createdAt,desc" });
 
-  const legalUpdates = [
-    {
-      title: "Amendment to the Investment Promotion Act",
-      type: "Legislative Update",
-      date: "2024-01-12",
-      status: "Enacted",
-    },
-    {
-      title: "New Practice Direction on E-Filing",
-      type: "Practice Direction",
-      date: "2024-01-10",
-      status: "Effective",
-    },
-    {
-      title: "Appointment of High Court Judges",
-      type: "Judicial Appointment",
-      date: "2024-01-08",
-      status: "Gazette",
-    },
-  ];
+  const { data: lawStats } = useGetLaws({ page: 0, size: 1 });
+  const { data: judgmentStats } = useGetJudgments({ page: 0, size: 1 });
+  const { data: noticeStats } = useGetNotices({ page: 0, size: 1 });
 
   return (
-    <section className="py-16 bg-secondary/30">
+    <section className="py-12 bg-secondary/30">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Judgments */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Recent Judgments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentJudgments.map((judgment, index) => (
-                  <div key={index} className="border-b border-border pb-4 last:border-b-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-foreground hover:text-primary cursor-pointer">
-                        {judgment.title}
-                      </h4>
-                      <Badge variant="outline" className="ml-2 text-xs">
-                        {judgment.subject}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                      <span>{judgment.court} • {judgment.citation}</span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(judgment.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" className="w-full mt-4">
-                View All Judgments
-              </Button>
-            </CardContent>
-          </Card>
 
-          {/* Legal Updates */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-accent" />
-                Legal Updates & Notices
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {legalUpdates.map((update, index) => (
-                  <div key={index} className="border-b border-border pb-4 last:border-b-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-foreground hover:text-primary cursor-pointer">
-                        {update.title}
-                      </h4>
-                      <Badge 
-                        variant={update.status === "Enacted" ? "default" : "secondary"}
-                        className="ml-2 text-xs"
-                      >
-                        {update.status}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
-                      <span>{update.type}</span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(update.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" className="w-full mt-4">
-                View All Updates
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Stats row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+          <StatCard label="Laws & Regulations" value={lawStats?.totalElements} icon={<BookOpen className="h-8 w-8" />} href="/laws" />
+          <StatCard label="Court Judgments" value={judgmentStats?.totalElements} icon={<Gavel className="h-8 w-8" />} href="/judgments" />
+          <StatCard label="Legal Notices" value={noticeStats?.totalElements} icon={<FileText className="h-8 w-8" />} href="/notices" />
         </div>
 
-        {/* Featured Resources */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-center mb-8">Featured Legal Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 text-center">
-                <Download className="h-8 w-8 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Court Forms</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Download official court forms and templates
-                </p>
-                <Button variant="outline" size="sm">
-                  Access Forms
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+          {/* Recent Judgments */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Gavel className="h-5 w-5 text-primary" />
+                Recent Judgments
+              </CardTitle>
+              <Link to="/judgments">
+                <Button variant="ghost" size="sm" className="text-primary text-xs">
+                  View all <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
-              </CardContent>
-            </Card>
-            
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 text-center">
-                <FileText className="h-8 w-8 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Law Reports Archive</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Historical legal decisions and precedents
-                </p>
-                <Button variant="outline" size="sm">
-                  Browse Archive
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {judgementsLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : recentJudgments && recentJudgments.length > 0 ? (
+                <div className="space-y-4">
+                  {recentJudgments.map((j) => (
+                    <div key={j.id} className="border-b border-border pb-3 last:border-b-0">
+                      <Link to={`/judgments/${j.id}`} className="block hover:text-primary transition-colors">
+                        <div className="flex justify-between items-start mb-1 gap-2">
+                          <h4 className="font-medium text-sm leading-tight flex-1">{j.caseName}</h4>
+                          {j.courtLevel && <Badge variant="outline" className="text-xs shrink-0">{j.courtLevel}</Badge>}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          {j.courtName && <span>{j.courtName}</span>}
+                          {j.judgmentDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(j.judgmentDate).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">No judgments yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Laws */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BookOpen className="h-5 w-5 text-primary" />
+                Recent Laws
+              </CardTitle>
+              <Link to="/laws">
+                <Button variant="ghost" size="sm" className="text-primary text-xs">
+                  View all <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
-              </CardContent>
-            </Card>
-            
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 text-center">
-                <AlertCircle className="h-8 w-8 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Legal Aid Information</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Pro bono services and legal assistance
-                </p>
-                <Button variant="outline" size="sm">
-                  Learn More
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {lawsLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : recentLaws && recentLaws.length > 0 ? (
+                <div className="space-y-4">
+                  {recentLaws.map((law) => (
+                    <div key={law.id} className="border-b border-border pb-3 last:border-b-0">
+                      <Link to={`/laws/${law.id}`} className="block hover:text-primary transition-colors">
+                        <div className="flex justify-between items-start mb-1 gap-2">
+                          <h4 className="font-medium text-sm leading-tight flex-1">{law.title}</h4>
+                          {law.type && <Badge variant="secondary" className="text-xs shrink-0">{law.type}</Badge>}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          {law.year && <span>{law.year}</span>}
+                          {law.status && <span className="text-green-700">{law.status}</span>}
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">No laws yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Legal Notices */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <FileText className="h-5 w-5 text-primary" />
+                Recent Legal Notices
+              </CardTitle>
+              <Link to="/notices">
+                <Button variant="ghost" size="sm" className="text-primary text-xs">
+                  View all <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {noticesLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : recentNotices && recentNotices.content.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {recentNotices.content.map((n) => (
+                    <div key={n.id} className="border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+                      <Link to={`/notices/${n.id}`} className="block">
+                        <div className="flex justify-between items-start mb-1 gap-2">
+                          <h4 className="font-medium text-sm leading-tight flex-1">{n.title}</h4>
+                          {n.type && <Badge variant="outline" className="text-xs shrink-0">{n.type}</Badge>}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                          {n.publicationDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {new Date(n.publicationDate).toLocaleDateString()}
+                            </span>
+                          )}
+                          {n.status && (
+                            <span className={n.status === 'Active' ? 'text-green-700' : 'text-muted-foreground'}>
+                              {n.status}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-6">No legal notices yet.</p>
+              )}
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     </section>
