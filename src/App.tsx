@@ -38,6 +38,7 @@ import AdminUploadNotice from "@/pages/admin/UploadNotice.tsx";
 import EditLaw from './pages/admin/EditLaw';
 import EditJudgment from './pages/admin/EditJudgment';
 import EditNotice from './pages/admin/EditNotice';
+import AdminUsers from './pages/admin/Users';
 import SearchPage from './pages/Search';
 
 const queryClient = new QueryClient({
@@ -121,6 +122,11 @@ const App = () => (
             <Route path="/admin/edit-notice/:id" element={
               <ProtectedRoute requireAdmin={true}>
                 <EditNotice />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute requireAdmin={true}>
+                <AdminUsers />
               </ProtectedRoute>
             } />
 
