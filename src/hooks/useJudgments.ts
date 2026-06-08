@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { judgmentService } from '@/services/judgmentService';
-import { CreateJudgmentRequest, JudgmentFilterParams, SearchParams, DateRangeParams } from '@/types/api';
+import { CreateJudgmentRequest, JudgmentFilterParams, PaginationParams, SearchParams, DateRangeParams } from '@/types/api';
 import { toast } from 'sonner';
 
 export const judgmentKeys = {
