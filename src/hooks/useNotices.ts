@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { noticeService } from '@/services/noticeService';
-import { CreateLegalNoticeRequest, PaginationParams, SearchParams } from '@/types/api';
+import { CreateLegalNoticeRequest, NoticeFilterParams, SearchParams } from '@/types/api';
 import { toast } from 'sonner';
 
 export const noticeKeys = {
   all: ['notices'] as const,
   lists: () => [...noticeKeys.all, 'list'] as const,
-  list: (params?: PaginationParams) => [...noticeKeys.lists(), params] as const,
+  list: (params?: NoticeFilterParams) => [...noticeKeys.lists(), params] as const,
   details: () => [...noticeKeys.all, 'detail'] as const,
   detail: (id: string) => [...noticeKeys.details(), id] as const,
   search: (params: SearchParams) => [...noticeKeys.all, 'search', params] as const,
 };
 
-export const useGetNotices = (params?: PaginationParams) => {
+export const useGetNotices = (params?: NoticeFilterParams) => {
   return useQuery({
     queryKey: noticeKeys.list(params),
     queryFn: () => noticeService.getAllNotices(params),
