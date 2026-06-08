@@ -104,6 +104,9 @@ export interface Law {
   relatedLaws?: string[];
   amendments?: string[];
   language?: string;
+  verificationStatus?: string;
+  createdBy?: string;
+  updatedBy?: string;
   viewCount: number;
   downloadCount: number;
   createdAt: string;
@@ -170,6 +173,9 @@ export interface Judgment {
   language?: string;
   pdfUrl?: string;
   status?: string;
+  verificationStatus?: string;
+  createdBy?: string;
+  updatedBy?: string;
   viewCount: number;
   downloadCount: number;
   createdAt: string;
@@ -224,6 +230,9 @@ export interface LegalNotice {
   language?: string;
   pdfUrl?: string;
   status?: string;
+  verificationStatus?: string;
+  createdBy?: string;
+  updatedBy?: string;
   viewCount: number;
   downloadCount: number;
   createdAt: string;
@@ -277,6 +286,28 @@ export interface PaginationParams {
   page?: number;
   size?: number;
   sort?: string;
+}
+
+export interface LawFilterParams extends PaginationParams {
+  type?: string;
+  year?: number;
+  status?: string;
+  category?: string;
+}
+
+export interface JudgmentFilterParams extends PaginationParams {
+  courtLevel?: string;
+  caseType?: string;
+  status?: string;
+  yearFrom?: number;
+  yearTo?: number;
+}
+
+export interface NoticeFilterParams extends PaginationParams {
+  type?: string;
+  status?: string;
+  yearFrom?: number;
+  yearTo?: number;
 }
 
 export interface SearchParams extends PaginationParams {
