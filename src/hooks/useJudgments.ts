@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { judgmentService } from '@/services/judgmentService';
-import { CreateJudgmentRequest, PaginationParams, SearchParams, DateRangeParams } from '@/types/api';
+import { CreateJudgmentRequest, JudgmentFilterParams, SearchParams, DateRangeParams } from '@/types/api';
 import { toast } from 'sonner';
 
 export const judgmentKeys = {
   all: ['judgments'] as const,
   lists: () => [...judgmentKeys.all, 'list'] as const,
-  list: (params?: PaginationParams) => [...judgmentKeys.lists(), params] as const,
+  list: (params?: JudgmentFilterParams) => [...judgmentKeys.lists(), params] as const,
   details: () => [...judgmentKeys.all, 'detail'] as const,
   detail: (id: string) => [...judgmentKeys.details(), id] as const,
   search: (params: SearchParams) => [...judgmentKeys.all, 'search', params] as const,
@@ -19,7 +19,7 @@ export const judgmentKeys = {
   recent: (limit: number) => [...judgmentKeys.all, 'recent', limit] as const,
 };
 
-export const useGetJudgments = (params?: PaginationParams) => {
+export const useGetJudgments = (params?: JudgmentFilterParams) => {
   return useQuery({
     queryKey: judgmentKeys.list(params),
     queryFn: () => judgmentService.getAllJudgments(params),
