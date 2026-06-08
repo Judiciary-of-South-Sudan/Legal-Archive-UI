@@ -1,11 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { lawService } from '@/services/lawService';
-import { CreateLawRequest, PaginationParams, SearchParams } from '@/types/api';
+import { CreateLawRequest, LawFilterParams, SearchParams } from '@/types/api';
 import { toast } from 'sonner';
 export const lawKeys = {
   all: ['laws'] as const,
   lists: () => [...lawKeys.all, 'list'] as const,
-  list: (params?: PaginationParams) => [...lawKeys.lists(), params] as const,
+  list: (params?: LawFilterParams) => [...lawKeys.lists(), params] as const,
   details: () => [...lawKeys.all, 'detail'] as const,
   detail: (id: string) => [...lawKeys.details(), id] as const,
   search: (params: SearchParams) => [...lawKeys.all, 'search', params] as const,
@@ -15,7 +15,7 @@ export const lawKeys = {
   stats: () => [...lawKeys.all, 'stats'] as const,
   recent: (limit: number) => [...lawKeys.all, 'recent', limit] as const,
 };
-export const useGetLaws = (params?: PaginationParams) => {
+export const useGetLaws = (params?: LawFilterParams) => {
   return useQuery({
     queryKey: lawKeys.list(params),
     queryFn: () => lawService.getAllLaws(params),
