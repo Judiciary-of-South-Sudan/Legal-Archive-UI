@@ -4,13 +4,13 @@ import {
   PaginatedResponse,
   Judgment,
   CreateJudgmentRequest,
-  PaginationParams,
+  JudgmentFilterParams,
   SearchParams,
   DateRangeParams
 } from '@/types/api';
 
 export const judgmentService = {
-  async getAllJudgments(params?: PaginationParams): Promise<PaginatedResponse<Judgment>> {
+  async getAllJudgments(params?: JudgmentFilterParams): Promise<PaginatedResponse<Judgment>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Judgment>>>('/judgments', { params });
     return response.data.data!;
   },
