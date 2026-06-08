@@ -1,8 +1,8 @@
 import apiClient from '@/lib/apiClient';
-import { ApiResponse, PaginatedResponse, Law, CreateLawRequest, LawStats, PaginationParams, SearchParams } from '@/types/api';
+import { ApiResponse, PaginatedResponse, Law, CreateLawRequest, LawStats, LawFilterParams, SearchParams } from '@/types/api';
 
 export const lawService = {
-  async getAllLaws(params?: PaginationParams): Promise<PaginatedResponse<Law>> {
+  async getAllLaws(params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws', { params });
     return response.data.data!;
   },
