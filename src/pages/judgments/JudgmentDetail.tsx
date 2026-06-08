@@ -1,14 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2 } from 'lucide-react';
+import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2, Copy, Check } from 'lucide-react';
 import { useGetJudgmentById, useIncrementJudgmentView } from '@/hooks/useJudgments';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const JudgmentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,20 @@ const JudgmentDetail: React.FC = () => {
   const { mutate: incrementView } = useIncrementJudgmentView();
   const { isAdmin } = useAuth();
   const countedViewForId = useRef<string | null>(null);
+  const [citationCopied, setCitationCopied] = useState(false);
+
+  const copyCitation = () => {
+    if (!judgment) return;
+    const parts = [judgment.caseName];
+    if (judgment.caseNumber) parts.push(`(${judgment.caseNumber})`);
+    if (judgment.judgmentDate) parts.push(String(new Date(judgment.judgmentDate).getFullYear()));
+    if (judgment.courtName) parts.push(judgment.courtName);
+    parts.push(window.location.href);
+    navigator.clipboard.writeText(parts.join(', '));
+    setCitationCopied(true);
+    toast.success('Citation copied to clipboard');
+    setTimeout(() => setCitationCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
@@ -192,6 +207,10 @@ const JudgmentDetail: React.FC = () => {
               ) : (
                 <Button variant="outline" disabled>No PDF available</Button>
               )}
+              <Button variant="outline" onClick={copyCitation}>
+                {citationCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                {citationCopied ? 'Copied' : 'Copy Citation'}
+              </Button>
               {isAdmin() && (
                 <Link to={`/admin/edit-judgment/${id}`}>
                   <Button variant="outline">
