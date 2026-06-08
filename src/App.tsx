@@ -38,6 +38,7 @@ import AdminUploadNotice from "@/pages/admin/UploadNotice.tsx";
 import EditLaw from './pages/admin/EditLaw';
 import EditJudgment from './pages/admin/EditJudgment';
 import EditNotice from './pages/admin/EditNotice';
+import SearchPage from './pages/Search';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,7 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/sitemap" element={<Sitemap />} />
             <Route path="/opinions" element={<JudicialOpinions />} />
+            <Route path="/search" element={<SearchPage />} />
             <Route path="/resources" element={<LegalResources />} />
             <Route path="/judgments/supreme-court" element={<SupremeCourt />} />
             <Route path="/judgments/court-of-appeal" element={<CourtOfAppeal />} />
