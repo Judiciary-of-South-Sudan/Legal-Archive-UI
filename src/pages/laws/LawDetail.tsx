@@ -1,14 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Download, Calendar, BookOpen, ExternalLink, Pencil, Loader2 } from 'lucide-react';
+import { FileText, Download, Calendar, BookOpen, ExternalLink, Pencil, Loader2, Copy, Check } from 'lucide-react';
 import { useGetLawById, useIncrementLawView } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const LawDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,19 @@ const LawDetail: React.FC = () => {
   const { mutate: incrementView } = useIncrementLawView();
   const { isAdmin } = useAuth();
   const countedViewForId = useRef<string | null>(null);
+  const [citationCopied, setCitationCopied] = useState(false);
+
+  const copyCitation = () => {
+    if (!law) return;
+    const parts = [law.title];
+    if (law.year) parts.push(String(law.year));
+    if (law.publisher) parts.push(law.publisher);
+    parts.push(window.location.href);
+    navigator.clipboard.writeText(parts.join(', '));
+    setCitationCopied(true);
+    toast.success('Citation copied to clipboard');
+    setTimeout(() => setCitationCopied(false), 2000);
+  };
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
@@ -186,6 +200,10 @@ const LawDetail: React.FC = () => {
               ) : (
                 <Button variant="outline" disabled>No PDF available</Button>
               )}
+              <Button variant="outline" onClick={copyCitation}>
+                {citationCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
+                {citationCopied ? 'Copied' : 'Copy Citation'}
+              </Button>
               {isAdmin() && (
                 <Link to={`/admin/edit-law/${id}`}>
                   <Button variant="outline">
