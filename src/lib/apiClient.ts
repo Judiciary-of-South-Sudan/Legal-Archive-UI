@@ -1,9 +1,9 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
-// Strips the trailing /api segment to get the backend origin (e.g. http://localhost:8080)
-const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '');
+// Strips the trailing /api/v1 segment to get the backend origin (e.g. http://localhost:8080)
+const API_ORIGIN = API_BASE_URL.replace(/\/api\/v1\/?$/, '');
 
 /**
  * Converts a backend-relative path like /api/files/laws/foo.pdf to a usable URL.
