@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -17,6 +18,14 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = (searchInputRef.current?.value || mobileSearchRef.current?.value || "").trim();
+    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -58,18 +67,17 @@ const Header = () => {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:flex items-center space-x-4 flex-1 max-w-md mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center space-x-2 flex-1 max-w-md mx-8">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
+                ref={searchInputRef}
                 placeholder="Search laws, cases, judgments..."
                 className="pl-10"
               />
             </div>
-            <Button variant="default" size="sm">
-              Search
-            </Button>
-          </div>
+            <Button type="submit" variant="default" size="sm">Search</Button>
+          </form>
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center space-x-2">
@@ -151,15 +159,16 @@ const Header = () => {
         </nav>
 
         {/* Mobile Search */}
-        <div className="md:hidden pb-4">
+        <form onSubmit={handleSearch} className="md:hidden pb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
+              ref={mobileSearchRef}
               placeholder="Search laws, cases, judgments..."
               className="pl-10"
             />
           </div>
-        </div>
+        </form>
       </div>
     </header>
   );
