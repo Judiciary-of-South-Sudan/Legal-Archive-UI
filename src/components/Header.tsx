@@ -1,9 +1,8 @@
-import { Search, Menu, Scale, User, LogOut } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   DropdownMenu,
@@ -16,10 +15,16 @@ import {
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }, [dark]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,8 +84,11 @@ const Header = () => {
             <Button type="submit" variant="default" size="sm">Search</Button>
           </form>
 
-          {/* Auth Section */}
+          {/* Dark mode toggle + Auth */}
           <div className="hidden md:flex items-center space-x-2">
+            <Button variant="ghost" size="sm" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -131,6 +139,10 @@ const Header = () => {
               </>
             )}
           </div>
+          {/* Mobile dark mode toggle */}
+          <Button variant="ghost" size="sm" className="md:hidden mr-1" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
 
           {/* Mobile Menu Button */}
           <Button
