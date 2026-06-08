@@ -1,8 +1,8 @@
 import apiClient from '@/lib/apiClient';
-import { ApiResponse, LegalNotice, CreateLegalNoticeRequest, PaginatedResponse, PaginationParams, SearchParams } from '@/types/api';
+import { ApiResponse, LegalNotice, CreateLegalNoticeRequest, PaginatedResponse, NoticeFilterParams, SearchParams } from '@/types/api';
 
 export const noticeService = {
-  async getAllNotices(params?: PaginationParams): Promise<PaginatedResponse<LegalNotice>> {
+  async getAllNotices(params?: NoticeFilterParams): Promise<PaginatedResponse<LegalNotice>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<LegalNotice>>>('/legal-notices', { params });
     return response.data.data!;
   },
