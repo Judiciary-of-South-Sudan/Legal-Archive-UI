@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 5173,
     proxy: {
-      '/api/files': {
+      '/api/v1/files': {
         target: 'http://127.0.0.1:8080',
         changeOrigin: true,
       },
