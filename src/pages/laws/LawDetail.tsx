@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Download, Calendar, BookOpen, ExternalLink, Pencil, Loader2, Copy, Check, Bookmark, BookmarkCheck } from 'lucide-react';
-import { useGetLawById, useIncrementLawView } from '@/hooks/useLaws';
+import { useGetLawById, useIncrementLawView, useIncrementLawDownload } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
@@ -23,6 +23,7 @@ const LawDetail: React.FC = () => {
   const [citationCopied, setCitationCopied] = useState(false);
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
+  const { mutate: trackDownload } = useIncrementLawDownload();
 
   const copyCitation = () => {
     if (!law) return;
@@ -190,7 +191,7 @@ const LawDetail: React.FC = () => {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <a href={pdfUrl} target="_blank" rel="noreferrer" download>
+                    <a href={pdfUrl} target="_blank" rel="noreferrer" download onClick={() => trackDownload(id!)}>
                       <Download className="h-4 w-4 mr-1" /> {t('laws.download_pdf')}
                     </a>
                   </Button>
