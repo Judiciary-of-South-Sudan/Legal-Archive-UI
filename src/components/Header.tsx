@@ -1,4 +1,4 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings, LayoutDashboard, FilePlus } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings, LayoutDashboard, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
@@ -173,34 +173,10 @@ const Header = () => {
                   {(isEditor() || isAdmin()) && (
                     <>
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-3">Upload</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/upload-law" className="cursor-pointer">
-                          <FilePlus className="mr-2 h-4 w-4" />
-                          Upload Law
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/upload-judgment" className="cursor-pointer">
-                          <FilePlus className="mr-2 h-4 w-4" />
-                          Upload Judgment
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin/upload-notice" className="cursor-pointer">
-                          <FilePlus className="mr-2 h-4 w-4" />
-                          Upload Notice
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  {isAdmin() && (
-                    <>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="cursor-pointer">
                           <LayoutDashboard className="mr-2 h-4 w-4" />
-                          {t('header.admin_dashboard')}
+                          {isAdmin() ? t('header.admin_dashboard') : 'Dashboard'}
                         </Link>
                       </DropdownMenuItem>
                     </>
