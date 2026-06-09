@@ -11,8 +11,10 @@ import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const LawDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: law, isLoading, error } = useGetLawById(id || '');
   const { mutate: incrementView } = useIncrementLawView();
@@ -30,7 +32,7 @@ const LawDetail: React.FC = () => {
     parts.push(window.location.href);
     navigator.clipboard.writeText(parts.join(', '));
     setCitationCopied(true);
-    toast.success('Citation copied to clipboard');
+    toast.success(t('common.citation_copied'));
     setTimeout(() => setCitationCopied(false), 2000);
   };
 
@@ -48,7 +50,7 @@ const LawDetail: React.FC = () => {
         <Header />
         <main className="container mx-auto px-4 py-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading law...</span>
+          <span className="ml-2">{t('laws.loading_detail')}</span>
         </main>
         <Footer />
       </div>
@@ -62,11 +64,11 @@ const LawDetail: React.FC = () => {
         <main className="container mx-auto px-4 py-12">
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold">Law not found</h2>
-              <p className="text-muted-foreground mt-2">Unable to find the requested law.</p>
+              <h2 className="text-xl font-semibold">{t('laws.not_found')}</h2>
+              <p className="text-muted-foreground mt-2">{t('laws.not_found_desc')}</p>
               <div className="mt-4">
                 <Link to="/laws">
-                  <Button variant="outline">Back to Laws</Button>
+                  <Button variant="outline">{t('laws.back')}</Button>
                 </Link>
               </div>
             </CardContent>
@@ -92,7 +94,6 @@ const LawDetail: React.FC = () => {
       <main className="container mx-auto px-4 py-8 space-y-4">
         <Card>
           <CardContent className="p-6">
-            {/* Badges */}
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {law.type && <Badge variant="secondary">{law.type}</Badge>}
               {law.status && <Badge className={statusColor}>{law.status}</Badge>}
@@ -102,55 +103,52 @@ const LawDetail: React.FC = () => {
 
             <h1 className="text-3xl font-bold text-foreground mb-4">{law.title}</h1>
 
-            {/* Metadata grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground mb-5">
               {law.enactmentDate && (
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" />
-                  Enacted: <span className="text-foreground">{new Date(law.enactmentDate).toLocaleDateString()}</span>
+                  {t('laws.enacted')}: <span className="text-foreground">{new Date(law.enactmentDate).toLocaleDateString()}</span>
                 </span>
               )}
               {law.commencementDate && (
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" />
-                  Commenced: <span className="text-foreground">{new Date(law.commencementDate).toLocaleDateString()}</span>
+                  {t('laws.commenced')}: <span className="text-foreground">{new Date(law.commencementDate).toLocaleDateString()}</span>
                 </span>
               )}
               {law.lastAmended && (
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" />
-                  Last Amended: <span className="text-foreground">{new Date(law.lastAmended).toLocaleDateString()}</span>
+                  {t('laws.last_amended')}: <span className="text-foreground">{new Date(law.lastAmended).toLocaleDateString()}</span>
                 </span>
               )}
               {law.jurisdiction && (
                 <span className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 shrink-0" />
-                  Jurisdiction: <span className="text-foreground">{law.jurisdiction}</span>
+                  {t('laws.jurisdiction')}: <span className="text-foreground">{law.jurisdiction}</span>
                 </span>
               )}
               {law.publisher && (
                 <span className="flex items-center gap-2">
                   <FileText className="h-4 w-4 shrink-0" />
-                  Publisher: <span className="text-foreground">{law.publisher}</span>
+                  {t('laws.publisher')}: <span className="text-foreground">{law.publisher}</span>
                 </span>
               )}
               {law.language && (
                 <span className="flex items-center gap-2">
                   <FileText className="h-4 w-4 shrink-0" />
-                  Language: <span className="text-foreground">{law.language}</span>
+                  {t('laws.language')}: <span className="text-foreground">{law.language}</span>
                 </span>
               )}
             </div>
 
-            {/* Summary */}
             {law.summary && (
               <p className="text-foreground mb-5 leading-relaxed">{law.summary}</p>
             )}
 
-            {/* Tags */}
             {law.tags && law.tags.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-2">Tags</h4>
+                <h4 className="text-sm font-semibold mb-2">{t('laws.tags')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {law.tags.map((tag, i) => (
                     <span key={i} className="text-xs bg-muted px-2 py-1 rounded">{tag}</span>
@@ -159,10 +157,9 @@ const LawDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Related laws */}
             {law.relatedLaws && law.relatedLaws.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-2">Related Laws</h4>
+                <h4 className="text-sm font-semibold mb-2">{t('laws.related_laws')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {law.relatedLaws.map((lawId) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
@@ -173,10 +170,9 @@ const LawDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Amendments */}
             {law.amendments && law.amendments.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-2">Amendments</h4>
+                <h4 className="text-sm font-semibold mb-2">{t('laws.amendments_label')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {law.amendments.map((a, i) => (
                     <span key={i} className="text-xs bg-muted px-2 py-1 rounded">{a}</span>
@@ -185,23 +181,22 @@ const LawDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               {pdfUrl ? (
                 <>
                   <Button asChild>
                     <Link to={`/laws/${id}/document`}>
-                      <ExternalLink className="h-4 w-4 mr-1" /> View Document
+                      <ExternalLink className="h-4 w-4 mr-1" /> {t('laws.view_document')}
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <a href={pdfUrl} target="_blank" rel="noreferrer" download>
-                      <Download className="h-4 w-4 mr-1" /> Download PDF
+                      <Download className="h-4 w-4 mr-1" /> {t('laws.download_pdf')}
                     </a>
                   </Button>
                 </>
               ) : (
-                <Button variant="outline" disabled>No PDF available</Button>
+                <Button variant="outline" disabled>{t('laws.no_pdf')}</Button>
               )}
               {isAuthenticated && (
                 <Button
@@ -210,22 +205,22 @@ const LawDetail: React.FC = () => {
                   disabled={bookmarkPending}
                 >
                   {bookmarked ? <BookmarkCheck className="h-4 w-4 mr-1" /> : <Bookmark className="h-4 w-4 mr-1" />}
-                  {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                  {bookmarked ? t('common.bookmarked') : t('common.bookmark')}
                 </Button>
               )}
               <Button variant="outline" onClick={copyCitation}>
                 {citationCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
-                {citationCopied ? 'Copied' : 'Copy Citation'}
+                {citationCopied ? t('common.citation_copied') : t('common.copy_citation')}
               </Button>
               {isAdmin() && (
                 <Link to={`/admin/edit-law/${id}`}>
                   <Button variant="outline">
-                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                    <Pencil className="h-4 w-4 mr-1" /> {t('common.edit')}
                   </Button>
                 </Link>
               )}
               <Link to="/laws">
-                <Button variant="ghost">Back to Laws</Button>
+                <Button variant="ghost">{t('laws.back')}</Button>
               </Link>
             </div>
           </CardContent>
