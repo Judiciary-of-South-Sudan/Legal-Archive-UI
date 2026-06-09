@@ -315,7 +315,17 @@
       "recorded_queries": "استعلامات البحث المسجلة",
       "views_downloads_by_type": "المشاهدات والتنزيلات حسب النوع",
       "docs_added_6months": "المستندات المضافة (آخر 6 أشهر)",
-      "top_search_terms": "أبرز مصطلحات البحث"
+      "top_search_terms": "أبرز مصطلحات البحث",
+      "audit_log": "سجل التدقيق",
+      "audit_log_desc": "آخر التغييرات على المستندات في جميع المجموعات",
+      "audit_doc_type": "النوع",
+      "audit_title": "المستند",
+      "audit_created_by": "رُفع بواسطة",
+      "audit_created_at": "تاريخ الرفع",
+      "audit_updated_by": "آخر تعديل بواسطة",
+      "audit_updated_at": "تاريخ آخر تعديل",
+      "audit_status": "الحالة",
+      "audit_empty": "لم يتم رفع أي مستندات بعد."
     },
     "form": {
       "uploading": "جارٍ الرفع...",
