@@ -97,13 +97,17 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
-          <Link to="/" className="flex items-center space-x-3">
-            <Scale className="h-8 w-8 text-primary" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground shadow-sm group-hover:shadow-md transition-shadow">
+              <Scale className="h-6 w-6" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">
-                {t('header.title')}
+              <h1 className="text-lg font-bold text-foreground leading-tight tracking-tight">
+                South Sudan
               </h1>
-              <p className="text-xs text-muted-foreground">{t('header.subtitle')}</p>
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest">
+                Law Reports
+              </p>
             </div>
           </Link>
 
