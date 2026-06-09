@@ -315,7 +315,17 @@
       "recorded_queries": "Recorded search queries",
       "views_downloads_by_type": "Views & Downloads by Type",
       "docs_added_6months": "Documents Added (Last 6 Months)",
-      "top_search_terms": "Top Search Terms"
+      "top_search_terms": "Top Search Terms",
+      "audit_log": "Audit Log",
+      "audit_log_desc": "Recent document changes across all collections",
+      "audit_doc_type": "Type",
+      "audit_title": "Document",
+      "audit_created_by": "Uploaded By",
+      "audit_created_at": "Uploaded",
+      "audit_updated_by": "Last Edited By",
+      "audit_updated_at": "Last Edited",
+      "audit_status": "Status",
+      "audit_empty": "No documents uploaded yet."
     },
     "form": {
       "uploading": "Uploading...",
