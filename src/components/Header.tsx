@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
+import apiClient from "@/lib/apiClient";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,36 @@ import {
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [tickerItems, setTickerItems] = useState<string[]>([]);
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
+
+  useEffect(() => {
+    Promise.allSettled([
+      apiClient.get('/laws?size=4&sort=createdAt,desc'),
+      apiClient.get('/judgments?size=4&sort=createdAt,desc'),
+      apiClient.get('/notices?size=4&sort=createdAt,desc'),
+    ]).then(([lawsRes, judgmentsRes, noticesRes]) => {
+      const items: { label: string; createdAt: string }[] = [];
+
+      const laws = lawsRes.status === 'fulfilled' ? (lawsRes.value.data?.data?.content ?? []) : [];
+      const judgments = judgmentsRes.status === 'fulfilled' ? (judgmentsRes.value.data?.data?.content ?? []) : [];
+      const notices = noticesRes.status === 'fulfilled' ? (noticesRes.value.data?.data?.content ?? []) : [];
+
+      laws.forEach((d: any) => items.push({ label: `${d.type || 'Law'}: ${d.title}`, createdAt: d.createdAt ?? '' }));
+      judgments.forEach((d: any) => items.push({ label: `Judgment: ${d.caseName}`, createdAt: d.createdAt ?? '' }));
+      notices.forEach((d: any) => items.push({ label: `Notice: ${d.title}`, createdAt: d.createdAt ?? '' }));
+
+      // Sort all by newest first, take top 8
+      items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      const labels = items.slice(0, 8).map(i => i.label);
+      if (labels.length > 0) setTickerItems(labels);
+    });
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
@@ -60,13 +85,13 @@ const Header = () => {
       {/* South Sudan flag stripe */}
       <div className="flag-stripe-bar" />
       {/* Top Bar with News Ticker */}
-      <div className="bg-primary text-primary-foreground py-1 overflow-hidden">
-        <div className="news-ticker whitespace-nowrap text-sm">
-          Latest: New Supreme Court judgment on constitutional law published •
-          South Sudan Gazette Issue 15/2024 now available •
-          Practice Direction on e-filing systems updated
+      {tickerItems.length > 0 && (
+        <div className="bg-primary text-primary-foreground py-1 overflow-hidden">
+          <div className="news-ticker whitespace-nowrap text-sm">
+            {tickerItems.join('  •  ')}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Header */}
       <div className="container mx-auto px-4">
