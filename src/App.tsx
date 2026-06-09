@@ -40,6 +40,7 @@ import EditJudgment from './pages/admin/EditJudgment';
 import EditNotice from './pages/admin/EditNotice';
 import AdminUsers from './pages/admin/Users';
 import SearchPage from './pages/Search';
+import Library from './pages/Library';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,6 +74,11 @@ const App = () => (
             <Route path="/sitemap" element={<Sitemap />} />
             <Route path="/opinions" element={<JudicialOpinions />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/library" element={
+              <ProtectedRoute>
+                <Library />
+              </ProtectedRoute>
+            } />
             <Route path="/resources" element={<LegalResources />} />
             <Route path="/judgments/supreme-court" element={<SupremeCourt />} />
             <Route path="/judgments/court-of-appeal" element={<CourtOfAppeal />} />
