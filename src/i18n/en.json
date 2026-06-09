@@ -467,6 +467,29 @@
       "status_rejected": "Rejected"
     }
   },
+  "searchbar": {
+    "search": "Search",
+    "filters": "Filters",
+    "active_filters": "Active filters:",
+    "clear_all": "Clear all",
+    "category": "Category",
+    "year": "Year",
+    "court": "Court",
+    "document_type": "Document Type",
+    "criminal_law": "Criminal Law",
+    "civil_law": "Civil Law",
+    "commercial_law": "Commercial Law",
+    "constitutional_law": "Constitutional Law",
+    "family_law": "Family Law",
+    "supreme_court": "Supreme Court",
+    "court_of_appeal": "Court of Appeal",
+    "high_court": "High Court",
+    "county_courts": "County Courts",
+    "type_judgment": "Judgment",
+    "type_ruling": "Ruling",
+    "type_order": "Court Order",
+    "type_notice": "Legal Notice"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

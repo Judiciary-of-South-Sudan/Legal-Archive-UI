@@ -467,6 +467,29 @@
       "status_rejected": "مرفوض"
     }
   },
+  "searchbar": {
+    "search": "بحث",
+    "filters": "التصفية",
+    "active_filters": "الفلاتر النشطة:",
+    "clear_all": "مسح الكل",
+    "category": "الفئة",
+    "year": "السنة",
+    "court": "المحكمة",
+    "document_type": "نوع المستند",
+    "criminal_law": "قانون جنائي",
+    "civil_law": "قانون مدني",
+    "commercial_law": "قانون تجاري",
+    "constitutional_law": "قانون دستوري",
+    "family_law": "قانون الأسرة",
+    "supreme_court": "المحكمة العليا",
+    "court_of_appeal": "محكمة الاستئناف",
+    "high_court": "المحكمة الابتدائية العليا",
+    "county_courts": "محاكم المقاطعات",
+    "type_judgment": "حكم",
+    "type_ruling": "قرار",
+    "type_order": "أمر المحكمة",
+    "type_notice": "إشعار قانوني"
+  },
   "common": {
     "loading": "جارٍ التحميل...",
     "error": "حدث خطأ ما",
