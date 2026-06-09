@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2, Copy, Check, Bookmark, BookmarkCheck } from 'lucide-react';
-import { useGetJudgmentById, useIncrementJudgmentView } from '@/hooks/useJudgments';
+import { useGetJudgmentById, useIncrementJudgmentView, useIncrementJudgmentDownload } from '@/hooks/useJudgments';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
@@ -18,6 +18,7 @@ const JudgmentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: judgment, isLoading, error } = useGetJudgmentById(id || '');
   const { mutate: incrementView } = useIncrementJudgmentView();
+  const { mutate: trackDownload } = useIncrementJudgmentDownload();
   const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
@@ -197,7 +198,7 @@ const JudgmentDetail: React.FC = () => {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <a href={pdfUrl} target="_blank" rel="noreferrer" download>
+                    <a href={pdfUrl} target="_blank" rel="noreferrer" download onClick={() => trackDownload(id!)}>
                       <Download className="h-4 w-4 mr-1" /> {t('laws.download_pdf')}
                     </a>
                   </Button>
