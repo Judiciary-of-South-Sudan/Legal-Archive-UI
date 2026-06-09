@@ -9,10 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DocStatusDropdown from "@/components/DocStatusDropdown";
 import { useGetJudgments, useSearchJudgments } from "@/hooks/useJudgments";
 import { Link } from 'react-router-dom';
 import { JudgmentFilterParams } from "@/types/api";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
 
 const COURT_LEVELS = ["Supreme Court", "Court of Appeal", "High Court", "Magistrate Court"];
 const CASE_TYPES = ["Civil", "Criminal", "Constitutional", "Commercial", "Family", "Administrative"];
@@ -26,6 +28,8 @@ const verificationBadge = (status?: string) => {
 
 const Judgments = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false;
   const [searchTerm, setSearchTerm] = useState("");
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
