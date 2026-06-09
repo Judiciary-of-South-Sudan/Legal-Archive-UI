@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -28,10 +30,7 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,14 +38,14 @@ const Register: React.FC = () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      toast.error('Passwords do not match');
+      setError(t("register.passwords_mismatch"));
+      toast.error(t("register.passwords_mismatch"));
       return;
     }
 
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      toast.error('Password must be at least 8 characters long');
+      setError(t("register.password_too_short"));
+      toast.error(t("register.password_too_short"));
       return;
     }
 
@@ -55,10 +54,10 @@ const Register: React.FC = () => {
     try {
       const { confirmPassword, ...registerData } = formData;
       await register(registerData);
-      toast.success('Registration successful! Please login.');
+      toast.success(t("register.success"));
       navigate('/login');
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.response?.data?.error || 'Registration failed. Please try again.';
+      const errorMessage = err?.response?.data?.message || err?.response?.data?.error || t("register.error");
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -70,10 +69,8 @@ const Register: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-2xl">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Create an Account</CardTitle>
-          <CardDescription className="text-center">
-            Register to access the Legal Archive System
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">{t("register.title")}</CardTitle>
+          <CardDescription className="text-center">{t("register.subtitle")}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -85,12 +82,12 @@ const Register: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username *</Label>
+                <Label htmlFor="username">{t("register.username")} *</Label>
                 <Input
                   id="username"
                   name="username"
                   type="text"
-                  placeholder="Enter username"
+                  placeholder={t("register.username_placeholder")}
                   value={formData.username}
                   onChange={handleChange}
                   required
@@ -99,12 +96,12 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">{t("register.email")} *</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  placeholder="Enter email"
+                  placeholder={t("register.email_placeholder")}
                   value={formData.email}
                   onChange={handleChange}
                   required
@@ -113,12 +110,12 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name *</Label>
+                <Label htmlFor="fullName">{t("register.full_name")} *</Label>
                 <Input
                   id="fullName"
                   name="fullName"
                   type="text"
-                  placeholder="Enter full name"
+                  placeholder={t("register.fullname_placeholder")}
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -127,12 +124,12 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="organization">Organization</Label>
+                <Label htmlFor="organization">{t("register.organization")}</Label>
                 <Input
                   id="organization"
                   name="organization"
                   type="text"
-                  placeholder="Enter organization"
+                  placeholder={t("register.org_placeholder")}
                   value={formData.organization}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -140,12 +137,12 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="position">Position</Label>
+                <Label htmlFor="position">{t("register.position")}</Label>
                 <Input
                   id="position"
                   name="position"
                   type="text"
-                  placeholder="Enter position"
+                  placeholder={t("register.position_placeholder")}
                   value={formData.position}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -153,13 +150,13 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password *</Label>
+                <Label htmlFor="password">{t("register.password")} *</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Min 8 characters"
+                    placeholder={t("register.password_placeholder")}
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -178,13 +175,13 @@ const Register: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                <Label htmlFor="confirmPassword">{t("register.confirm_password")} *</Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Re-enter password"
+                    placeholder={t("register.confirm_placeholder")}
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
@@ -208,23 +205,23 @@ const Register: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registering...
+                  {t("register.registering")}
                 </>
               ) : (
-                'Register'
+                t("register.btn")
               )}
             </Button>
 
             <div className="text-sm text-center text-gray-600">
-              Already have an account?{' '}
+              {t("register.have_account")}{' '}
               <Link to="/login" className="text-primary hover:underline font-medium">
-                Login here
+                {t("register.login_link")}
               </Link>
             </div>
 
             <div className="text-sm text-center">
               <Link to="/" className="text-gray-600 hover:text-primary hover:underline">
-                Back to Home
+                {t("register.back_home")}
               </Link>
             </div>
           </CardFooter>
@@ -235,4 +232,3 @@ const Register: React.FC = () => {
 };
 
 export default Register;
-
