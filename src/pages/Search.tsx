@@ -12,8 +12,10 @@ import { Search, BookOpen, Gavel, FileText, Calendar, Loader2, ChevronRight } fr
 import { useSearchLaws } from "@/hooks/useLaws";
 import { useSearchJudgments } from "@/hooks/useJudgments";
 import { useSearchNotices } from "@/hooks/useNotices";
+import { useTranslation } from "react-i18next";
 
 const SearchPage = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [inputValue, setInputValue] = useState(searchParams.get("q") || "");
 
@@ -54,63 +56,62 @@ const SearchPage = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
 
-        {/* Search form */}
         <div className="max-w-2xl mb-8">
-          <h1 className="text-2xl font-bold mb-4">Search the Legal Archive</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("search.page_title")}</h1>
           <form onSubmit={handleSearch} className="flex gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Search laws, judgments, legal notices..."
+                placeholder={t("search.placeholder")}
                 className="pl-10"
               />
             </div>
-            <Button type="submit">Search</Button>
+            <Button type="submit">{t("search.btn")}</Button>
           </form>
         </div>
 
         {!query ? (
           <div className="text-center py-16">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground text-lg">Enter a search term to find laws, judgments, and notices.</p>
+            <p className="text-muted-foreground text-lg">{t("search.empty_prompt")}</p>
           </div>
         ) : (
           <>
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
-                <span className="text-muted-foreground">Searching across all collections...</span>
+                <span className="text-muted-foreground">{t("search.loading")}</span>
               </div>
             ) : (
               <>
                 <p className="text-sm text-muted-foreground mb-6">
-                  {totalCount} result{totalCount !== 1 ? "s" : ""} for <span className="font-semibold text-foreground">"{query}"</span>
+                  {totalCount} {totalCount !== 1 ? t("search.results_plural") : t("search.results_singular")}{" "}
+                  <span className="font-semibold text-foreground">"{query}"</span>
                 </p>
 
                 <Tabs defaultValue="all">
                   <TabsList className="mb-6">
                     <TabsTrigger value="all">
-                      All <Badge variant="secondary" className="ml-2">{totalCount}</Badge>
+                      {t("search.tab_all")} <Badge variant="secondary" className="ml-2">{totalCount}</Badge>
                     </TabsTrigger>
                     <TabsTrigger value="laws">
-                      Laws <Badge variant="secondary" className="ml-2">{lawsCount}</Badge>
+                      {t("search.tab_laws")} <Badge variant="secondary" className="ml-2">{lawsCount}</Badge>
                     </TabsTrigger>
                     <TabsTrigger value="judgments">
-                      Judgments <Badge variant="secondary" className="ml-2">{judgmentsCount}</Badge>
+                      {t("search.tab_judgments")} <Badge variant="secondary" className="ml-2">{judgmentsCount}</Badge>
                     </TabsTrigger>
                     <TabsTrigger value="notices">
-                      Notices <Badge variant="secondary" className="ml-2">{noticesCount}</Badge>
+                      {t("search.tab_notices")} <Badge variant="secondary" className="ml-2">{noticesCount}</Badge>
                     </TabsTrigger>
                   </TabsList>
 
-                  {/* ALL TAB */}
                   <TabsContent value="all" className="space-y-3">
                     {totalCount === 0 && (
                       <div className="text-center py-12">
-                        <p className="text-muted-foreground">No results found for "{query}".</p>
-                        <p className="text-sm text-muted-foreground mt-2">Try different keywords or browse by category.</p>
+                        <p className="text-muted-foreground">{t("search.no_results", { query })}</p>
+                        <p className="text-sm text-muted-foreground mt-2">{t("search.no_results_hint")}</p>
                       </div>
                     )}
 
@@ -119,7 +120,7 @@ const SearchPage = () => {
                         key={law.id}
                         href={`/laws/${law.id}`}
                         icon={<BookOpen className="h-4 w-4" />}
-                        type="Law"
+                        type={t("search.type_law")}
                         typeColor="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                         title={law.title}
                         meta={[law.type, law.year?.toString(), law.status].filter(Boolean) as string[]}
@@ -133,7 +134,7 @@ const SearchPage = () => {
                         key={j.id}
                         href={`/judgments/${j.id}`}
                         icon={<Gavel className="h-4 w-4" />}
-                        type="Judgment"
+                        type={t("search.type_judgment")}
                         typeColor="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
                         title={j.caseName}
                         meta={[j.courtLevel, j.caseType, j.status].filter(Boolean) as string[]}
@@ -147,7 +148,7 @@ const SearchPage = () => {
                         key={n.id}
                         href={`/notices/${n.id}`}
                         icon={<FileText className="h-4 w-4" />}
-                        type="Notice"
+                        type={t("search.type_notice")}
                         typeColor="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100"
                         title={n.title}
                         meta={[n.type, n.status].filter(Boolean) as string[]}
@@ -158,24 +159,23 @@ const SearchPage = () => {
 
                     {(lawsCount > 5 || judgmentsCount > 5 || noticesCount > 5) && (
                       <p className="text-sm text-muted-foreground text-center pt-2">
-                        Showing top 5 per category. Use the tabs above to see all results.
+                        {t("search.top_5_hint")}
                       </p>
                     )}
                   </TabsContent>
 
-                  {/* LAWS TAB */}
                   <TabsContent value="laws" className="space-y-3">
                     {lawsResult.isLoading ? (
                       <Loading />
                     ) : lawsResult.data?.content.length === 0 ? (
-                      <Empty type="laws" query={query} />
+                      <Empty message={t("search.no_laws", { query })} />
                     ) : (
                       lawsResult.data?.content.map((law) => (
                         <ResultCard
                           key={law.id}
                           href={`/laws/${law.id}`}
                           icon={<BookOpen className="h-4 w-4" />}
-                          type="Law"
+                          type={t("search.type_law")}
                           typeColor="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                           title={law.title}
                           meta={[law.type, law.year?.toString(), law.category, law.status].filter(Boolean) as string[]}
@@ -186,19 +186,18 @@ const SearchPage = () => {
                     )}
                   </TabsContent>
 
-                  {/* JUDGMENTS TAB */}
                   <TabsContent value="judgments" className="space-y-3">
                     {judgmentsResult.isLoading ? (
                       <Loading />
                     ) : judgmentsResult.data?.content.length === 0 ? (
-                      <Empty type="judgments" query={query} />
+                      <Empty message={t("search.no_judgments", { query })} />
                     ) : (
                       judgmentsResult.data?.content.map((j) => (
                         <ResultCard
                           key={j.id}
                           href={`/judgments/${j.id}`}
                           icon={<Gavel className="h-4 w-4" />}
-                          type="Judgment"
+                          type={t("search.type_judgment")}
                           typeColor="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
                           title={j.caseName}
                           meta={[j.courtLevel, j.courtName, j.caseType, j.verdict].filter(Boolean) as string[]}
@@ -210,19 +209,18 @@ const SearchPage = () => {
                     )}
                   </TabsContent>
 
-                  {/* NOTICES TAB */}
                   <TabsContent value="notices" className="space-y-3">
                     {noticesResult.isLoading ? (
                       <Loading />
                     ) : noticesResult.data?.content.length === 0 ? (
-                      <Empty type="notices" query={query} />
+                      <Empty message={t("search.no_notices", { query })} />
                     ) : (
                       noticesResult.data?.content.map((n) => (
                         <ResultCard
                           key={n.id}
                           href={`/notices/${n.id}`}
                           icon={<FileText className="h-4 w-4" />}
-                          type="Notice"
+                          type={t("search.type_notice")}
                           typeColor="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100"
                           title={n.title}
                           meta={[n.type, n.issuingAuthority, n.status].filter(Boolean) as string[]}
@@ -297,9 +295,9 @@ const Loading = () => (
   </div>
 );
 
-const Empty = ({ type, query }: { type: string; query: string }) => (
+const Empty = ({ message }: { message: string }) => (
   <div className="text-center py-10">
-    <p className="text-muted-foreground">No {type} found for "{query}".</p>
+    <p className="text-muted-foreground">{message}</p>
   </div>
 );
 
