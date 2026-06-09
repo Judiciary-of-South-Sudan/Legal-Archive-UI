@@ -1,4 +1,4 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
@@ -170,7 +170,7 @@ const Header = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="cursor-pointer">
-                          <span className="mr-2">🎛️</span>
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
                           {t('header.admin_dashboard')}
                         </Link>
                       </DropdownMenuItem>
