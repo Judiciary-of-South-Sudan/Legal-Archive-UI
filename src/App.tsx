@@ -109,33 +109,33 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/admin/upload-law" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <AdminUploadLaw />
               </ProtectedRoute>
             } />
             <Route path="/admin/upload-judgment" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <AdminUploadJudgment />
               </ProtectedRoute>
             } />
             <Route path="/admin/upload-notice" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <AdminUploadNotice />
               </ProtectedRoute>
             } />
 
             <Route path="/admin/edit-law/:id" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <EditLaw />
               </ProtectedRoute>
             } />
             <Route path="/admin/edit-judgment/:id" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <EditJudgment />
               </ProtectedRoute>
             } />
             <Route path="/admin/edit-notice/:id" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <EditNotice />
               </ProtectedRoute>
             } />
