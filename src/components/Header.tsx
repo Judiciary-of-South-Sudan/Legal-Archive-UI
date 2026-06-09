@@ -108,6 +108,7 @@ const Header = () => {
               <p className="text-xs font-semibold text-primary uppercase tracking-widest">
                 Law Reports
               </p>
+              <p className="text-xs text-muted-foreground leading-none">Legal Portal</p>
             </div>
           </Link>
 
