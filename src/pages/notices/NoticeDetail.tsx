@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, FileText, Download, Building2, ExternalLink, Loader2, Pencil, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useGetNoticeById, useIncrementNoticeView, useIncrementNoticeDownload } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
+import apiClient from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,19 @@ const NoticeDetail: React.FC = () => {
   const countedViewForId = useRef<string | null>(null);
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
+  const [lawTitles, setLawTitles] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const allIds = [...(notice?.relatedLaws ?? []), ...(notice?.amendsLaws ?? [])];
+    if (!allIds.length) return;
+    Promise.allSettled(allIds.map((lawId: string) => apiClient.get(`/laws/${lawId}`))).then(results => {
+      const map: Record<string, string> = {};
+      results.forEach((r, i) => {
+        map[allIds[i]] = r.status === 'fulfilled' ? (r.value.data?.data?.title ?? allIds[i]) : allIds[i];
+      });
+      setLawTitles(map);
+    });
+  }, [notice?.relatedLaws?.join(','), notice?.amendsLaws?.join(',')]);
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
@@ -152,9 +166,9 @@ const NoticeDetail: React.FC = () => {
               <div className="mb-5">
                 <h4 className="text-sm font-semibold mb-1">{t('notices.related_laws')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {notice.relatedLaws.map((lawId) => (
+                  {notice.relatedLaws.map((lawId: string) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
-                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawId}</Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawTitles[lawId] ?? lawId}</Badge>
                     </Link>
                   ))}
                 </div>
@@ -165,9 +179,9 @@ const NoticeDetail: React.FC = () => {
               <div className="mb-5">
                 <h4 className="text-sm font-semibold mb-1">{t('notices.amends')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {notice.amendsLaws.map((lawId) => (
+                  {notice.amendsLaws.map((lawId: string) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
-                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawId}</Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawTitles[lawId] ?? lawId}</Badge>
                     </Link>
                   ))}
                 </div>
