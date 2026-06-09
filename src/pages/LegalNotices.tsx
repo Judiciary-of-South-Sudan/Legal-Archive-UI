@@ -30,6 +30,8 @@ const verificationBadge = (status?: string) => {
 
 const LegalNotices = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false;
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
