@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   isAdmin: () => boolean;
+  isEditor: () => boolean;
   hasRole: (role: string) => boolean;
 }
 
@@ -72,6 +73,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return authService.isAdmin();
   };
 
+  const isEditor = () => {
+    return authService.hasRole('ROLE_EDITOR');
+  };
+
   const hasRole = (role: string) => {
     return authService.hasRole(role);
   };
@@ -84,6 +89,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     register,
     logout,
     isAdmin,
+    isEditor,
     hasRole,
   };
 
