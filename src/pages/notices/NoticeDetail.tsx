@@ -10,8 +10,10 @@ import { useGetNoticeById, useIncrementNoticeView } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
+import { useTranslation } from 'react-i18next';
 
 const NoticeDetail: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data: notice, isLoading, error } = useGetNoticeById(id || '');
   const { mutate: incrementView } = useIncrementNoticeView();
@@ -33,7 +35,7 @@ const NoticeDetail: React.FC = () => {
         <Header />
         <main className="container mx-auto px-4 py-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading notice...</span>
+          <span className="ml-2">{t('notices.loading_detail')}</span>
         </main>
         <Footer />
       </div>
@@ -47,11 +49,11 @@ const NoticeDetail: React.FC = () => {
         <main className="container mx-auto px-4 py-12">
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-xl font-semibold">Notice not found</h2>
-              <p className="text-muted-foreground mt-2">Unable to find the requested notice.</p>
+              <h2 className="text-xl font-semibold">{t('notices.not_found')}</h2>
+              <p className="text-muted-foreground mt-2">{t('notices.not_found_desc')}</p>
               <div className="mt-4">
                 <Link to="/notices">
-                  <Button variant="outline">Back to Notices</Button>
+                  <Button variant="outline">{t('notices.back')}</Button>
                 </Link>
               </div>
             </CardContent>
@@ -77,7 +79,6 @@ const NoticeDetail: React.FC = () => {
       <main className="container mx-auto px-4 py-8 space-y-4">
         <Card>
           <CardContent className="p-6">
-            {/* Title and badges */}
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {notice.type && <Badge variant="secondary">{notice.type}</Badge>}
               {notice.status && <Badge className={statusColor}>{notice.status}</Badge>}
@@ -86,61 +87,58 @@ const NoticeDetail: React.FC = () => {
 
             <h1 className="text-3xl font-bold text-foreground mb-4">{notice.title}</h1>
 
-            {/* Metadata grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm text-muted-foreground mb-5">
               {notice.noticeNumber && (
                 <span className="flex items-center gap-2">
                   <FileText className="h-4 w-4 shrink-0" />
-                  Notice No: <span className="text-foreground font-medium">{notice.noticeNumber}</span>
+                  {t('notices.notice_number')}: <span className="text-foreground font-medium">{notice.noticeNumber}</span>
                 </span>
               )}
               {notice.publicationDate && (
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" />
-                  Published: <span className="text-foreground">{new Date(notice.publicationDate).toLocaleDateString()}</span>
+                  {t('notices.published')}: <span className="text-foreground">{new Date(notice.publicationDate).toLocaleDateString()}</span>
                 </span>
               )}
               {notice.effectiveDate && (
                 <span className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 shrink-0" />
-                  Effective: <span className="text-foreground">{new Date(notice.effectiveDate).toLocaleDateString()}</span>
+                  {t('notices.effective')}: <span className="text-foreground">{new Date(notice.effectiveDate).toLocaleDateString()}</span>
                 </span>
               )}
               {notice.issuingAuthority && (
                 <span className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 shrink-0" />
-                  Authority: <span className="text-foreground">{notice.issuingAuthority}</span>
+                  {t('notices.authority')}: <span className="text-foreground">{notice.issuingAuthority}</span>
                 </span>
               )}
               {notice.ministry && (
                 <span className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 shrink-0" />
-                  Ministry: <span className="text-foreground">{notice.ministry}</span>
+                  {t('notices.ministry')}: <span className="text-foreground">{notice.ministry}</span>
                 </span>
               )}
               {notice.department && (
                 <span className="flex items-center gap-2">
                   <FileText className="h-4 w-4 shrink-0" />
-                  Department: <span className="text-foreground">{notice.department}</span>
+                  {t('notices.department')}: <span className="text-foreground">{notice.department}</span>
                 </span>
               )}
               {notice.jurisdiction && (
                 <span className="flex items-center gap-2">
                   <FileText className="h-4 w-4 shrink-0" />
-                  Jurisdiction: <span className="text-foreground">{notice.jurisdiction}</span>
+                  {t('judgments.jurisdiction')}: <span className="text-foreground">{notice.jurisdiction}</span>
                 </span>
               )}
             </div>
 
-            {/* Summary */}
             {notice.summary && (
               <p className="text-foreground mb-5 leading-relaxed">{notice.summary}</p>
             )}
 
-            {/* Tags */}
             {notice.tags && notice.tags.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-2">Tags</h4>
+                <h4 className="text-sm font-semibold mb-2">{t('notices.tags')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {notice.tags.map((tag, i) => (
                     <span key={i} className="text-xs bg-muted px-2 py-1 rounded">{tag}</span>
@@ -149,10 +147,9 @@ const NoticeDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Related laws */}
             {notice.relatedLaws && notice.relatedLaws.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-1">Related Laws</h4>
+                <h4 className="text-sm font-semibold mb-1">{t('notices.related_laws')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {notice.relatedLaws.map((lawId) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
@@ -163,10 +160,9 @@ const NoticeDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Amends laws */}
             {notice.amendsLaws && notice.amendsLaws.length > 0 && (
               <div className="mb-5">
-                <h4 className="text-sm font-semibold mb-1">Amends</h4>
+                <h4 className="text-sm font-semibold mb-1">{t('notices.amends')}</h4>
                 <div className="flex flex-wrap gap-2">
                   {notice.amendsLaws.map((lawId) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
@@ -177,7 +173,6 @@ const NoticeDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
               {isAuthenticated && (
                 <Button
@@ -186,34 +181,34 @@ const NoticeDetail: React.FC = () => {
                   disabled={bookmarkPending}
                 >
                   {bookmarked ? <BookmarkCheck className="h-4 w-4 mr-1" /> : <Bookmark className="h-4 w-4 mr-1" />}
-                  {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                  {bookmarked ? t('common.bookmarked') : t('common.bookmark')}
                 </Button>
               )}
               {pdfUrl ? (
                 <>
                   <Button asChild>
                     <Link to={`/notices/${id}/document`}>
-                      <ExternalLink className="h-4 w-4 mr-1" /> View Document
+                      <ExternalLink className="h-4 w-4 mr-1" /> {t('notices.view_document')}
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <a href={pdfUrl} target="_blank" rel="noreferrer" download>
-                      <Download className="h-4 w-4 mr-1" /> Download PDF
+                      <Download className="h-4 w-4 mr-1" /> {t('laws.download_pdf')}
                     </a>
                   </Button>
                 </>
               ) : (
-                <Button variant="outline" disabled>No PDF available</Button>
+                <Button variant="outline" disabled>{t('notices.no_pdf')}</Button>
               )}
               {isAdmin() && (
                 <Link to={`/admin/edit-notice/${id}`}>
                   <Button variant="outline">
-                    <Pencil className="h-4 w-4 mr-1" /> Edit
+                    <Pencil className="h-4 w-4 mr-1" /> {t('common.edit')}
                   </Button>
                 </Link>
               )}
               <Link to="/notices">
-                <Button variant="ghost">Back to Notices</Button>
+                <Button variant="ghost">{t('notices.back')}</Button>
               </Link>
             </div>
           </CardContent>
