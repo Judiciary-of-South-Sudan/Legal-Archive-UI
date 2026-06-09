@@ -1,4 +1,4 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
@@ -109,6 +109,13 @@ const Header = () => {
                     <span className="text-sm">
                       Role: {user?.roles?.join(', ') || 'User'}
                     </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/library" className="cursor-pointer">
+                      <BookmarkCheck className="mr-2 h-4 w-4" />
+                      My Library
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {user?.roles?.includes('ROLE_ADMIN') && (
