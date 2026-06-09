@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Document, Page, Thumbnail, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -24,7 +24,10 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
   const thumbnailRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const isProgrammaticScroll = useRef(false);
 
+  // Track container width for page sizing
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -35,20 +38,46 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
     return () => observer.disconnect();
   }, []);
 
+  // Keep the active thumbnail visible when page changes via scroll
   useEffect(() => {
     thumbnailRefs.current[pageNumber]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [pageNumber]);
+
+  const goToPage = useCallback((n: number) => {
+    const clamped = Math.max(1, Math.min(n, numPages));
+    setPageNumber(clamped);
+    isProgrammaticScroll.current = true;
+    pageRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => { isProgrammaticScroll.current = false; }, 700);
+  }, [numPages]);
+
+  // Update page counter as user scrolls
+  const handleScroll = useCallback(() => {
+    if (isProgrammaticScroll.current) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const scrollTop = container.scrollTop;
+    let closest = 1;
+    let closestDist = Infinity;
+    for (let n = 1; n <= numPages; n++) {
+      const el = pageRefs.current[n];
+      if (!el) continue;
+      const dist = Math.abs(el.offsetTop - scrollTop - 40);
+      if (dist < closestDist) { closestDist = dist; closest = n; }
+    }
+    setPageNumber(closest);
+  }, [numPages]);
 
   return (
     <div className={`border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900 flex flex-col${fullHeight ? ' h-full' : ''}`}>
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 bg-white dark:bg-gray-800 border-b shrink-0">
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => setPageNumber(p => Math.max(p - 1, 1))} disabled={pageNumber <= 1}>
+          <Button variant="ghost" size="sm" onClick={() => goToPage(pageNumber - 1)} disabled={pageNumber <= 1}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm tabular-nums px-1">{pageNumber} / {numPages || '—'}</span>
-          <Button variant="ghost" size="sm" onClick={() => setPageNumber(p => Math.min(p + 1, numPages))} disabled={pageNumber >= numPages}>
+          <Button variant="ghost" size="sm" onClick={() => goToPage(pageNumber + 1)} disabled={pageNumber >= numPages}>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
@@ -72,7 +101,7 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
         )}
       </div>
 
-      {/* Body: thumbnail strip + main page */}
+      {/* Body: thumbnail strip + continuously scrollable pages */}
       <div className="flex flex-1 overflow-hidden">
         <Document
           file={url}
@@ -89,22 +118,23 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
           }
           className="flex flex-1 overflow-hidden w-full"
         >
+          {/* Thumbnail sidebar */}
           {showThumbnails && numPages > 0 && (
-            <div className="w-20 shrink-0 overflow-y-auto bg-gray-200 dark:bg-gray-800 border-r flex flex-col items-center py-2 gap-2">
+            <div className="w-32 shrink-0 overflow-y-auto bg-gray-200 dark:bg-gray-800 border-r flex flex-col items-center py-2 gap-2">
               {Array.from({ length: numPages }, (_, i) => {
                 const n = i + 1;
                 return (
                   <button
                     key={n}
                     ref={el => { thumbnailRefs.current[n] = el; }}
-                    onClick={() => setPageNumber(n)}
+                    onClick={() => goToPage(n)}
                     className={`flex flex-col items-center gap-1 p-1 rounded w-full transition-colors ${
                       pageNumber === n
                         ? 'bg-primary/20 ring-1 ring-primary'
                         : 'hover:bg-gray-300 dark:hover:bg-gray-700'
                     }`}
                   >
-                    <Thumbnail pageNumber={n} width={64} />
+                    <Thumbnail pageNumber={n} width={100} />
                     <span className="text-xs tabular-nums text-muted-foreground">{n}</span>
                   </button>
                 );
@@ -112,18 +142,27 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
             </div>
           )}
 
+          {/* Continuous scroll area — all pages stacked */}
           <div
             ref={containerRef}
-            className="overflow-auto flex justify-center py-6 flex-1"
+            onScroll={handleScroll}
+            className="overflow-auto flex flex-col items-center py-6 gap-6 flex-1"
             style={fullHeight ? {} : { maxHeight: '82vh' }}
           >
-            <Page
-              pageNumber={pageNumber}
-              width={Math.floor(containerWidth * zoom)}
-              renderTextLayer
-              renderAnnotationLayer
-              className="shadow-lg"
-            />
+            {numPages > 0 && Array.from({ length: numPages }, (_, i) => {
+              const n = i + 1;
+              return (
+                <div key={n} ref={el => { pageRefs.current[n] = el; }}>
+                  <Page
+                    pageNumber={n}
+                    width={Math.floor(containerWidth * zoom)}
+                    renderTextLayer
+                    renderAnnotationLayer
+                    className="shadow-lg"
+                  />
+                </div>
+              );
+            })}
           </div>
         </Document>
       </div>
