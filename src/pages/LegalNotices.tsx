@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { useGetNotices, useSearchNotices } from "@/hooks/useNotices";
 import { NoticeFilterParams } from "@/types/api";
+import { useTranslation } from "react-i18next";
 
 const NOTICE_TYPES = [
   "Appointment", "Amendment", "Regulation", "Proclamation", "Gazette", "Court Order", "Public Notice"
@@ -26,6 +27,7 @@ const verificationBadge = (status?: string) => {
 };
 
 const LegalNotices = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -52,37 +54,34 @@ const LegalNotices = () => {
   const clearFilters = () => { setPage(0); setFilters({}); };
 
   const noticeTypeStats = [
-    { id: "appointments", name: "Judicial Appointments", icon: Bell, typeFilter: "Appointment" },
-    { id: "amendments", name: "Legal Amendments", icon: FileText, typeFilter: "Amendment" },
-    { id: "regulations", name: "Court Regulations", icon: Archive, typeFilter: "Regulation" },
-    { id: "proclamations", name: "Presidential Proclamations", icon: Star, typeFilter: "Proclamation" },
+    { id: "appointments", name: t("notices.type_appointments"), icon: Bell, typeFilter: "Appointment" },
+    { id: "amendments", name: t("notices.type_amendments"), icon: FileText, typeFilter: "Amendment" },
+    { id: "regulations", name: t("notices.type_regulations"), icon: Archive, typeFilter: "Regulation" },
+    { id: "proclamations", name: t("notices.type_proclamations"), icon: Star, typeFilter: "Proclamation" },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">Legal Notices & Gazette</h1>
-          <p className="text-muted-foreground">
-            Official legal notices, appointments, and gazette publications from South Sudan authorities.
-          </p>
+          <h1 className="text-3xl font-bold text-foreground mb-4">{t("notices.page_title")}</h1>
+          <p className="text-muted-foreground">{t("notices.page_subtitle")}</p>
         </div>
 
         <Tabs defaultValue="notices" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="notices">All Notices</TabsTrigger>
-            <TabsTrigger value="types">By Type</TabsTrigger>
-            <TabsTrigger value="gazette">Gazette Archive</TabsTrigger>
-            <TabsTrigger value="recent">Recent Updates</TabsTrigger>
+            <TabsTrigger value="notices">{t("notices.tab_all")}</TabsTrigger>
+            <TabsTrigger value="types">{t("notices.tab_types")}</TabsTrigger>
+            <TabsTrigger value="gazette">{t("notices.tab_gazette")}</TabsTrigger>
+            <TabsTrigger value="recent">{t("notices.tab_recent")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="notices" className="space-y-4">
             <div className="flex gap-3 items-start">
               <div className="flex-1">
                 <SearchBar
-                  placeholder="Search legal notices by title, gazette number, or authority..."
+                  placeholder={t("notices.search_placeholder")}
                   onSearch={(query) => { setPage(0); setSearchQuery(query || ""); }}
                 />
               </div>
@@ -93,7 +92,7 @@ const LegalNotices = () => {
                 onClick={() => setShowFilters(v => !v)}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-1" />
-                Filters {hasFilters && !searchQuery ? `(${Object.values(filters).filter(Boolean).length})` : ""}
+                {t("notices.filters")} {hasFilters && !searchQuery ? `(${Object.values(filters).filter(Boolean).length})` : ""}
               </Button>
             </div>
 
@@ -102,24 +101,24 @@ const LegalNotices = () => {
                 <CardContent className="pt-4 pb-3">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <Select value={filters.type ?? ""} onValueChange={v => setFilter("type", v)}>
-                      <SelectTrigger><SelectValue placeholder="All Types" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("notices.all_types")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Types</SelectItem>
-                        {NOTICE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                        <SelectItem value="">{t("notices.all_types")}</SelectItem>
+                        {NOTICE_TYPES.map(nt => <SelectItem key={nt} value={nt}>{nt}</SelectItem>)}
                       </SelectContent>
                     </Select>
 
                     <Select value={filters.status ?? ""} onValueChange={v => setFilter("status", v)}>
-                      <SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("notices.all_statuses")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Statuses</SelectItem>
+                        <SelectItem value="">{t("notices.all_statuses")}</SelectItem>
                         {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   {hasFilters && (
                     <Button variant="ghost" size="sm" className="mt-2 text-muted-foreground" onClick={clearFilters}>
-                      <X className="h-3 w-3 mr-1" /> Clear filters
+                      <X className="h-3 w-3 mr-1" /> {t("notices.clear_filters")}
                     </Button>
                   )}
                 </CardContent>
@@ -128,21 +127,21 @@ const LegalNotices = () => {
 
             {activeQuery.error && (
               <Alert variant="destructive">
-                <AlertDescription>
-                  Failed to load legal notices. Please check your connection to the backend.
-                </AlertDescription>
+                <AlertDescription>{t("notices.error")}</AlertDescription>
               </Alert>
             )}
 
             {activeQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">Loading notices...</span>
+                <span className="ml-2">{t("notices.loading")}</span>
               </div>
             ) : (
               <>
                 {totalElements > 0 && (
-                  <p className="text-sm text-muted-foreground">{totalElements} notice{totalElements !== 1 ? "s" : ""} found</p>
+                  <p className="text-sm text-muted-foreground">
+                    {totalElements} {totalElements !== 1 ? t("notices.found_plural") : t("notices.found_singular")}
+                  </p>
                 )}
                 <div className="space-y-4">
                   {notices.map((notice) => (
@@ -173,12 +172,12 @@ const LegalNotices = () => {
                           </div>
                           <div className="flex gap-2 ml-4">
                             <Link to={`/notices/${notice.id}`}>
-                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" />View</Button>
+                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" />{t("notices.view")}</Button>
                             </Link>
                             {notice.pdfUrl && (
                               <Button size="sm" variant="outline" asChild>
                                 <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
-                                  <Download className="h-4 w-4 mr-1" />PDF
+                                  <Download className="h-4 w-4 mr-1" />{t("notices.pdf")}
                                 </a>
                               </Button>
                             )}
@@ -189,12 +188,12 @@ const LegalNotices = () => {
                           {notice.publicationDate && (
                             <div className="flex items-center gap-2">
                               <Calendar className="h-4 w-4" />
-                              <span>Published: {new Date(notice.publicationDate).toLocaleDateString()}</span>
+                              <span>{t("notices.published")}: {new Date(notice.publicationDate).toLocaleDateString()}</span>
                             </div>
                           )}
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4" />
-                            <span>Authority: {notice.issuingAuthority}</span>
+                            <span>{t("notices.authority")}: {notice.issuingAuthority}</span>
                           </div>
                         </div>
 
@@ -203,7 +202,7 @@ const LegalNotices = () => {
                         <div className="flex justify-end">
                           <Link to={`/notices/${notice.id}`}>
                             <Button variant="ghost" size="sm" className="text-primary">
-                              View Details <ChevronRight className="h-4 w-4 ml-1" />
+                              {t("notices.view_details")} <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                           </Link>
                         </div>
@@ -214,7 +213,7 @@ const LegalNotices = () => {
                   {notices.length === 0 && (
                     <div className="text-center py-12">
                       <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">No legal notices found.</p>
+                      <p className="text-muted-foreground">{t("notices.no_results")}</p>
                     </div>
                   )}
                 </div>
@@ -222,12 +221,12 @@ const LegalNotices = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4">
                     <div className="text-sm text-muted-foreground">
-                      Showing {page * size + 1}–{Math.min((page + 1) * size, totalElements)} of {totalElements}
+                      {t("common.showing")} {page * size + 1}–{Math.min((page + 1) * size, totalElements)} {t("common.of")} {totalElements}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>Previous</Button>
-                      <span className="text-sm">Page {page + 1} of {totalPages}</span>
-                      <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>Next</Button>
+                      <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>{t("common.previous")}</Button>
+                      <span className="text-sm">{t("common.page")} {page + 1} {t("common.of")} {totalPages}</span>
+                      <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>{t("common.next")}</Button>
                     </div>
                   </div>
                 )}
@@ -248,7 +247,7 @@ const LegalNotices = () => {
                         setFilter("type", type.typeFilter);
                         setShowFilters(true);
                       }}>
-                        View Notices <ChevronRight className="h-4 w-4 ml-1" />
+                        {t("notices.view_notices")} <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </CardContent>
                   </Card>
@@ -262,13 +261,11 @@ const LegalNotices = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Archive className="h-5 w-5" />
-                  South Sudan Gazette Archive
+                  {t("notices.gazette_title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Gazette entries are loaded from the same legal notice API and can be found using search or the all notices list.
-                </p>
+                <p className="text-muted-foreground">{t("notices.gazette_desc")}</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -278,7 +275,7 @@ const LegalNotices = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5" />
-                  Recent Updates
+                  {t("notices.tab_recent")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -292,18 +289,17 @@ const LegalNotices = () => {
                         </p>
                       </div>
                       <Link to={`/notices/${notice.id}`}>
-                        <Button variant="outline" size="sm"><Eye className="h-4 w-4 mr-1" />View</Button>
+                        <Button variant="outline" size="sm"><Eye className="h-4 w-4 mr-1" />{t("notices.view")}</Button>
                       </Link>
                     </div>
                   ))}
-                  {notices.length === 0 && <p className="text-sm text-muted-foreground">No recent notices found.</p>}
+                  {notices.length === 0 && <p className="text-sm text-muted-foreground">{t("notices.no_results")}</p>}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </main>
-
       <Footer />
     </div>
   );
