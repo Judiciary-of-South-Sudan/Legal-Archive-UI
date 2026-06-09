@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import apiClient from "@/lib/apiClient";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
@@ -17,9 +18,17 @@ const SearchPage = () => {
   const [inputValue, setInputValue] = useState(searchParams.get("q") || "");
 
   const query = searchParams.get("q") || "";
+  const lastRecordedQuery = useRef("");
 
   useEffect(() => {
     setInputValue(query);
+  }, [query]);
+
+  useEffect(() => {
+    if (query && query !== lastRecordedQuery.current) {
+      lastRecordedQuery.current = query;
+      apiClient.post("/analytics/search", { query }).catch(() => {});
+    }
   }, [query]);
 
   const handleSearch = (e: React.FormEvent) => {
