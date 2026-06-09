@@ -1,9 +1,10 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +21,17 @@ const Header = () => {
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
     localStorage.setItem('theme', dark ? 'dark' : 'light');
   }, [dark]);
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(isArabic ? 'en' : 'ar');
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +45,12 @@ const Header = () => {
   };
 
   const navItems = [
-    { name: "Judgments", href: "/judgments" },
-    { name: "Laws of South Sudan", href: "/laws" },
-    { name: "Legal Notices", href: "/notices" },
-    { name: "Judicial Opinions", href: "/opinions" },
-    { name: "Judiciary Directory", href: "/directory" },
-    { name: "Citizen's Guide", href: "/resources" },
+    { name: t('nav.judgments'), href: "/judgments" },
+    { name: t('nav.laws'), href: "/laws" },
+    { name: t('nav.notices'), href: "/notices" },
+    { name: t('nav.opinions'), href: "/opinions" },
+    { name: t('nav.directory'), href: "/directory" },
+    { name: t('nav.guide'), href: "/resources" },
   ];
 
   return (
@@ -51,8 +58,8 @@ const Header = () => {
       {/* Top Bar with News Ticker */}
       <div className="bg-primary text-primary-foreground py-1 overflow-hidden">
         <div className="news-ticker whitespace-nowrap text-sm">
-          Latest: New Supreme Court judgment on constitutional law published • 
-          South Sudan Gazette Issue 15/2024 now available • 
+          Latest: New Supreme Court judgment on constitutional law published •
+          South Sudan Gazette Issue 15/2024 now available •
           Practice Direction on e-filing systems updated
         </div>
       </div>
@@ -65,9 +72,9 @@ const Header = () => {
             <Scale className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-xl font-bold text-foreground">
-                South Sudan Law Reports
+                {t('header.title')}
               </h1>
-              <p className="text-xs text-muted-foreground">Official Legal Portal</p>
+              <p className="text-xs text-muted-foreground">{t('header.subtitle')}</p>
             </div>
           </Link>
 
@@ -77,18 +84,32 @@ const Header = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
-                placeholder="Search laws, cases, judgments..."
+                placeholder={t('header.search_placeholder')}
                 className="pl-10"
               />
             </div>
-            <Button type="submit" variant="default" size="sm">Search</Button>
+            <Button type="submit" variant="default" size="sm">{t('header.search')}</Button>
           </form>
 
-          {/* Dark mode toggle + Auth */}
-          <div className="hidden md:flex items-center space-x-2">
+          {/* Dark mode + Language toggle + Auth */}
+          <div className="hidden md:flex items-center space-x-1">
+            {/* Language toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              aria-label="Toggle language"
+              className="gap-1 text-xs font-medium"
+            >
+              <Languages className="h-4 w-4" />
+              {isArabic ? 'EN' : 'عربي'}
+            </Button>
+
+            {/* Dark mode toggle */}
             <Button variant="ghost" size="sm" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
+
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -98,23 +119,19 @@ const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('header.my_account')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <span className="text-sm text-muted-foreground">
-                      {user?.email}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{user?.email}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <span className="text-sm">
-                      Role: {user?.roles?.join(', ') || 'User'}
-                    </span>
+                    <span className="text-sm">Role: {user?.roles?.join(', ') || 'User'}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/library" className="cursor-pointer">
                       <BookmarkCheck className="mr-2 h-4 w-4" />
-                      My Library
+                      {t('header.my_library')}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -123,7 +140,7 @@ const Header = () => {
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="cursor-pointer">
                           <span className="mr-2">🎛️</span>
-                          Admin Dashboard
+                          {t('header.admin_dashboard')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -131,35 +148,38 @@ const Header = () => {
                   )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    {t('header.logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Login</Link>
+                  <Link to="/login">{t('header.login')}</Link>
                 </Button>
                 <Button variant="default" size="sm" asChild>
-                  <Link to="/register">Register</Link>
+                  <Link to="/register">{t('header.register')}</Link>
                 </Button>
               </>
             )}
           </div>
-          {/* Mobile dark mode toggle */}
-          <Button variant="ghost" size="sm" className="md:hidden mr-1" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
-            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </Button>
 
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
+          {/* Mobile: language + dark + menu */}
+          <div className="md:hidden flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={toggleLanguage} aria-label="Toggle language" className="text-xs">
+              {isArabic ? 'EN' : 'ع'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setDark(d => !d)} aria-label="Toggle dark mode">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -167,7 +187,7 @@ const Header = () => {
           <div className="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0">
             {navItems.map((item) => (
               <a
-                key={item.name}
+                key={item.href}
                 href={item.href}
                 className="text-foreground hover:text-primary transition-colors duration-200 py-2 px-3 rounded-md hover:bg-secondary text-sm font-medium"
               >
@@ -183,7 +203,7 @@ const Header = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               ref={mobileSearchRef}
-              placeholder="Search laws, cases, judgments..."
+              placeholder={t('header.search_placeholder')}
               className="pl-10"
             />
           </div>
