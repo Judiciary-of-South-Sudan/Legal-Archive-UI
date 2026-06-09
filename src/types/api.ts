@@ -318,3 +318,12 @@ export interface DateRangeParams extends PaginationParams {
   startDate: string;
   endDate: string;
 }
+
+export interface Bookmark {
+  id: string;
+  userId: string;
+  documentId: string;
+  documentType: 'LAW' | 'JUDGMENT' | 'NOTICE';
+  title: string;
+  createdAt: string;
+}
