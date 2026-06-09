@@ -162,7 +162,10 @@ const Judgments = () => {
                               {judgment.status}
                             </Badge>
                           )}
-                          {verificationBadge(judgment.verificationStatus)}
+                          {isAdmin && judgment.id
+                            ? <DocStatusDropdown id={judgment.id} collection="judgments" current={judgment.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                            : verificationBadge(judgment.verificationStatus)
+                          }
                         </div>
                       </div>
                       <div className="flex gap-2 ml-4">
