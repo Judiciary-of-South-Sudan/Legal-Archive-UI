@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, FileText, Download, Building2, ExternalLink, Loader2, Pencil, Bookmark, BookmarkCheck } from 'lucide-react';
-import { useGetNoticeById, useIncrementNoticeView } from '@/hooks/useNotices';
+import { useGetNoticeById, useIncrementNoticeView, useIncrementNoticeDownload } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
@@ -17,6 +17,7 @@ const NoticeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: notice, isLoading, error } = useGetNoticeById(id || '');
   const { mutate: incrementView } = useIncrementNoticeView();
+  const { mutate: trackDownload } = useIncrementNoticeDownload();
   const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const { data: bookmarked } = useIsBookmarked(id || '');
@@ -192,7 +193,7 @@ const NoticeDetail: React.FC = () => {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <a href={pdfUrl} target="_blank" rel="noreferrer" download>
+                    <a href={pdfUrl} target="_blank" rel="noreferrer" download onClick={() => trackDownload(id!)}>
                       <Download className="h-4 w-4 mr-1" /> {t('laws.download_pdf')}
                     </a>
                   </Button>
