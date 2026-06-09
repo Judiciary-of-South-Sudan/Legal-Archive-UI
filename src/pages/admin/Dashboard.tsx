@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Gavel, FileWarning, Users, Upload, BarChart3, TrendingUp, UserCog, Eye, Download, Search } from 'lucide-react';
+import { FileText, Gavel, FileWarning, Users, Upload, BarChart3, TrendingUp, UserCog, Eye, Download, Search, ClipboardList } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +35,17 @@ interface DocTypeStats { type: string; views: number; downloads: number; }
 interface SearchTermStat { term: string; count: number; }
 interface MonthlyDocStat { month: string; laws: number; judgments: number; notices: number; total: number; }
 
+interface AuditEntry {
+  id: string;
+  docType: 'Law' | 'Judgment' | 'Notice';
+  title: string;
+  createdBy: string;
+  updatedBy: string;
+  createdAt: string;
+  updatedAt: string;
+  verificationStatus: string;
+}
+
 interface AnalyticsSummary {
   totalViews: number;
   totalDownloads: number;
@@ -44,11 +55,22 @@ interface AnalyticsSummary {
   monthlyDocuments: MonthlyDocStat[];
 }
 
+const fmtDate = (iso: string) => {
+  if (!iso) return '—';
+  try {
+    return new Date(iso).toLocaleString('en-GB', {
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  } catch { return iso; }
+};
+
 const AdminDashboard: React.FC = () => {
   const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivitySummary | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,11 +78,13 @@ const AdminDashboard: React.FC = () => {
       apiClient.get('/admin/dashboard'),
       apiClient.get('/admin/activity'),
       apiClient.get('/admin/analytics'),
+      apiClient.get('/admin/audit'),
     ])
-      .then(([statsRes, activityRes, analyticsRes]) => {
+      .then(([statsRes, activityRes, analyticsRes, auditRes]) => {
         setStats(statsRes.data.data);
         setActivity(activityRes.data.data);
         setAnalytics(analyticsRes.data.data);
+        setAuditLog(auditRes.data.data ?? []);
       })
       .catch((error) => {
         console.error('Failed to fetch dashboard data:', error);
@@ -341,6 +365,64 @@ const AdminDashboard: React.FC = () => {
             )}
           </>
         )}
+        {/* Audit Log */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <ClipboardList className="h-4 w-4" />
+              {t('admin.dashboard.audit_log')}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">{t('admin.dashboard.audit_log_desc')}</p>
+          </CardHeader>
+          <CardContent>
+            {auditLog.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('admin.dashboard.audit_empty')}</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-muted-foreground text-xs">
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_doc_type')}</th>
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_title')}</th>
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_created_by')}</th>
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_created_at')}</th>
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_updated_by')}</th>
+                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_updated_at')}</th>
+                      <th className="text-left py-2 font-medium">{t('admin.dashboard.audit_status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {auditLog.map((entry) => (
+                      <tr key={entry.id} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="py-2 pr-4">
+                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium
+                            ${entry.docType === 'Law' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' :
+                              entry.docType === 'Judgment' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
+                              'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'}`}>
+                            {entry.docType}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-4 max-w-[200px] truncate font-medium" title={entry.title}>{entry.title}</td>
+                        <td className="py-2 pr-4 text-muted-foreground">{entry.createdBy}</td>
+                        <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">{fmtDate(entry.createdAt)}</td>
+                        <td className="py-2 pr-4 text-muted-foreground">{entry.updatedBy}</td>
+                        <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">{fmtDate(entry.updatedAt)}</td>
+                        <td className="py-2">
+                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium
+                            ${entry.verificationStatus === 'PUBLISHED' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' :
+                              entry.verificationStatus === 'UNDER_REVIEW' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' :
+                              'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
+                            {entry.verificationStatus}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </main>
       <Footer />
     </div>
