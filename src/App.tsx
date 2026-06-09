@@ -39,6 +39,7 @@ import EditLaw from './pages/admin/EditLaw';
 import EditJudgment from './pages/admin/EditJudgment';
 import EditNotice from './pages/admin/EditNotice';
 import AdminUsers from './pages/admin/Users';
+import BulkImport from './pages/admin/BulkImport';
 import SearchPage from './pages/Search';
 import Library from './pages/Library';
 
@@ -133,6 +134,11 @@ const App = () => (
             <Route path="/admin/users" element={
               <ProtectedRoute requireAdmin={true}>
                 <AdminUsers />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/bulk-import" element={
+              <ProtectedRoute requireAdmin={true}>
+                <BulkImport />
               </ProtectedRoute>
             } />
 
