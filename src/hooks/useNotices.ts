@@ -74,6 +74,12 @@ export const useIncrementNoticeView = () => {
   });
 };
 
+export const useIncrementNoticeDownload = () => {
+  return useMutation({
+    mutationFn: (id: string) => noticeService.incrementNoticeDownload(id),
+  });
+};
+
 export const useDeleteNotice = () => {
   const queryClient = useQueryClient();
 
