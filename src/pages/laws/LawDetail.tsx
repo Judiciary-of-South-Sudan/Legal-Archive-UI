@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Download, Calendar, BookOpen, ExternalLink, Pencil, Loader2, Copy, Check, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useGetLawById, useIncrementLawView, useIncrementLawDownload } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
+import apiClient from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
@@ -24,6 +25,15 @@ const LawDetail: React.FC = () => {
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const { mutate: trackDownload } = useIncrementLawDownload();
+  const [relatedLawTitles, setRelatedLawTitles] = useState<{ id: string; title: string }[]>([]);
+
+  useEffect(() => {
+    if (!id || !law?.relatedLaws?.length) return;
+    apiClient.get(`/laws/${id}/related`).then(res => {
+      const laws: any[] = res.data?.data ?? [];
+      setRelatedLawTitles(laws.map(l => ({ id: l.id, title: l.title })));
+    }).catch(() => {});
+  }, [id, law?.relatedLaws?.length]);
 
   const copyCitation = () => {
     if (!law) return;
@@ -162,9 +172,9 @@ const LawDetail: React.FC = () => {
               <div className="mb-5">
                 <h4 className="text-sm font-semibold mb-2">{t('laws.related_laws')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {law.relatedLaws.map((lawId) => (
+                  {(relatedLawTitles.length > 0 ? relatedLawTitles : law.relatedLaws.map(id => ({ id, title: id }))).map(({ id: lawId, title }) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
-                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawId}</Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{title}</Badge>
                     </Link>
                   ))}
                 </div>
