@@ -149,6 +149,7 @@ const AdminDashboard: React.FC = () => {
               <Link to="/admin/upload-law"><Button className="w-full" variant="outline" size="sm">Upload Law</Button></Link>
               <Link to="/admin/upload-judgment"><Button className="w-full" variant="outline" size="sm">Upload Judgment</Button></Link>
               <Link to="/admin/upload-notice"><Button className="w-full" variant="outline" size="sm">Upload Legal Notice</Button></Link>
+              <Link to="/admin/bulk-import"><Button className="w-full" size="sm">Bulk Import PDFs</Button></Link>
             </CardContent>
           </Card>
 
