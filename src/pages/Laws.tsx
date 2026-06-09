@@ -180,7 +180,10 @@ const Laws = () => {
                               <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                                 {law.status || "Active"}
                               </Badge>
-                              {verificationBadge(law.verificationStatus)}
+                              {isAdmin && law.id
+                                ? <DocStatusDropdown id={law.id} collection="laws" current={law.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                                : verificationBadge(law.verificationStatus)
+                              }
                             </div>
                           </div>
                           <div className="flex gap-2 ml-4">
