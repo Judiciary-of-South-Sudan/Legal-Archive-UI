@@ -5,19 +5,22 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2, Copy, Check } from 'lucide-react';
+import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2, Copy, Check, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useGetJudgmentById, useIncrementJudgmentView } from '@/hooks/useJudgments';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
 
 const JudgmentDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: judgment, isLoading, error } = useGetJudgmentById(id || '');
   const { mutate: incrementView } = useIncrementJudgmentView();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
+  const { data: bookmarked } = useIsBookmarked(id || '');
+  const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
 
   const copyCitation = () => {
     if (!judgment) return;
@@ -206,6 +209,16 @@ const JudgmentDetail: React.FC = () => {
                 </>
               ) : (
                 <Button variant="outline" disabled>No PDF available</Button>
+              )}
+              {isAuthenticated && (
+                <Button
+                  variant={bookmarked ? 'default' : 'outline'}
+                  onClick={() => toggleBookmark({ documentId: id!, documentType: 'JUDGMENT', title: judgment.caseName })}
+                  disabled={bookmarkPending}
+                >
+                  {bookmarked ? <BookmarkCheck className="h-4 w-4 mr-1" /> : <Bookmark className="h-4 w-4 mr-1" />}
+                  {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                </Button>
               )}
               <Button variant="outline" onClick={copyCitation}>
                 {citationCopied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
