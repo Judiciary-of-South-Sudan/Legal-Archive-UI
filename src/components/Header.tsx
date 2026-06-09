@@ -55,6 +55,8 @@ const Header = () => {
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50">
+      {/* South Sudan flag stripe */}
+      <div className="flag-stripe-bar" />
       {/* Top Bar with News Ticker */}
       <div className="bg-primary text-primary-foreground py-1 overflow-hidden">
         <div className="news-ticker whitespace-nowrap text-sm">
