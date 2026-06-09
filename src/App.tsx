@@ -104,7 +104,7 @@ const App = () => (
 
             {/* Admin Routes - Protected */}
             <Route path="/admin/dashboard" element={
-              <ProtectedRoute requireAdmin={true}>
+              <ProtectedRoute requireEditor={true}>
                 <AdminDashboard />
               </ProtectedRoute>
             } />
