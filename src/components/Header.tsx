@@ -1,4 +1,4 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings, LayoutDashboard } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings, LayoutDashboard, FilePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
@@ -19,7 +19,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
   const [tickerItems, setTickerItems] = useState<string[]>([]);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin, isEditor } = useAuth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
@@ -170,7 +170,31 @@ const Header = () => {
                       {t('header.my_library')}
                     </Link>
                   </DropdownMenuItem>
-                  {user?.roles?.includes('ROLE_ADMIN') && (
+                  {(isEditor() || isAdmin()) && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel className="text-xs text-muted-foreground font-normal px-3">Upload</DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/upload-law" className="cursor-pointer">
+                          <FilePlus className="mr-2 h-4 w-4" />
+                          Upload Law
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/upload-judgment" className="cursor-pointer">
+                          <FilePlus className="mr-2 h-4 w-4" />
+                          Upload Judgment
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/upload-notice" className="cursor-pointer">
+                          <FilePlus className="mr-2 h-4 w-4" />
+                          Upload Notice
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {isAdmin() && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
