@@ -412,28 +412,50 @@ const AdminDashboard: React.FC = () => {
                 <CardTitle className="text-base">Quick Actions</CardTitle>
                 <CardDescription>Upload new content or jump to any section</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-                  {[
-                    { to: '/admin/upload-law',      icon: <FileText className="h-5 w-5" />,  label: 'Upload Law',      color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
-                    { to: '/admin/upload-judgment',  icon: <Gavel className="h-5 w-5" />,     label: 'Upload Judgment', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
-                    { to: '/admin/upload-notice',    icon: <FileWarning className="h-5 w-5" />, label: 'Upload Notice', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
-                    { to: '/admin/bulk-import',      icon: <Layers className="h-5 w-5" />,    label: 'Bulk Import',     color: 'text-green-600 bg-green-50 dark:bg-green-950/60' },
-                    { to: '/laws',                   icon: <BookOpen className="h-5 w-5" />,  label: 'Browse Laws',     color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
-                    { to: '/judgments',              icon: <Gavel className="h-5 w-5" />,     label: 'Browse Judgments',color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
-                    { to: '/admin/users',            icon: <Users className="h-5 w-5" />,     label: 'Manage Users',    color: 'text-slate-600 bg-slate-50 dark:bg-slate-900/60' },
-                    { to: '/profile',                icon: <UserCog className="h-5 w-5" />,   label: 'My Profile',      color: 'text-slate-600 bg-slate-50 dark:bg-slate-900/60' },
-                  ].map(({ to, icon, label, color }) => (
-                    <Link key={to} to={to}>
-                      <div className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer text-center">
-                        <div className={`p-2.5 rounded-lg ${color} group-hover:scale-110 transition-transform`}>
-                          {icon}
-                        </div>
-                        <span className="text-xs font-medium leading-tight text-foreground">{label}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+              <CardContent className="space-y-5">
+                {[
+                  {
+                    label: 'Upload',
+                    items: [
+                      { to: '/admin/upload-law',     icon: <FileText className="h-5 w-5" />,    label: 'Law',       color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                      { to: '/admin/upload-judgment', icon: <Gavel className="h-5 w-5" />,       label: 'Judgment',  color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                      { to: '/admin/upload-notice',   icon: <FileWarning className="h-5 w-5" />, label: 'Notice',    color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                      { to: '/admin/bulk-import',     icon: <Layers className="h-5 w-5" />,      label: 'Bulk Import', color: 'text-green-600 bg-green-50 dark:bg-green-950/60' },
+                    ],
+                  },
+                  {
+                    label: 'Browse',
+                    items: [
+                      { to: '/laws',       icon: <FileText className="h-5 w-5" />,  label: 'Laws',      color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                      { to: '/judgments',  icon: <Gavel className="h-5 w-5" />,     label: 'Judgments', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                      { to: '/notices',    icon: <FileWarning className="h-5 w-5" />, label: 'Notices', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                      { to: '/library',    icon: <BookOpen className="h-5 w-5" />,  label: 'Library',   color: 'text-teal-600 bg-teal-50 dark:bg-teal-950/60' },
+                    ],
+                  },
+                  {
+                    label: 'Manage',
+                    items: [
+                      { to: '/admin/users', icon: <Users className="h-5 w-5" />,   label: 'Users',      color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' },
+                      { to: '/profile',     icon: <UserCog className="h-5 w-5" />, label: 'My Profile', color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' },
+                    ],
+                  },
+                ].map(group => (
+                  <div key={group.label}>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">{group.label}</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {group.items.map(({ to, icon, label, color }) => (
+                        <Link key={to} to={to}>
+                          <div className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer text-center">
+                            <div className={`p-2.5 rounded-lg ${color} group-hover:scale-110 transition-transform`}>
+                              {icon}
+                            </div>
+                            <span className="text-xs font-medium leading-tight text-foreground">{label}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </TabsContent>
