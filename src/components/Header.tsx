@@ -1,4 +1,4 @@
-import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages } from "lucide-react";
+import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
@@ -147,34 +147,36 @@ const Header = () => {
                     <span className="text-sm">{user?.username}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuLabel>{t('header.my_account')}</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-52">
+                  <div className="px-3 py-2">
+                    <p className="text-sm font-semibold">{user?.username}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                  </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <span className="text-sm text-muted-foreground">{user?.email}</span>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      My Profile
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <span className="text-sm">Role: {user?.roles?.join(', ') || 'User'}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link to="/library" className="cursor-pointer">
                       <BookmarkCheck className="mr-2 h-4 w-4" />
                       {t('header.my_library')}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   {user?.roles?.includes('ROLE_ADMIN') && (
                     <>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="cursor-pointer">
                           <span className="mr-2">🎛️</span>
                           {t('header.admin_dashboard')}
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                     </>
                   )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     {t('header.logout')}
