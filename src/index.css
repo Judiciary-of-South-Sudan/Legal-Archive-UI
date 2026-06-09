@@ -2,103 +2,109 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/*
+  South Sudan Justice Portal — Design System
+  Flag colors (exact):
+    Blue   #003DA5  hsl(218 100% 32%)   — triangle (primary)
+    Gold   #FCDD09  hsl(52  98%  51%)   — star (accent)
+    Red    #DA121A  hsl(358 85%  46%)   — middle stripe
+    Green  #078930  hsl(139 90%  28%)   — bottom stripe
+    Black  #000000  hsl(0   0%   0%)    — top stripe
+    White  #FFFFFF                      — thin separators
 */
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 218 20% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 218 20% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 218 20% 10%;
 
-    /* South Sudan themed colors */
-    --primary: 220 100% 25%;  /* Deep blue from flag */
+    /* Primary: SS Flag Blue #003DA5 */
+    --primary: 218 100% 32%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 25% 95%;  /* Light neutral */
-    --secondary-foreground: 222.2 84% 4.9%;
+    --secondary: 218 20% 94%;
+    --secondary-foreground: 218 30% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 218 15% 95%;
+    --muted-foreground: 218 10% 45%;
 
-    --accent: 46 100% 50%;  /* Yellow accent from flag */
-    --accent-foreground: 222.2 84% 4.9%;
-    
-    /* Custom South Sudan palette */
-    --ss-red: 0 100% 45%;
-    --ss-blue: 220 100% 25%;
-    --ss-green: 120 60% 30%;
-    --ss-yellow: 46 100% 50%;
-    --ss-black: 0 0% 10%;
+    /* Accent: SS Flag Gold #FCDD09 */
+    --accent: 52 98% 51%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* SS Flag palette — exact values */
+    --ss-blue:   218 100% 32%;   /* #003DA5 */
+    --ss-gold:   52  98%  51%;   /* #FCDD09 */
+    --ss-red:    358 85%  46%;   /* #DA121A */
+    --ss-green:  139 90%  28%;   /* #078930 */
+    --ss-black:  0   0%   0%;    /* #000000 */
+    --ss-white:  0   0%   100%;  /* #FFFFFF */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Destructive uses the flag red */
+    --destructive: 358 85% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 218 20% 88%;
+    --input: 218 20% 88%;
+    --ring: 218 100% 32%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 218 30% 98%;
+    --sidebar-foreground: 218 20% 25%;
+    --sidebar-primary: 218 100% 32%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 218 20% 92%;
+    --sidebar-accent-foreground: 218 30% 20%;
+    --sidebar-border: 218 20% 88%;
+    --sidebar-ring: 218 100% 32%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 218 30% 8%;
+    --foreground: 210 30% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 218 28% 12%;
+    --card-foreground: 210 30% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 218 28% 12%;
+    --popover-foreground: 210 30% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Lighter blue for dark mode readability */
+    --primary: 218 90% 60%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 218 25% 18%;
+    --secondary-foreground: 210 30% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 218 25% 18%;
+    --muted-foreground: 218 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Gold stays readable on dark */
+    --accent: 52 98% 51%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 358 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 218 25% 20%;
+    --input: 218 25% 20%;
+    --ring: 218 90% 60%;
+
+    --sidebar-background: 218 30% 6%;
+    --sidebar-foreground: 210 30% 90%;
+    --sidebar-primary: 218 90% 60%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 218 25% 15%;
+    --sidebar-accent-foreground: 210 30% 90%;
+    --sidebar-border: 218 25% 18%;
+    --sidebar-ring: 218 90% 60%;
   }
 }
 
@@ -114,23 +120,43 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  /* Hero gradient: flag black → flag blue */
   .gradient-hero {
-    background: linear-gradient(135deg, hsl(var(--ss-blue) / 0.95), hsl(var(--primary) / 0.9));
+    background: linear-gradient(
+      150deg,
+      hsl(0 0% 8%)        0%,
+      hsl(218 100% 22%)  35%,
+      hsl(218 100% 36%) 100%
+    );
   }
-  
+
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--ss-blue)), hsl(var(--accent)));
+    background: linear-gradient(135deg, hsl(var(--ss-blue)), hsl(var(--ss-gold)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
+  /* Thin decorative bar showing the 3 flag horizontal stripes */
+  .flag-stripe-bar {
+    height: 4px;
+    background: linear-gradient(
+      to right,
+      #000000  0%   33%,
+      #FFFFFF  33%  33.8%,
+      #DA121A  33.8% 66.2%,
+      #FFFFFF  66.2% 67%,
+      #078930  67%  100%
+    );
+    flex-shrink: 0;
+  }
+
   .news-ticker {
     animation: scroll-left 30s linear infinite;
   }
-  
+
   @keyframes scroll-left {
-    0% { transform: translateX(100%); }
+    0%   { transform: translateX(100%); }
     100% { transform: translateX(-100%); }
   }
 }
