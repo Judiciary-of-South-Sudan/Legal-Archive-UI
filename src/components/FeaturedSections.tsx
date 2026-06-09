@@ -8,6 +8,7 @@ import { useGetRecentLaws } from "@/hooks/useLaws";
 import { useGetNotices } from "@/hooks/useNotices";
 import { useGetLaws } from "@/hooks/useLaws";
 import { useGetJudgments } from "@/hooks/useJudgments";
+import { useTranslation } from "react-i18next";
 
 const StatCard = ({ label, value, icon, href }: { label: string; value: number | undefined; icon: React.ReactNode; href: string }) => (
   <Link to={href} className="block group">
@@ -24,6 +25,7 @@ const StatCard = ({ label, value, icon, href }: { label: string; value: number |
 );
 
 const FeaturedSections = () => {
+  const { t } = useTranslation();
   const { data: recentJudgments, isLoading: judgementsLoading } = useGetRecentJudgments(4);
   const { data: recentLaws, isLoading: lawsLoading } = useGetRecentLaws(4);
   const { data: recentNotices, isLoading: noticesLoading } = useGetNotices({ page: 0, size: 4, sort: "createdAt,desc" });
@@ -38,9 +40,9 @@ const FeaturedSections = () => {
 
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-          <StatCard label="Laws & Regulations" value={lawStats?.totalElements} icon={<BookOpen className="h-8 w-8" />} href="/laws" />
-          <StatCard label="Court Judgments" value={judgmentStats?.totalElements} icon={<Gavel className="h-8 w-8" />} href="/judgments" />
-          <StatCard label="Legal Notices" value={noticeStats?.totalElements} icon={<FileText className="h-8 w-8" />} href="/notices" />
+          <StatCard label={t("featured.laws_label")} value={lawStats?.totalElements} icon={<BookOpen className="h-8 w-8" />} href="/laws" />
+          <StatCard label={t("featured.judgments_label")} value={judgmentStats?.totalElements} icon={<Gavel className="h-8 w-8" />} href="/judgments" />
+          <StatCard label={t("featured.notices_label")} value={noticeStats?.totalElements} icon={<FileText className="h-8 w-8" />} href="/notices" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -50,11 +52,11 @@ const FeaturedSections = () => {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Gavel className="h-5 w-5 text-primary" />
-                Recent Judgments
+                {t("featured.recent_judgments")}
               </CardTitle>
               <Link to="/judgments">
                 <Button variant="ghost" size="sm" className="text-primary text-xs">
-                  View all <ChevronRight className="h-3 w-3 ml-1" />
+                  {t("featured.view_all")} <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
               </Link>
             </CardHeader>
@@ -84,7 +86,7 @@ const FeaturedSections = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-6">No judgments yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-6">{t("featured.no_judgments")}</p>
               )}
             </CardContent>
           </Card>
@@ -94,11 +96,11 @@ const FeaturedSections = () => {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Recent Laws
+                {t("featured.recent_laws")}
               </CardTitle>
               <Link to="/laws">
                 <Button variant="ghost" size="sm" className="text-primary text-xs">
-                  View all <ChevronRight className="h-3 w-3 ml-1" />
+                  {t("featured.view_all")} <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
               </Link>
             </CardHeader>
@@ -123,7 +125,7 @@ const FeaturedSections = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-6">No laws yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-6">{t("featured.no_laws")}</p>
               )}
             </CardContent>
           </Card>
@@ -133,11 +135,11 @@ const FeaturedSections = () => {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base">
                 <FileText className="h-5 w-5 text-primary" />
-                Recent Legal Notices
+                {t("featured.recent_notices")}
               </CardTitle>
               <Link to="/notices">
                 <Button variant="ghost" size="sm" className="text-primary text-xs">
-                  View all <ChevronRight className="h-3 w-3 ml-1" />
+                  {t("featured.view_all")} <ChevronRight className="h-3 w-3 ml-1" />
                 </Button>
               </Link>
             </CardHeader>
@@ -171,7 +173,7 @@ const FeaturedSections = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-6">No legal notices yet.</p>
+                <p className="text-sm text-muted-foreground text-center py-6">{t("featured.no_notices")}</p>
               )}
             </CardContent>
           </Card>
