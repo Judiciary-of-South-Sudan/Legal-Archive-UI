@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import { useGetLaws, useGetLawCategories, useGetLawTypes, useGetLawYears, useGetRecentLaws, useSearchLaws } from "@/hooks/useLaws";
 import { Link } from 'react-router-dom';
 import { LawFilterParams } from "@/types/api";
+import { useTranslation } from "react-i18next";
 
 const STATUSES = ["Active", "Repealed", "Amended"];
 
@@ -23,6 +24,7 @@ const verificationBadge = (status?: string) => {
 };
 
 const Laws = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -50,33 +52,32 @@ const Laws = () => {
     setFilters(prev => ({ ...prev, [key]: value || undefined }));
   };
 
-  const clearFilters = () => {
-    setPage(0);
-    setFilters({});
-  };
+  const clearFilters = () => { setPage(0); setFilters({}); };
+
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">Laws of South Sudan</h1>
-          <p className="text-muted-foreground">Complete collection of the Constitution, Acts, and statutory instruments.</p>
+          <h1 className="text-3xl font-bold text-foreground mb-4">{t("laws.page_title")}</h1>
+          <p className="text-muted-foreground">{t("laws.page_subtitle")}</p>
         </div>
 
         <Tabs defaultValue="browse" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="browse">Browse Laws</TabsTrigger>
-            <TabsTrigger value="constitution">Constitution</TabsTrigger>
-            <TabsTrigger value="categories">By Category</TabsTrigger>
-            <TabsTrigger value="recent">Recent Updates</TabsTrigger>
+            <TabsTrigger value="browse">{t("laws.tab_browse")}</TabsTrigger>
+            <TabsTrigger value="constitution">{t("laws.tab_constitution")}</TabsTrigger>
+            <TabsTrigger value="categories">{t("laws.tab_categories")}</TabsTrigger>
+            <TabsTrigger value="recent">{t("laws.tab_recent")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-4">
             <div className="flex gap-3 items-start">
               <div className="flex-1">
                 <SearchBar
-                  placeholder="Search laws by title, citation, or keywords..."
+                  placeholder={t("laws.search_placeholder")}
                   onSearch={(query) => { setPage(0); setSearchQuery(query || ""); }}
                 />
               </div>
@@ -87,7 +88,7 @@ const Laws = () => {
                 onClick={() => setShowFilters(v => !v)}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-1" />
-                Filters {hasFilters && !searchQuery ? `(${Object.values(filters).filter(Boolean).length})` : ""}
+                {t("laws.filters")} {hasFilters && !searchQuery ? `(${activeFilterCount})` : ""}
               </Button>
             </div>
 
@@ -96,19 +97,19 @@ const Laws = () => {
                 <CardContent className="pt-4 pb-3">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <Select value={filters.type ?? ""} onValueChange={v => setFilter("type", v)}>
-                      <SelectTrigger><SelectValue placeholder="All Types" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("laws.all_types")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Types</SelectItem>
-                        {(types ?? ["Act", "Constitution", "Regulation", "Statutory Instrument"]).map(t => (
-                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                        <SelectItem value="">{t("laws.all_types")}</SelectItem>
+                        {(types ?? ["Act", "Constitution", "Regulation", "Statutory Instrument"]).map(tp => (
+                          <SelectItem key={tp} value={tp}>{tp}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
 
                     <Select value={filters.status ?? ""} onValueChange={v => setFilter("status", v)}>
-                      <SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("laws.all_statuses")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Statuses</SelectItem>
+                        <SelectItem value="">{t("laws.all_statuses")}</SelectItem>
                         {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -117,9 +118,9 @@ const Laws = () => {
                       value={filters.year?.toString() ?? ""}
                       onValueChange={v => setFilter("year", v ? parseInt(v) : undefined)}
                     >
-                      <SelectTrigger><SelectValue placeholder="All Years" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("laws.all_years")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Years</SelectItem>
+                        <SelectItem value="">{t("laws.all_years")}</SelectItem>
                         {(years ?? []).map(y => (
                           <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
                         ))}
@@ -127,16 +128,16 @@ const Laws = () => {
                     </Select>
 
                     <Select value={filters.category ?? ""} onValueChange={v => setFilter("category", v)}>
-                      <SelectTrigger><SelectValue placeholder="All Categories" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("laws.all_categories")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Categories</SelectItem>
+                        <SelectItem value="">{t("laws.all_categories")}</SelectItem>
                         {(categories ?? []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   {hasFilters && (
                     <Button variant="ghost" size="sm" className="mt-2 text-muted-foreground" onClick={clearFilters}>
-                      <X className="h-3 w-3 mr-1" /> Clear filters
+                      <X className="h-3 w-3 mr-1" /> {t("laws.clear_filters")}
                     </Button>
                   )}
                 </CardContent>
@@ -145,19 +146,21 @@ const Laws = () => {
 
             {activeQuery.error && (
               <Alert variant="destructive">
-                <AlertDescription>Failed to load laws. Please check your connection to the backend.</AlertDescription>
+                <AlertDescription>{t("laws.error")}</AlertDescription>
               </Alert>
             )}
 
             {activeQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">Loading laws...</span>
+                <span className="ml-2">{t("laws.loading")}</span>
               </div>
             ) : (
               <>
                 {totalElements > 0 && (
-                  <p className="text-sm text-muted-foreground">{totalElements} law{totalElements !== 1 ? "s" : ""} found</p>
+                  <p className="text-sm text-muted-foreground">
+                    {totalElements} {totalElements !== 1 ? t("laws.found_plural") : t("laws.found_singular")}
+                  </p>
                 )}
                 <div className="space-y-4">
                   {laws.map((law, idx) => (
@@ -178,12 +181,12 @@ const Laws = () => {
                           </div>
                           <div className="flex gap-2 ml-4">
                             <Link to={`/laws/${law.id}`}>
-                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> View</Button>
+                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
                             </Link>
                             {law.pdfUrl && (
                               <Button size="sm" variant="outline" asChild>
                                 <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                                  <Download className="h-4 w-4 mr-1" /> PDF
+                                  <Download className="h-4 w-4 mr-1" /> {t("laws.pdf")}
                                 </a>
                               </Button>
                             )}
@@ -194,13 +197,13 @@ const Laws = () => {
                           {law.enactmentDate && (
                             <div className="flex items-center gap-2">
                               <Calendar className="h-4 w-4" />
-                              <span>Enacted: {new Date(law.enactmentDate).toLocaleDateString()}</span>
+                              <span>{t("laws.enacted")}: {new Date(law.enactmentDate).toLocaleDateString()}</span>
                             </div>
                           )}
                           {law.jurisdiction && (
                             <div className="flex items-center gap-2">
                               <BookOpen className="h-4 w-4" />
-                              <span>Jurisdiction: {law.jurisdiction}</span>
+                              <span>{t("laws.jurisdiction")}: {law.jurisdiction}</span>
                             </div>
                           )}
                         </div>
@@ -215,12 +218,15 @@ const Laws = () => {
 
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-muted-foreground">
-                            {law.lastAmended ? `Last amended: ${new Date(law.lastAmended).toLocaleDateString()}` :
-                              law.enactmentDate ? `Enacted: ${new Date(law.enactmentDate).toLocaleDateString()}` : ""}
+                            {law.lastAmended
+                              ? `${t("laws.last_amended")}: ${new Date(law.lastAmended).toLocaleDateString()}`
+                              : law.enactmentDate
+                              ? `${t("laws.enacted")}: ${new Date(law.enactmentDate).toLocaleDateString()}`
+                              : ""}
                           </div>
                           <Link to={`/laws/${law.id}`}>
                             <Button variant="ghost" size="sm" className="text-primary">
-                              View Details <ChevronRight className="h-4 w-4 ml-1" />
+                              {t("laws.view_details")} <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
                           </Link>
                         </div>
@@ -231,7 +237,7 @@ const Laws = () => {
                   {!activeQuery.isLoading && laws.length === 0 && (
                     <div className="text-center py-12">
                       <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">No laws found.</p>
+                      <p className="text-muted-foreground">{t("laws.no_results")}</p>
                     </div>
                   )}
                 </div>
@@ -239,12 +245,12 @@ const Laws = () => {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4">
                     <div className="text-sm text-muted-foreground">
-                      Showing {page * size + 1}–{Math.min((page + 1) * size, totalElements)} of {totalElements}
+                      {t("common.showing")} {page * size + 1}–{Math.min((page + 1) * size, totalElements)} {t("common.of")} {totalElements}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>Previous</Button>
-                      <span className="text-sm">Page {page + 1} of {totalPages}</span>
-                      <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>Next</Button>
+                      <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>{t("common.previous")}</Button>
+                      <span className="text-sm">{t("common.page")} {page + 1} {t("common.of")} {totalPages}</span>
+                      <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>{t("common.next")}</Button>
                     </div>
                   </div>
                 )}
@@ -254,7 +260,7 @@ const Laws = () => {
 
           <TabsContent value="constitution">
             <div className="space-y-4">
-              <p className="text-muted-foreground mb-4">View the Constitution and constitutional documents of South Sudan</p>
+              <p className="text-muted-foreground mb-4">{t("laws.constitution_subtitle")}</p>
               {laws.filter(law => law.type === "Constitution").map((law) => (
                 <Card key={law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
@@ -262,12 +268,12 @@ const Laws = () => {
                     <p className="text-muted-foreground mb-4">{law.summary}</p>
                     <div className="flex gap-2">
                       <Link to={`/laws/${law.id}`}>
-                        <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> View</Button>
+                        <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
                       </Link>
                       {law.pdfUrl && (
                         <Button size="sm" variant="default" asChild>
                           <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                            <Download className="h-4 w-4 mr-1" /> Download PDF
+                            <Download className="h-4 w-4 mr-1" /> {t("laws.download_pdf")}
                           </a>
                         </Button>
                       )}
@@ -288,12 +294,12 @@ const Laws = () => {
                       <Badge variant="secondary">{category}</Badge>
                     </div>
                     <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">{category}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Browse laws in this category</p>
+                    <p className="text-sm text-muted-foreground mb-4">{t("laws.category_subtitle")}</p>
                     <Button variant="ghost" size="sm" className="text-primary" onClick={() => {
                       setFilter("category", category);
                       setShowFilters(true);
                     }}>
-                      View Laws <ChevronRight className="h-4 w-4 ml-1" />
+                      {t("laws.view_laws")} <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -303,7 +309,7 @@ const Laws = () => {
 
           <TabsContent value="recent">
             <div className="space-y-4">
-              <p className="text-muted-foreground mb-4">Recently added or updated laws in the archive</p>
+              <p className="text-muted-foreground mb-4">{t("laws.recent_subtitle")}</p>
               {recentLaws?.map((law) => (
                 <Card key={law.id || law.title} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
@@ -315,18 +321,21 @@ const Laws = () => {
                           {law.year && <Badge variant="outline">{law.year}</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {law.lastAmended ? `Updated: ${new Date(law.lastAmended).toLocaleDateString()}` :
-                            law.enactmentDate ? `Enacted: ${new Date(law.enactmentDate).toLocaleDateString()}` : ""}
+                          {law.lastAmended
+                            ? `${t("laws.updated")}: ${new Date(law.lastAmended).toLocaleDateString()}`
+                            : law.enactmentDate
+                            ? `${t("laws.enacted")}: ${new Date(law.enactmentDate).toLocaleDateString()}`
+                            : ""}
                         </p>
                       </div>
                       <div className="flex gap-2 ml-4">
                         <Link to={`/laws/${law.id}`}>
-                          <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> View</Button>
+                          <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
                         </Link>
                         {law.pdfUrl && (
                           <Button size="sm" variant="outline" asChild>
                             <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                              <Download className="h-4 w-4 mr-1" /> PDF
+                              <Download className="h-4 w-4 mr-1" /> {t("laws.pdf")}
                             </a>
                           </Button>
                         )}
