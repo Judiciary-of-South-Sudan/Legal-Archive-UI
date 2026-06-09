@@ -30,6 +30,16 @@ export const authService = {
     return response.data.data!;
   },
 
+  async getProfile(): Promise<User> {
+    const response = await apiClient.get<ApiResponse<User>>('/auth/profile');
+    return response.data.data!;
+  },
+
+  async updateProfile(data: { fullName?: string; organization?: string; position?: string }): Promise<User> {
+    const response = await apiClient.put<ApiResponse<User>>('/auth/profile', data);
+    return response.data.data!;
+  },
+
   async changePassword(data: ChangePasswordRequest): Promise<void> {
     await apiClient.post<ApiResponse<string>>('/auth/change-password', data);
   },
