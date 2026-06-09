@@ -8,12 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SearchBar from "@/components/SearchBar";
+import DocStatusDropdown from "@/components/DocStatusDropdown";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useGetLaws, useGetLawCategories, useGetLawTypes, useGetLawYears, useGetRecentLaws, useSearchLaws } from "@/hooks/useLaws";
 import { Link } from 'react-router-dom';
 import { LawFilterParams } from "@/types/api";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
 
 const STATUSES = ["Active", "Repealed", "Amended"];
 
@@ -25,6 +27,8 @@ const verificationBadge = (status?: string) => {
 
 const Laws = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false;
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
