@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   LineChart, Line,
@@ -144,6 +145,7 @@ function MetricCard({ icon, label, value, sub }: { icon: React.ReactNode; label:
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const AdminDashboard: React.FC = () => {
+  const { isAdmin } = useAuth();
   const [stats, setStats]       = useState<DashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivitySummary | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
@@ -245,10 +247,10 @@ const AdminDashboard: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Scale className="h-6 w-6 text-primary" /> Admin Dashboard
+              <Scale className="h-6 w-6 text-primary" /> {isAdmin() ? 'Admin Dashboard' : 'Dashboard'}
             </h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              South Sudan Legal Archive — content and system management
+              {isAdmin() ? 'South Sudan Legal Archive — content and system management' : 'Upload and manage your document submissions'}
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
@@ -258,25 +260,27 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-xl">
+          <TabsList className={`grid w-full max-w-xl ${isAdmin() ? 'grid-cols-4' : 'grid-cols-2'}`}>
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="review" className="relative">
-              Review
-              {reviewQueue.length > 0 && (
-                <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                  {reviewQueue.length}
-                </span>
-              )}
-            </TabsTrigger>
+            {isAdmin() && (
+              <TabsTrigger value="review" className="relative">
+                Review
+                {reviewQueue.length > 0 && (
+                  <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                    {reviewQueue.length}
+                  </span>
+                )}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="audit">Audit Log</TabsTrigger>
+            {isAdmin() && <TabsTrigger value="audit">Audit Log</TabsTrigger>}
           </TabsList>
 
           {/* ──────────────── OVERVIEW TAB ──────────────── */}
           <TabsContent value="overview" className="space-y-6">
 
             {/* Stat cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${isAdmin() ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
               <StatCard
                 icon={<FileText className="h-4 w-4 text-blue-600" />}
                 label="Laws" total={stats?.totalLaws ?? 0}
@@ -295,21 +299,23 @@ const AdminDashboard: React.FC = () => {
                 published={stats?.publishedNotices ?? 0} underReview={stats?.underReviewNotices ?? 0}
                 thisYear={stats?.noticesThisYear ?? 0} color="bg-amber-50 dark:bg-amber-950"
               />
-              <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Registered Users</CardTitle>
-                  <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950">
-                    <Users className="h-4 w-4 text-green-600" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="text-3xl font-bold">{stats?.totalUsers ?? 0}</div>
-                  <div className="text-sm text-muted-foreground">{totalDocs} documents total</div>
-                  <div className="text-xs text-muted-foreground border-t pt-2">
-                    <Link to="/admin/users" className="underline hover:text-foreground">Manage users →</Link>
-                  </div>
-                </CardContent>
-              </Card>
+              {isAdmin() && (
+                <Card className="overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">Registered Users</CardTitle>
+                    <div className="p-2 rounded-lg bg-green-50 dark:bg-green-950">
+                      <Users className="h-4 w-4 text-green-600" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="text-3xl font-bold">{stats?.totalUsers ?? 0}</div>
+                    <div className="text-sm text-muted-foreground">{totalDocs} documents total</div>
+                    <div className="text-xs text-muted-foreground border-t pt-2">
+                      <Link to="/admin/users" className="underline hover:text-foreground">Manage users →</Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Content Health + Recent Activity */}
@@ -417,26 +423,26 @@ const AdminDashboard: React.FC = () => {
                   {
                     label: 'Upload',
                     items: [
-                      { to: '/admin/upload-law',     icon: <FileText className="h-5 w-5" />,    label: 'Law',       color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
-                      { to: '/admin/upload-judgment', icon: <Gavel className="h-5 w-5" />,       label: 'Judgment',  color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
-                      { to: '/admin/upload-notice',   icon: <FileWarning className="h-5 w-5" />, label: 'Notice',    color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
-                      { to: '/admin/bulk-import',     icon: <Layers className="h-5 w-5" />,      label: 'Bulk Import', color: 'text-green-600 bg-green-50 dark:bg-green-950/60' },
+                      { to: '/admin/upload-law',      icon: <FileText className="h-5 w-5" />,    label: 'Law',         color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                      { to: '/admin/upload-judgment',  icon: <Gavel className="h-5 w-5" />,       label: 'Judgment',    color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                      { to: '/admin/upload-notice',    icon: <FileWarning className="h-5 w-5" />, label: 'Notice',      color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                      ...(isAdmin() ? [{ to: '/admin/bulk-import', icon: <Layers className="h-5 w-5" />, label: 'Bulk Import', color: 'text-green-600 bg-green-50 dark:bg-green-950/60' }] : []),
                     ],
                   },
                   {
                     label: 'Browse',
                     items: [
-                      { to: '/laws',       icon: <FileText className="h-5 w-5" />,  label: 'Laws',      color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
-                      { to: '/judgments',  icon: <Gavel className="h-5 w-5" />,     label: 'Judgments', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
-                      { to: '/notices',    icon: <FileWarning className="h-5 w-5" />, label: 'Notices', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
-                      { to: '/library',    icon: <BookOpen className="h-5 w-5" />,  label: 'Library',   color: 'text-teal-600 bg-teal-50 dark:bg-teal-950/60' },
+                      { to: '/laws',      icon: <FileText className="h-5 w-5" />,    label: 'Laws',      color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                      { to: '/judgments', icon: <Gavel className="h-5 w-5" />,       label: 'Judgments', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                      { to: '/notices',   icon: <FileWarning className="h-5 w-5" />, label: 'Notices',   color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                      { to: '/library',   icon: <BookOpen className="h-5 w-5" />,    label: 'Library',   color: 'text-teal-600 bg-teal-50 dark:bg-teal-950/60' },
                     ],
                   },
                   {
                     label: 'Manage',
                     items: [
-                      { to: '/admin/users', icon: <Users className="h-5 w-5" />,   label: 'Users',      color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' },
-                      { to: '/profile',     icon: <UserCog className="h-5 w-5" />, label: 'My Profile', color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' },
+                      ...(isAdmin() ? [{ to: '/admin/users', icon: <Users className="h-5 w-5" />, label: 'Users', color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' }] : []),
+                      { to: '/profile', icon: <UserCog className="h-5 w-5" />, label: 'My Profile', color: 'text-slate-600 bg-slate-100 dark:bg-slate-800/60' },
                     ],
                   },
                 ].map(group => (
