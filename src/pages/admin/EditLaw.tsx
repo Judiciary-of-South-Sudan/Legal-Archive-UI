@@ -160,7 +160,10 @@ const EditLaw: React.FC = () => {
                     <SelectContent>
                       <SelectItem value="Constitution">Constitution</SelectItem>
                       <SelectItem value="Act">Act</SelectItem>
+                      <SelectItem value="Agreement">Agreement</SelectItem>
+                      <SelectItem value="Treaty">Treaty</SelectItem>
                       <SelectItem value="Bill">Bill</SelectItem>
+                      <SelectItem value="Decree">Decree</SelectItem>
                       <SelectItem value="Regulation">Regulation</SelectItem>
                       <SelectItem value="Ordinance">Ordinance</SelectItem>
                     </SelectContent>
