@@ -8,12 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SearchBar from "@/components/SearchBar";
+import DocStatusDropdown from "@/components/DocStatusDropdown";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { useGetNotices, useSearchNotices } from "@/hooks/useNotices";
 import { NoticeFilterParams } from "@/types/api";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NOTICE_TYPES = [
   "Appointment", "Amendment", "Regulation", "Proclamation", "Gazette", "Court Order", "Public Notice"
