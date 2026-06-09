@@ -13,6 +13,7 @@ import { useGetNoticeById, useUpdateNotice } from '@/hooks/useNotices';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateLegalNoticeRequest, LegalNotice } from '@/types/api';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface EditNoticeForm {
   title: string;
@@ -34,6 +35,7 @@ interface EditNoticeForm {
 }
 
 const EditNotice: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: notice, isLoading } = useGetNoticeById(id || '');
@@ -71,8 +73,11 @@ const EditNotice: React.FC = () => {
     const { name, value } = e.target as HTMLInputElement;
     setFormData({ ...formData, [name]: value });
   };
-  const handleSelectChange = (name: string, value: string) => setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]); };
+  const handleSelectChange = (name: string, value: string) =>
+    setFormData(prev => (prev ? { ...prev, [name]: value } : prev));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,14 +109,15 @@ const EditNotice: React.FC = () => {
       if (pdfFile) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        await apiClient.post<ApiResponse<LegalNotice>>(`/upload/legal-notice/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await apiClient.post<ApiResponse<LegalNotice>>(`/upload/legal-notice/${id}`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
         toast.success('PDF uploaded');
       }
 
       navigate('/admin/dashboard');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      console.error('Update failed', err);
       toast.error(error?.response?.data?.message || 'Failed to update notice');
     } finally {
       setIsSaving(false);
@@ -124,7 +130,7 @@ const EditNotice: React.FC = () => {
         <Header />
         <main className="container mx-auto px-4 py-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading...</span>
+          <span className="ml-2">{t('admin.form.loading')}</span>
         </main>
         <Footer />
       </div>
@@ -136,23 +142,23 @@ const EditNotice: React.FC = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Edit Legal Notice</h1>
+          <h1 className="text-3xl font-bold">{t('admin.edit.notice_title')}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Notice Details</CardTitle>
+            <CardTitle>{t('admin.edit.notice_details')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="noticeNumber">Notice Number</Label>
+                  <Label htmlFor="noticeNumber">{t('admin.form.notice_number')}</Label>
                   <Input id="noticeNumber" name="noticeNumber" value={formData.noticeNumber} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="type">Type</Label>
+                  <Label htmlFor="type">{t('admin.form.type_required')}</Label>
                   <Select value={formData.type} onValueChange={(v) => handleSelectChange('type', v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -165,42 +171,42 @@ const EditNotice: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title">{t('admin.form.title_required')}</Label>
                   <Input id="title" name="title" value={formData.title} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="publicationDate">Publication Date</Label>
+                  <Label htmlFor="publicationDate">{t('admin.form.publication_date')}</Label>
                   <Input id="publicationDate" name="publicationDate" type="date" value={formData.publicationDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="effectiveDate">Effective Date</Label>
+                  <Label htmlFor="effectiveDate">{t('admin.form.effective_date')}</Label>
                   <Input id="effectiveDate" name="effectiveDate" type="date" value={formData.effectiveDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="issuingAuthority">Issuing Authority *</Label>
+                  <Label htmlFor="issuingAuthority">{t('admin.form.issuing_authority_required')}</Label>
                   <Input id="issuingAuthority" name="issuingAuthority" value={formData.issuingAuthority} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="ministry">Ministry</Label>
+                  <Label htmlFor="ministry">{t('admin.form.ministry')}</Label>
                   <Input id="ministry" name="ministry" value={formData.ministry} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="department">Department</Label>
+                  <Label htmlFor="department">{t('admin.form.department')}</Label>
                   <Input id="department" name="department" value={formData.department} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="gazetteIssue">Gazette Issue</Label>
+                  <Label htmlFor="gazetteIssue">{t('admin.form.gazette_issue')}</Label>
                   <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">{t('admin.form.status')}</Label>
                   <Select value={formData.status} onValueChange={(v) => handleSelectChange('status', v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -212,27 +218,27 @@ const EditNotice: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="summary">Summary</Label>
+                  <Label htmlFor="summary">{t('admin.form.summary')}</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Label htmlFor="tags">{t('admin.form.tags_hint')}</Label>
                   <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">Related Law IDs (comma-separated)</Label>
+                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
                   <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="amendsLaws">Amends Law IDs (comma-separated)</Label>
+                  <Label htmlFor="amendsLaws">{t('admin.form.amends_laws')}</Label>
                   <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="pdfFile">Replace PDF</Label>
+                  <Label htmlFor="pdfFile">{t('admin.form.replace_pdf')}</Label>
                   <div className="mt-2">
                     <Input id="pdfFile" type="file" accept=".pdf" onChange={handleFileChange} className="cursor-pointer" />
                     {pdfFile && (
@@ -248,19 +254,13 @@ const EditNotice: React.FC = () => {
               <div className="flex gap-4">
                 <Button type="submit" disabled={isSaving}>
                   {isSaving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('admin.form.saving')}</>
                   ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
+                    <><Upload className="mr-2 h-4 w-4" />{t('admin.form.save_changes')}</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
-                  Cancel
+                  {t('admin.form.cancel')}
                 </Button>
               </div>
             </form>
