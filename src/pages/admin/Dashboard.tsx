@@ -37,13 +37,13 @@ interface MonthlyDocStat { month: string; laws: number; judgments: number; notic
 
 interface AuditEntry {
   id: string;
-  docType: 'Law' | 'Judgment' | 'Notice';
-  title: string;
-  createdBy: string;
-  updatedBy: string;
-  createdAt: string;
-  updatedAt: string;
-  verificationStatus: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  entityTitle: string;
+  performedBy: string;
+  timestamp: string;
+  details: string | null;
 }
 
 interface AnalyticsSummary {
@@ -378,47 +378,48 @@ const AdminDashboard: React.FC = () => {
             {auditLog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('admin.dashboard.audit_empty')}</p>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b text-muted-foreground text-xs">
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_doc_type')}</th>
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_title')}</th>
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_created_by')}</th>
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_created_at')}</th>
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_updated_by')}</th>
-                      <th className="text-left py-2 pr-4 font-medium">{t('admin.dashboard.audit_updated_at')}</th>
-                      <th className="text-left py-2 font-medium">{t('admin.dashboard.audit_status')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {auditLog.map((entry) => (
-                      <tr key={entry.id} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="py-2 pr-4">
-                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium
-                            ${entry.docType === 'Law' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300' :
-                              entry.docType === 'Judgment' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' :
-                              'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'}`}>
-                            {entry.docType}
-                          </span>
-                        </td>
-                        <td className="py-2 pr-4 max-w-[200px] truncate font-medium" title={entry.title}>{entry.title}</td>
-                        <td className="py-2 pr-4 text-muted-foreground">{entry.createdBy}</td>
-                        <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">{fmtDate(entry.createdAt)}</td>
-                        <td className="py-2 pr-4 text-muted-foreground">{entry.updatedBy}</td>
-                        <td className="py-2 pr-4 text-muted-foreground whitespace-nowrap">{fmtDate(entry.updatedAt)}</td>
-                        <td className="py-2">
-                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium
-                            ${entry.verificationStatus === 'PUBLISHED' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' :
-                              entry.verificationStatus === 'UNDER_REVIEW' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300' :
-                              'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
-                            {entry.verificationStatus}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="space-y-1">
+                {auditLog.map((entry) => {
+                  const actionCfg: Record<string, { label: string; cls: string }> = {
+                    CREATED:        { label: 'Created',        cls: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' },
+                    UPDATED:        { label: 'Edited',         cls: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
+                    STATUS_CHANGED: { label: 'Status Changed', cls: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
+                    DELETED:        { label: 'Deleted',        cls: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300' },
+                    PDF_UPLOADED:   { label: 'PDF Uploaded',   cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300' },
+                  };
+                  const typeCls: Record<string, string> = {
+                    Law:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300',
+                    Judgment: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300',
+                    Notice:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300',
+                  };
+                  const cfg = actionCfg[entry.action] ?? { label: entry.action, cls: 'bg-gray-100 text-gray-700' };
+                  return (
+                    <div key={entry.id} className="flex items-start gap-3 py-2.5 border-b last:border-0">
+                      {/* Action badge */}
+                      <span className={`shrink-0 mt-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.cls}`}>
+                        {cfg.label}
+                      </span>
+                      {/* Type badge */}
+                      <span className={`shrink-0 mt-0.5 text-xs font-medium px-2 py-0.5 rounded border ${typeCls[entry.entityType] ?? ''}`}>
+                        {entry.entityType}
+                      </span>
+                      {/* Main content */}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-medium truncate block" title={entry.entityTitle}>
+                          {entry.entityTitle}
+                        </span>
+                        {entry.details && (
+                          <span className="text-xs text-muted-foreground font-mono">{entry.details}</span>
+                        )}
+                      </div>
+                      {/* Who + when */}
+                      <div className="shrink-0 text-right">
+                        <div className="text-xs font-medium text-foreground">{entry.performedBy}</div>
+                        <div className="text-xs text-muted-foreground whitespace-nowrap">{fmtDate(entry.timestamp)}</div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </CardContent>
