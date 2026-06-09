@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Hero = () => {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,26 +21,26 @@ const Hero = () => {
   const quickLinks = [
     {
       icon: <FileText className="h-6 w-6" />,
-      title: "Recent Judgments",
-      description: "Latest court decisions and rulings",
+      title: t("hero.quick_judgments_title"),
+      description: t("hero.quick_judgments_desc"),
       href: "/judgments",
     },
     {
       icon: <Book className="h-6 w-6" />,
-      title: "Constitution & Laws",
-      description: "Complete legal framework of South Sudan",
+      title: t("hero.quick_laws_title"),
+      description: t("hero.quick_laws_desc"),
       href: "/laws",
     },
     {
       icon: <Scale className="h-6 w-6" />,
-      title: "Legal Notices",
-      description: "Official gazette and proclamations",
+      title: t("hero.quick_notices_title"),
+      description: t("hero.quick_notices_desc"),
       href: "/notices",
     },
     {
       icon: <Users className="h-6 w-6" />,
-      title: "Judiciary Directory",
-      description: "Courts, judges, and contact information",
+      title: t("hero.quick_directory_title"),
+      description: t("hero.quick_directory_desc"),
       href: "/directory",
     },
   ];
@@ -48,11 +50,10 @@ const Hero = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            South Sudan Law Reports
+            {t("hero.title")}
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Your comprehensive digital gateway to South Sudan's legal system.
-            Access judgments, laws, legal notices, and judicial resources.
+            {t("hero.subtitle")}
           </p>
 
           <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-6">
@@ -61,17 +62,17 @@ const Hero = () => {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search laws, judgments, legal notices..."
+                placeholder={t("hero.search_placeholder")}
                 className="pl-10 h-12 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:bg-white/20"
               />
             </div>
             <Button type="submit" size="lg" variant="secondary" className="text-primary h-12 px-8">
-              Search
+              {t("hero.search_btn")}
             </Button>
           </form>
 
           <div className="flex flex-wrap justify-center gap-2 text-sm text-white/70">
-            <span>Try:</span>
+            <span>{t("hero.try")}</span>
             {["constitution", "land rights", "criminal code", "investment"].map((term) => (
               <button
                 key={term}
@@ -98,7 +99,7 @@ const Hero = () => {
                   className="text-accent hover:text-accent-foreground hover:bg-accent/20 p-0"
                   asChild
                 >
-                  <Link to={link.href}>Access Now →</Link>
+                  <Link to={link.href}>{t("hero.access_now")}</Link>
                 </Button>
               </CardContent>
             </Card>
