@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  FileText, Gavel, FileWarning, Users, Upload, BarChart3, TrendingUp,
+  FileText, Gavel, FileWarning, Users, BarChart3, TrendingUp,
   UserCog, Eye, Download, Search, ClipboardList, RefreshCw, CheckCircle2,
-  Clock, FileX, AlertTriangle, Scale, Plus,
+  Clock, AlertTriangle, Scale, BookOpen, Layers, ShieldCheck,
+  XCircle, ChevronRight,
 } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
@@ -46,6 +47,18 @@ interface AnalyticsSummary {
 interface AuditEntry {
   id: string; action: string; entityType: string; entityId: string;
   entityTitle: string; performedBy: string; timestamp: string; details: string | null;
+}
+
+interface ReviewItem {
+  id: string;
+  documentType: 'Law' | 'Judgment' | 'Notice';
+  collection: 'laws' | 'judgments' | 'notices';
+  title: string;
+  subType: string;
+  year: number;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -134,7 +147,9 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats]       = useState<DashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivitySummary | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [auditLog, setAuditLog]   = useState<AuditEntry[]>([]);
+  const [auditLog, setAuditLog]       = useState<AuditEntry[]>([]);
+  const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>([]);
+  const [reviewLoading, setReviewLoading] = useState<Record<string, boolean>>({});
   const [auditFilter, setAuditFilter] = useState<string>('ALL');
   const [auditLimit, setAuditLimit]   = useState(50);
   const [loading, setLoading]         = useState(true);
@@ -142,20 +157,44 @@ const AdminDashboard: React.FC = () => {
 
   const fetchData = useCallback(async (limit = 50) => {
     try {
-      const [statsRes, activityRes, analyticsRes, auditRes] = await Promise.all([
+      const [statsRes, activityRes, analyticsRes, auditRes, reviewRes] = await Promise.all([
         apiClient.get('/admin/dashboard'),
         apiClient.get('/admin/activity'),
         apiClient.get('/admin/analytics'),
         apiClient.get(`/admin/audit?limit=${limit}`),
+        apiClient.get('/admin/review-queue'),
       ]);
       setStats(statsRes.data.data);
       setActivity(activityRes.data.data);
       setAnalytics(analyticsRes.data.data);
       setAuditLog(auditRes.data.data ?? []);
+      setReviewQueue(reviewRes.data.data ?? []);
     } catch {
       toast.error('Failed to load dashboard data');
     }
   }, []);
+
+  const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'DRAFT') => {
+    setReviewLoading(prev => ({ ...prev, [item.id]: true }));
+    try {
+      await apiClient.put(`/admin/${item.collection}/${item.id}/status`, { verificationStatus: action });
+      setReviewQueue(prev => prev.filter(r => r.id !== item.id));
+      setStats(prev => prev ? {
+        ...prev,
+        underReviewLaws:      item.documentType === 'Law'      ? prev.underReviewLaws - 1      : prev.underReviewLaws,
+        underReviewJudgments: item.documentType === 'Judgment' ? prev.underReviewJudgments - 1 : prev.underReviewJudgments,
+        underReviewNotices:   item.documentType === 'Notice'   ? prev.underReviewNotices - 1   : prev.underReviewNotices,
+        publishedLaws:        action === 'PUBLISHED' && item.documentType === 'Law'      ? prev.publishedLaws + 1      : prev.publishedLaws,
+        publishedJudgments:   action === 'PUBLISHED' && item.documentType === 'Judgment' ? prev.publishedJudgments + 1 : prev.publishedJudgments,
+        publishedNotices:     action === 'PUBLISHED' && item.documentType === 'Notice'   ? prev.publishedNotices + 1   : prev.publishedNotices,
+      } : prev);
+      toast.success(action === 'PUBLISHED' ? `"${item.title}" published` : `"${item.title}" returned to draft`);
+    } catch {
+      toast.error('Action failed');
+    } finally {
+      setReviewLoading(prev => ({ ...prev, [item.id]: false }));
+    }
+  };
 
   useEffect(() => {
     fetchData(50).finally(() => setLoading(false));
@@ -219,8 +258,16 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid grid-cols-3 w-full max-w-md">
+          <TabsList className="grid grid-cols-4 w-full max-w-xl">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="review" className="relative">
+              Review
+              {reviewQueue.length > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                  {reviewQueue.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="audit">Audit Log</TabsTrigger>
           </TabsList>
@@ -363,45 +410,144 @@ const AdminDashboard: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Quick Actions</CardTitle>
+                <CardDescription>Upload new content or jump to any section</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <Upload className="h-3.5 w-3.5" /> Upload
-                    </p>
-                    <Link to="/admin/upload-law"><Button className="w-full" variant="outline" size="sm">Law</Button></Link>
-                    <Link to="/admin/upload-judgment"><Button className="w-full" variant="outline" size="sm">Judgment</Button></Link>
-                    <Link to="/admin/upload-notice"><Button className="w-full" variant="outline" size="sm">Notice</Button></Link>
-                    <Link to="/admin/bulk-import"><Button className="w-full" size="sm"><Plus className="h-3.5 w-3.5 mr-1" />Bulk Import</Button></Link>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <BarChart3 className="h-3.5 w-3.5" /> Browse
-                    </p>
-                    <Link to="/laws"><Button className="w-full" variant="outline" size="sm">All Laws</Button></Link>
-                    <Link to="/judgments"><Button className="w-full" variant="outline" size="sm">All Judgments</Button></Link>
-                    <Link to="/notices"><Button className="w-full" variant="outline" size="sm">All Notices</Button></Link>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <UserCog className="h-3.5 w-3.5" /> Users
-                    </p>
-                    <Link to="/admin/users"><Button className="w-full" size="sm">Manage Users</Button></Link>
-                    <Link to="/profile"><Button className="w-full" variant="outline" size="sm">My Profile</Button></Link>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <FileX className="h-3.5 w-3.5" /> Summary
-                    </p>
-                    <div className="rounded-lg border bg-muted/40 p-3 space-y-1.5 text-xs">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Total docs</span><span className="font-semibold">{totalDocs}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Published</span><span className="font-semibold text-green-600">{totalPublished}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Missing PDFs</span><span className="font-semibold text-amber-600">{totalWithoutPdf}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Users</span><span className="font-semibold">{stats?.totalUsers ?? 0}</span></div>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+                  {[
+                    { to: '/admin/upload-law',      icon: <FileText className="h-5 w-5" />,  label: 'Upload Law',      color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                    { to: '/admin/upload-judgment',  icon: <Gavel className="h-5 w-5" />,     label: 'Upload Judgment', color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                    { to: '/admin/upload-notice',    icon: <FileWarning className="h-5 w-5" />, label: 'Upload Notice', color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                    { to: '/admin/bulk-import',      icon: <Layers className="h-5 w-5" />,    label: 'Bulk Import',     color: 'text-green-600 bg-green-50 dark:bg-green-950/60' },
+                    { to: '/laws',                   icon: <BookOpen className="h-5 w-5" />,  label: 'Browse Laws',     color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
+                    { to: '/judgments',              icon: <Gavel className="h-5 w-5" />,     label: 'Browse Judgments',color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
+                    { to: '/admin/users',            icon: <Users className="h-5 w-5" />,     label: 'Manage Users',    color: 'text-slate-600 bg-slate-50 dark:bg-slate-900/60' },
+                    { to: '/profile',                icon: <UserCog className="h-5 w-5" />,   label: 'My Profile',      color: 'text-slate-600 bg-slate-50 dark:bg-slate-900/60' },
+                  ].map(({ to, icon, label, color }) => (
+                    <Link key={to} to={to}>
+                      <div className="group flex flex-col items-center gap-2 p-3 rounded-xl border border-border hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer text-center">
+                        <div className={`p-2.5 rounded-lg ${color} group-hover:scale-110 transition-transform`}>
+                          {icon}
+                        </div>
+                        <span className="text-xs font-medium leading-tight text-foreground">{label}</span>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ──────────────── REVIEW TAB ──────────────── */}
+          <TabsContent value="review" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4 text-amber-500" /> Document Review Queue
+                    </CardTitle>
+                    <CardDescription>
+                      {reviewQueue.length === 0
+                        ? 'No documents currently awaiting review'
+                        : `${reviewQueue.length} document${reviewQueue.length > 1 ? 's' : ''} awaiting your decision`}
+                    </CardDescription>
+                  </div>
+                  {reviewQueue.length > 0 && (
+                    <span className="text-sm font-semibold text-amber-600 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-full">
+                      {reviewQueue.length} pending
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {reviewQueue.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+                    <div className="p-4 rounded-full bg-green-50 dark:bg-green-950/40">
+                      <CheckCircle2 className="h-8 w-8 text-green-500" />
+                    </div>
+                    <p className="text-sm font-medium">All clear</p>
+                    <p className="text-xs text-muted-foreground">
+                      Documents move here when their status is set to "Under Review". <br />
+                      Use the status dropdown on any document to send it for review.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {reviewQueue.map(item => {
+                      const typeColor = {
+                        Law:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300',
+                        Judgment: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300',
+                        Notice:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300',
+                      }[item.documentType];
+                      const typeIcon = {
+                        Law:      <FileText className="h-4 w-4" />,
+                        Judgment: <Gavel className="h-4 w-4" />,
+                        Notice:   <FileWarning className="h-4 w-4" />,
+                      }[item.documentType];
+                      const detailLink = {
+                        Law:      `/laws/${item.id}`,
+                        Judgment: `/judgments/${item.id}`,
+                        Notice:   `/notices/${item.id}`,
+                      }[item.documentType];
+                      const isLoading = reviewLoading[item.id];
+
+                      return (
+                        <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border p-4 hover:bg-muted/20 transition-colors">
+                          {/* Type badge + icon */}
+                          <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border self-start sm:self-center shrink-0 ${typeColor}`}>
+                            {typeIcon} {item.documentType}
+                          </div>
+
+                          {/* Main info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-2">
+                              <p className="text-sm font-semibold leading-snug truncate" title={item.title}>
+                                {item.title}
+                              </p>
+                              <Link to={detailLink} className="shrink-0 text-muted-foreground hover:text-foreground">
+                                <ChevronRight className="h-4 w-4 mt-0.5" />
+                              </Link>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                              {item.subType && (
+                                <span className="text-xs text-muted-foreground">{item.subType}</span>
+                              )}
+                              {item.year > 0 && (
+                                <span className="text-xs text-muted-foreground">{item.year}</span>
+                              )}
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="h-3 w-3" /> Submitted by {item.createdBy || 'unknown'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={isLoading}
+                              onClick={() => handleReviewAction(item, 'DRAFT')}
+                              className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-400"
+                            >
+                              <XCircle className="h-3.5 w-3.5 mr-1.5" /> Reject
+                            </Button>
+                            <Button
+                              size="sm"
+                              disabled={isLoading}
+                              onClick={() => handleReviewAction(item, 'PUBLISHED')}
+                              className="bg-green-600 hover:bg-green-700 text-white"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                              {isLoading ? 'Saving…' : 'Approve'}
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
