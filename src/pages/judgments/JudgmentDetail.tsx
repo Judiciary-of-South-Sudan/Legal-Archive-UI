@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Gavel, Download, ExternalLink, Pencil, Users, FileText, Loader2, Copy, Check, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useGetJudgmentById, useIncrementJudgmentView, useIncrementJudgmentDownload } from '@/hooks/useJudgments';
 import { resolveFileUrl } from '@/lib/apiClient';
+import apiClient from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
@@ -22,6 +23,31 @@ const JudgmentDetail: React.FC = () => {
   const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
+  const [citedLawTitles, setCitedLawTitles] = useState<Record<string, string>>({});
+  const [citedCaseTitles, setCitedCaseTitles] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!judgment?.citedLaws?.length) return;
+    Promise.allSettled(judgment.citedLaws.map((lawId: string) => apiClient.get(`/laws/${lawId}`))).then(results => {
+      const map: Record<string, string> = {};
+      results.forEach((r, i) => {
+        map[judgment.citedLaws[i]] = r.status === 'fulfilled' ? (r.value.data?.data?.title ?? judgment.citedLaws[i]) : judgment.citedLaws[i];
+      });
+      setCitedLawTitles(map);
+    });
+  }, [judgment?.citedLaws?.join(',')]);
+
+  useEffect(() => {
+    if (!judgment?.citedCases?.length) return;
+    Promise.allSettled(judgment.citedCases.map((caseId: string) => apiClient.get(`/judgments/${caseId}`))).then(results => {
+      const map: Record<string, string> = {};
+      results.forEach((r, i) => {
+        map[judgment.citedCases[i]] = r.status === 'fulfilled' ? (r.value.data?.data?.caseName ?? judgment.citedCases[i]) : judgment.citedCases[i];
+      });
+      setCitedCaseTitles(map);
+    });
+  }, [judgment?.citedCases?.join(',')]);
+
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
 
@@ -167,9 +193,11 @@ const JudgmentDetail: React.FC = () => {
               <div className="mb-5">
                 <h4 className="text-sm font-semibold mb-2">{t('judgments.cited_laws')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {judgment.citedLaws.map((lawId) => (
+                  {judgment.citedLaws.map((lawId: string) => (
                     <Link key={lawId} to={`/laws/${lawId}`}>
-                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{lawId}</Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                        {citedLawTitles[lawId] ?? lawId}
+                      </Badge>
                     </Link>
                   ))}
                 </div>
@@ -180,9 +208,11 @@ const JudgmentDetail: React.FC = () => {
               <div className="mb-5">
                 <h4 className="text-sm font-semibold mb-2">{t('judgments.cited_cases')}</h4>
                 <div className="flex flex-wrap gap-2">
-                  {judgment.citedCases.map((caseId) => (
+                  {judgment.citedCases.map((caseId: string) => (
                     <Link key={caseId} to={`/judgments/${caseId}`}>
-                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">{caseId}</Badge>
+                      <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+                        {citedCaseTitles[caseId] ?? caseId}
+                      </Badge>
                     </Link>
                   ))}
                 </div>
