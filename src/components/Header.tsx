@@ -30,7 +30,7 @@ const Header = () => {
     Promise.allSettled([
       apiClient.get('/laws?size=4&sort=createdAt,desc'),
       apiClient.get('/judgments?size=4&sort=createdAt,desc'),
-      apiClient.get('/notices?size=4&sort=createdAt,desc'),
+      apiClient.get('/legal-notices?size=4&sort=createdAt,desc'),
     ]).then(([lawsRes, judgmentsRes, noticesRes]) => {
       const items: { label: string; createdAt: string }[] = [];
 
