@@ -27,6 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, FileText, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface PendingImport {
   id: string;
@@ -50,14 +51,12 @@ const emptyForm = {
   jurisdiction: 'South Sudan',
   language: 'English',
   useExtractedText: true,
-  // Law
   lawType: '',
   year: new Date().getFullYear(),
   category: '',
   enactmentDate: '',
   commencementDate: '',
   publisher: 'Government of South Sudan',
-  // Judgment
   caseNumber: '',
   caseName: '',
   courtName: '',
@@ -67,7 +66,6 @@ const emptyForm = {
   parties: '',
   caseType: '',
   verdict: '',
-  // Notice
   noticeNumber: '',
   noticeType: '',
   publicationDate: '',
@@ -77,13 +75,8 @@ const emptyForm = {
   gazetteIssue: '',
 };
 
-const statusBadge = (status: string) => {
-  if (status === 'PENDING') return <Badge variant="outline" className="text-amber-600 border-amber-400"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-  if (status === 'APPROVED') return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
-  return <Badge className="bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
-};
-
 const BulkImport: React.FC = () => {
+  const { t } = useTranslation();
   const [dragOver, setDragOver] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -95,6 +88,24 @@ const BulkImport: React.FC = () => {
   const [rejectNote, setRejectNote] = useState('');
   const [rejectTarget, setRejectTarget] = useState<PendingImport | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const statusBadge = (status: string) => {
+    if (status === 'PENDING') return (
+      <Badge variant="outline" className="text-amber-600 border-amber-400">
+        <Clock className="h-3 w-3 mr-1" />{t('admin.bulk.status_pending')}
+      </Badge>
+    );
+    if (status === 'APPROVED') return (
+      <Badge className="bg-green-100 text-green-800">
+        <CheckCircle className="h-3 w-3 mr-1" />{t('admin.bulk.status_approved')}
+      </Badge>
+    );
+    return (
+      <Badge className="bg-red-100 text-red-800">
+        <XCircle className="h-3 w-3 mr-1" />{t('admin.bulk.status_rejected')}
+      </Badge>
+    );
+  };
 
   const fetchImports = async () => {
     try {
@@ -238,18 +249,18 @@ const BulkImport: React.FC = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-6">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/admin/dashboard"><ArrowLeft className="h-4 w-4 mr-1" />Dashboard</Link>
+            <Link to="/admin/dashboard"><ArrowLeft className="h-4 w-4 mr-1" />{t('admin.bulk.dashboard')}</Link>
           </Button>
-          <h1 className="text-2xl font-bold">Bulk Gazette PDF Import</h1>
+          <h1 className="text-2xl font-bold">{t('admin.bulk.title')}</h1>
           {pending.length > 0 && (
-            <Badge variant="destructive">{pending.length} pending review</Badge>
+            <Badge variant="destructive">{t('admin.bulk.pending_badge', { count: pending.length })}</Badge>
           )}
         </div>
 
         {/* Upload Zone */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-base">Upload PDFs</CardTitle>
+            <CardTitle className="text-base">{t('admin.bulk.upload_pdfs')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div
@@ -262,8 +273,8 @@ const BulkImport: React.FC = () => {
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-sm font-medium mb-1">Drag & drop PDF files here, or click to browse</p>
-              <p className="text-xs text-muted-foreground">PDF only · Multiple files supported</p>
+              <p className="text-sm font-medium mb-1">{t('admin.bulk.drag_drop')}</p>
+              <p className="text-xs text-muted-foreground">{t('admin.bulk.pdf_only')}</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -287,7 +298,7 @@ const BulkImport: React.FC = () => {
                   </div>
                 ))}
                 <Button onClick={handleUpload} disabled={uploading} className="mt-2 w-full">
-                  {uploading ? 'Uploading...' : `Upload ${selectedFiles.length} file(s)`}
+                  {uploading ? t('admin.bulk.uploading') : t('admin.bulk.upload_btn', { count: selectedFiles.length })}
                 </Button>
               </div>
             )}
@@ -297,17 +308,17 @@ const BulkImport: React.FC = () => {
         {/* Queue */}
         <Tabs defaultValue="pending">
           <TabsList className="mb-4">
-            <TabsTrigger value="pending">Pending Review ({pending.length})</TabsTrigger>
-            <TabsTrigger value="processed">Processed ({processed.length})</TabsTrigger>
+            <TabsTrigger value="pending">{t('admin.bulk.pending_tab', { count: pending.length })}</TabsTrigger>
+            <TabsTrigger value="processed">{t('admin.bulk.processed_tab', { count: processed.length })}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending">
             {loading ? (
-              <p className="text-muted-foreground text-sm">Loading...</p>
+              <p className="text-muted-foreground text-sm">{t('admin.bulk.loading')}</p>
             ) : pending.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <CheckCircle className="h-10 w-10 mx-auto mb-3 text-green-400" />
-                <p>No files pending review</p>
+                <p>{t('admin.bulk.no_pending')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -316,15 +327,19 @@ const BulkImport: React.FC = () => {
                     <CardContent className="p-4 flex items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{item.extractedTitle || item.filename}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{item.filename} · uploaded {new Date(item.uploadedAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {item.filename} · uploaded {new Date(item.uploadedAt).toLocaleDateString()}
+                        </p>
                         {item.extractedText && (
-                          <p className="text-xs text-green-600 mt-0.5">Text extracted ({item.extractedText.length.toLocaleString()} chars)</p>
+                          <p className="text-xs text-green-600 mt-0.5">
+                            {t('admin.bulk.text_extracted', { count: item.extractedText.length.toLocaleString() })}
+                          </p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Button size="sm" onClick={() => openReview(item)}>Review & Publish</Button>
+                        <Button size="sm" onClick={() => openReview(item)}>{t('admin.bulk.review_publish')}</Button>
                         <Button size="sm" variant="outline" className="text-destructive border-destructive/40" onClick={() => setRejectTarget(item)}>
-                          Reject
+                          {t('admin.bulk.reject')}
                         </Button>
                       </div>
                     </CardContent>
@@ -336,7 +351,7 @@ const BulkImport: React.FC = () => {
 
           <TabsContent value="processed">
             {processed.length === 0 ? (
-              <p className="text-muted-foreground text-sm py-8 text-center">No processed imports yet</p>
+              <p className="text-muted-foreground text-sm py-8 text-center">{t('admin.bulk.no_processed')}</p>
             ) : (
               <div className="space-y-3">
                 {processed.map(item => (
@@ -362,14 +377,13 @@ const BulkImport: React.FC = () => {
       <Dialog open={!!reviewItem} onOpenChange={open => !open && setReviewItem(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Review & Publish — {reviewItem?.filename}</DialogTitle>
+            <DialogTitle>{t('admin.bulk.review_modal_title')} — {reviewItem?.filename}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            {/* Document Type */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Document Type *</Label>
+                <Label>{t('admin.bulk.doc_type_required')}</Label>
                 <Select value={form.documentType} onValueChange={v => field('documentType', v as 'LAW' | 'JUDGMENT' | 'NOTICE')}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -380,7 +394,7 @@ const BulkImport: React.FC = () => {
                 </Select>
               </div>
               <div>
-                <Label>Status</Label>
+                <Label>{t('admin.bulk.status_field')}</Label>
                 <Select value={form.status} onValueChange={v => field('status', v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -392,19 +406,16 @@ const BulkImport: React.FC = () => {
               </div>
             </div>
 
-            {/* Title */}
             <div>
-              <Label>Title *</Label>
+              <Label>{t('admin.bulk.title_field')}</Label>
               <Input value={form.title} onChange={e => field('title', e.target.value)} />
             </div>
 
-            {/* Summary */}
             <div>
-              <Label>Summary</Label>
+              <Label>{t('admin.bulk.summary_field')}</Label>
               <Textarea value={form.summary} onChange={e => field('summary', e.target.value)} rows={3} />
             </div>
 
-            {/* Use extracted text */}
             {reviewItem?.extractedText && (
               <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
                 <Checkbox
@@ -413,19 +424,18 @@ const BulkImport: React.FC = () => {
                   onCheckedChange={v => field('useExtractedText', !!v)}
                 />
                 <Label htmlFor="useExtracted" className="cursor-pointer text-green-800 dark:text-green-200">
-                  Use extracted text as full text ({reviewItem.extractedText.length.toLocaleString()} chars)
+                  {t('admin.bulk.use_extracted', { count: reviewItem.extractedText.length.toLocaleString() })}
                 </Label>
               </div>
             )}
 
-            {/* Common fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Jurisdiction</Label>
+                <Label>{t('admin.bulk.jurisdiction_field')}</Label>
                 <Input value={form.jurisdiction} onChange={e => field('jurisdiction', e.target.value)} />
               </div>
               <div>
-                <Label>Language</Label>
+                <Label>{t('admin.bulk.language_field')}</Label>
                 <Select value={form.language} onValueChange={v => field('language', v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -437,7 +447,7 @@ const BulkImport: React.FC = () => {
             </div>
 
             <div>
-              <Label>Tags (comma-separated)</Label>
+              <Label>{t('admin.bulk.tags_field')}</Label>
               <Input value={form.tags} onChange={e => field('tags', e.target.value)} placeholder="constitutional, human rights, land" />
             </div>
 
@@ -446,10 +456,10 @@ const BulkImport: React.FC = () => {
             {/* Law-specific fields */}
             {form.documentType === 'LAW' && (
               <div className="space-y-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Law Details</p>
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('admin.bulk.law_details')}</p>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label>Law Type</Label>
+                    <Label>{t('admin.bulk.law_type')}</Label>
                     <Select value={form.lawType} onValueChange={v => field('lawType', v)}>
                       <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                       <SelectContent>
@@ -463,21 +473,21 @@ const BulkImport: React.FC = () => {
                     </Select>
                   </div>
                   <div>
-                    <Label>Year</Label>
+                    <Label>{t('admin.bulk.year')}</Label>
                     <Input type="number" value={form.year} onChange={e => field('year', parseInt(e.target.value))} />
                   </div>
                   <div>
-                    <Label>Category</Label>
+                    <Label>{t('admin.bulk.category')}</Label>
                     <Input value={form.category} onChange={e => field('category', e.target.value)} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Enactment Date</Label>
+                    <Label>{t('admin.bulk.enactment_date')}</Label>
                     <Input type="date" value={form.enactmentDate} onChange={e => field('enactmentDate', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Publisher</Label>
+                    <Label>{t('admin.bulk.publisher')}</Label>
                     <Input value={form.publisher} onChange={e => field('publisher', e.target.value)} />
                   </div>
                 </div>
@@ -487,24 +497,24 @@ const BulkImport: React.FC = () => {
             {/* Judgment-specific fields */}
             {form.documentType === 'JUDGMENT' && (
               <div className="space-y-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Judgment Details</p>
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('admin.bulk.judgment_details')}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Case Number</Label>
+                    <Label>{t('admin.bulk.case_number')}</Label>
                     <Input value={form.caseNumber} onChange={e => field('caseNumber', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Case Name</Label>
+                    <Label>{t('admin.bulk.case_name')}</Label>
                     <Input value={form.caseName} onChange={e => field('caseName', e.target.value)} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Court Name</Label>
+                    <Label>{t('admin.bulk.court_name')}</Label>
                     <Input value={form.courtName} onChange={e => field('courtName', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Court Level</Label>
+                    <Label>{t('admin.bulk.court_level')}</Label>
                     <Select value={form.courtLevel} onValueChange={v => field('courtLevel', v)}>
                       <SelectTrigger><SelectValue placeholder="Select level" /></SelectTrigger>
                       <SelectContent>
@@ -518,11 +528,11 @@ const BulkImport: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Judgment Date</Label>
+                    <Label>{t('admin.bulk.judgment_date')}</Label>
                     <Input type="date" value={form.judgmentDate} onChange={e => field('judgmentDate', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Verdict</Label>
+                    <Label>{t('admin.bulk.verdict')}</Label>
                     <Select value={form.verdict} onValueChange={v => field('verdict', v)}>
                       <SelectTrigger><SelectValue placeholder="Select verdict" /></SelectTrigger>
                       <SelectContent>
@@ -536,11 +546,11 @@ const BulkImport: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <Label>Parties</Label>
+                  <Label>{t('admin.bulk.parties')}</Label>
                   <Input value={form.parties} onChange={e => field('parties', e.target.value)} placeholder="Plaintiff v. Defendant" />
                 </div>
                 <div>
-                  <Label>Judges (comma-separated)</Label>
+                  <Label>{t('admin.bulk.judges_hint')}</Label>
                   <Input value={form.judges} onChange={e => field('judges', e.target.value)} />
                 </div>
               </div>
@@ -549,14 +559,14 @@ const BulkImport: React.FC = () => {
             {/* Notice-specific fields */}
             {form.documentType === 'NOTICE' && (
               <div className="space-y-4">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Notice Details</p>
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">{t('admin.bulk.notice_details')}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Notice Number</Label>
+                    <Label>{t('admin.bulk.notice_number')}</Label>
                     <Input value={form.noticeNumber} onChange={e => field('noticeNumber', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Notice Type</Label>
+                    <Label>{t('admin.bulk.notice_type')}</Label>
                     <Select value={form.noticeType} onValueChange={v => field('noticeType', v)}>
                       <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                       <SelectContent>
@@ -571,21 +581,21 @@ const BulkImport: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Publication Date</Label>
+                    <Label>{t('admin.bulk.publication_date')}</Label>
                     <Input type="date" value={form.publicationDate} onChange={e => field('publicationDate', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Effective Date</Label>
+                    <Label>{t('admin.bulk.effective_date')}</Label>
                     <Input type="date" value={form.effectiveDate} onChange={e => field('effectiveDate', e.target.value)} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Issuing Authority</Label>
+                    <Label>{t('admin.bulk.issuing_authority')}</Label>
                     <Input value={form.issuingAuthority} onChange={e => field('issuingAuthority', e.target.value)} />
                   </div>
                   <div>
-                    <Label>Gazette Issue</Label>
+                    <Label>{t('admin.bulk.gazette_issue')}</Label>
                     <Input value={form.gazetteIssue} onChange={e => field('gazetteIssue', e.target.value)} placeholder="e.g. Vol. 15 No. 3" />
                   </div>
                 </div>
@@ -594,9 +604,9 @@ const BulkImport: React.FC = () => {
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setReviewItem(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setReviewItem(null)}>{t('admin.form.cancel')}</Button>
             <Button onClick={handleApprove} disabled={submitting || !form.title || !form.documentType}>
-              {submitting ? 'Publishing...' : 'Approve & Publish'}
+              {submitting ? t('admin.bulk.publishing') : t('admin.bulk.approve_publish')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -606,11 +616,13 @@ const BulkImport: React.FC = () => {
       <Dialog open={!!rejectTarget} onOpenChange={open => !open && setRejectTarget(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Reject Import</DialogTitle>
+            <DialogTitle>{t('admin.bulk.reject_title')}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">Reject <strong>{rejectTarget?.filename}</strong>?</p>
+          <p className="text-sm text-muted-foreground">
+            {t('admin.bulk.reject_question', { filename: rejectTarget?.filename })}
+          </p>
           <div>
-            <Label>Reason (optional)</Label>
+            <Label>{t('admin.bulk.reject_reason')}</Label>
             <Textarea
               value={rejectNote}
               onChange={e => setRejectNote(e.target.value)}
@@ -619,8 +631,8 @@ const BulkImport: React.FC = () => {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectTarget(null)}>Cancel</Button>
-            <Button variant="destructive" onClick={handleReject}>Reject</Button>
+            <Button variant="outline" onClick={() => setRejectTarget(null)}>{t('admin.form.cancel')}</Button>
+            <Button variant="destructive" onClick={handleReject}>{t('admin.bulk.reject_btn')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
