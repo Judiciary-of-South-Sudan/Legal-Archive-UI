@@ -270,6 +270,11 @@
     "login_link": "Login here",
     "back_home": "Back to Home"
   },
+  "notfound": {
+    "title": "404",
+    "message": "Oops! Page not found",
+    "back_home": "Return to Home"
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",
