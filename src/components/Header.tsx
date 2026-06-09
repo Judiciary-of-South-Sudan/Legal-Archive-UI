@@ -2,7 +2,7 @@ import { Search, Menu, Scale, User, LogOut, Moon, Sun, BookmarkCheck, Languages,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import apiClient from "@/lib/apiClient";
@@ -217,13 +217,19 @@ const Header = () => {
         <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block pb-4 md:pb-0`}>
           <div className="flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0">
             {navItems.map((item) => (
-              <a
+              <NavLink
                 key={item.href}
-                href={item.href}
-                className="text-foreground hover:text-primary transition-colors duration-200 py-2 px-3 rounded-md hover:bg-secondary text-sm font-medium"
+                to={item.href}
+                className={({ isActive }) =>
+                  `text-sm font-medium py-2 px-3 rounded-md transition-colors duration-200 ${
+                    isActive
+                      ? 'text-primary border-b-2 border-primary'
+                      : 'text-foreground hover:text-primary hover:bg-secondary'
+                  }`
+                }
               >
                 {item.name}
-              </a>
+              </NavLink>
             ))}
           </div>
         </nav>
