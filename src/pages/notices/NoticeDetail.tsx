@@ -5,18 +5,20 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, FileText, Download, Building2, ExternalLink, Loader2 } from 'lucide-react';
+import { Calendar, FileText, Download, Building2, ExternalLink, Loader2, Pencil, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useGetNoticeById, useIncrementNoticeView } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
 import { useAuth } from '@/contexts/AuthContext';
-import { Pencil } from 'lucide-react';
+import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 
 const NoticeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: notice, isLoading, error } = useGetNoticeById(id || '');
   const { mutate: incrementView } = useIncrementNoticeView();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
+  const { data: bookmarked } = useIsBookmarked(id || '');
+  const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
@@ -177,6 +179,16 @@ const NoticeDetail: React.FC = () => {
 
             {/* Action buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              {isAuthenticated && (
+                <Button
+                  variant={bookmarked ? 'default' : 'outline'}
+                  onClick={() => toggleBookmark({ documentId: id!, documentType: 'NOTICE', title: notice!.title })}
+                  disabled={bookmarkPending}
+                >
+                  {bookmarked ? <BookmarkCheck className="h-4 w-4 mr-1" /> : <Bookmark className="h-4 w-4 mr-1" />}
+                  {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                </Button>
+              )}
               {pdfUrl ? (
                 <>
                   <Button asChild>
