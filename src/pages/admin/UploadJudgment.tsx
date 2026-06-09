@@ -13,8 +13,10 @@ import { useCreateJudgment } from '@/hooks/useJudgments';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateJudgmentRequest, Judgment } from '@/types/api';
+import { useTranslation } from 'react-i18next';
 
 const AdminUploadJudgment: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const createMutation = useCreateJudgment();
 
@@ -28,9 +30,7 @@ const AdminUploadJudgment: React.FC = () => {
     caseType: '',
     verdict: '',
     summary: '',
-    // renamed keywords -> tags (comma-separated in UI)
     tags: '',
-    // new fields to match backend DTO
     parties: '',
     fullText: '',
     citedLaws: '',
@@ -51,9 +51,7 @@ const AdminUploadJudgment: React.FC = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0]);
-    }
+    if (e.target.files && e.target.files[0]) setPdfFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,7 +69,6 @@ const AdminUploadJudgment: React.FC = () => {
         caseType: formData.caseType || undefined,
         verdict: formData.verdict || undefined,
         summary: formData.summary || undefined,
-        // send tags (was keywords)
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         parties: formData.parties || undefined,
         fullText: formData.fullText || undefined,
@@ -86,7 +83,6 @@ const AdminUploadJudgment: React.FC = () => {
       if (pdfFile && (created?.id || created?.frbrUri)) {
         const fd = new FormData();
         fd.append('file', pdfFile);
-        // use id or frbrUri as fallback for upload route
         const uploadKey = created.id ?? created.frbrUri;
         await apiClient.post<ApiResponse<Judgment>>(`/upload/judgment/${uploadKey}`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
@@ -98,9 +94,7 @@ const AdminUploadJudgment: React.FC = () => {
 
       navigate('/admin/dashboard');
     } catch (err: unknown) {
-      // narrow unknown to extract possible message safely
       const error = err as { response?: { data?: { message?: string } } };
-      console.error('Upload error:', err);
       toast.error(error?.response?.data?.message || 'Failed to upload judgment');
     } finally {
       setIsUploading(false);
@@ -112,38 +106,36 @@ const AdminUploadJudgment: React.FC = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Upload New Judgment</h1>
-          <p className="text-muted-foreground">Add a new court judgment to the archive</p>
+          <h1 className="text-3xl font-bold">{t('admin.upload.judgment_title')}</h1>
+          <p className="text-muted-foreground">{t('admin.upload.judgment_subtitle')}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Judgment Details</CardTitle>
+            <CardTitle>{t('admin.upload.judgment_details')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="caseName">Case Name *</Label>
+                  <Label htmlFor="caseName">{t('admin.form.case_name_required')}</Label>
                   <Input id="caseName" name="caseName" value={formData.caseName} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="caseNumber">Case Number</Label>
+                  <Label htmlFor="caseNumber">{t('admin.form.case_number')}</Label>
                   <Input id="caseNumber" name="caseNumber" value={formData.caseNumber} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="courtName">Court Name *</Label>
+                  <Label htmlFor="courtName">{t('admin.form.court_name_required')}</Label>
                   <Input id="courtName" name="courtName" value={formData.courtName} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="courtLevel">Court Level</Label>
+                  <Label htmlFor="courtLevel">{t('admin.form.court_level')}</Label>
                   <Select value={formData.courtLevel} onValueChange={(v) => handleSelectChange('courtLevel', v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Supreme Court">Supreme Court</SelectItem>
                       <SelectItem value="Court of Appeal">Court of Appeal</SelectItem>
@@ -153,47 +145,47 @@ const AdminUploadJudgment: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="judges">Judges (comma-separated)</Label>
+                  <Label htmlFor="judges">{t('admin.form.judges_hint')}</Label>
                   <Input id="judges" name="judges" value={formData.judges} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="judgmentDate">Judgment Date</Label>
+                  <Label htmlFor="judgmentDate">{t('admin.form.judgment_date')}</Label>
                   <Input id="judgmentDate" name="judgmentDate" type="date" value={formData.judgmentDate} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="summary">Summary</Label>
+                  <Label htmlFor="summary">{t('admin.form.summary')}</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="parties">Parties</Label>
+                  <Label htmlFor="parties">{t('admin.form.parties')}</Label>
                   <Input id="parties" name="parties" value={formData.parties} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="fullText">Full Text</Label>
+                  <Label htmlFor="fullText">{t('admin.form.full_text')}</Label>
                   <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Label htmlFor="tags">{t('admin.form.tags_hint')}</Label>
                   <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="citedLaws">Cited Laws (comma-separated)</Label>
+                  <Label htmlFor="citedLaws">{t('admin.form.cited_laws')}</Label>
                   <Input id="citedLaws" name="citedLaws" value={formData.citedLaws} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="citedCases">Cited Cases (comma-separated)</Label>
+                  <Label htmlFor="citedCases">{t('admin.form.cited_cases')}</Label>
                   <Input id="citedCases" name="citedCases" value={formData.citedCases} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="pdfFile">PDF Document</Label>
+                  <Label htmlFor="pdfFile">{t('admin.form.pdf_document')}</Label>
                   <div className="mt-2">
                     <Input id="pdfFile" type="file" accept=".pdf" onChange={handleFileChange} className="cursor-pointer" />
                     {pdfFile && (
@@ -209,19 +201,13 @@ const AdminUploadJudgment: React.FC = () => {
               <div className="flex gap-4">
                 <Button type="submit" disabled={isUploading}>
                   {isUploading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading...
-                    </>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('admin.form.uploading')}</>
                   ) : (
-                    <>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Judgment
-                    </>
+                    <><Upload className="mr-2 h-4 w-4" />{t('admin.upload.judgment_btn')}</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
-                  Cancel
+                  {t('admin.form.cancel')}
                 </Button>
               </div>
             </form>
