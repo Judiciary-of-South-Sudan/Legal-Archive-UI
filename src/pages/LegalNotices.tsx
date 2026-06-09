@@ -163,7 +163,10 @@ const LegalNotices = () => {
                                   {notice.status}
                                 </Badge>
                               )}
-                              {verificationBadge(notice.verificationStatus)}
+                              {isAdmin && notice.id
+                                ? <DocStatusDropdown id={notice.id} collection="notices" current={notice.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                                : verificationBadge(notice.verificationStatus)
+                              }
                             </div>
 
                             {notice.tags && notice.tags.length > 0 && (
