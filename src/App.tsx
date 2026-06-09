@@ -43,6 +43,7 @@ import BulkImport from './pages/admin/BulkImport';
 import SearchPage from './pages/Search';
 import Library from './pages/Library';
 import Profile from './pages/Profile';
+import ScrollToTop from './components/ScrollToTop';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +62,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
