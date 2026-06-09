@@ -23,10 +23,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, UserX, ShieldCheck, ShieldOff, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, ShieldOff, Trash2, RefreshCw } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface UserRecord {
   id: string;
@@ -55,6 +56,7 @@ const roleBadgeVariant = (role: string): 'default' | 'secondary' | 'destructive'
 const roleLabel = (role: string) => role.replace('ROLE_', '');
 
 const AdminUsers: React.FC = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingRoleChange, setPendingRoleChange] = useState<Record<string, string>>({});
@@ -80,11 +82,10 @@ const AdminUsers: React.FC = () => {
         setUsers((prev) =>
           prev.map((u) => (u.id === userId ? { ...u, roles: res.data.data.roles } : u))
         );
-        toast.success('Role updated');
+        toast.success(t('admin.users.role_updated'));
       })
       .catch(() => {
         toast.error('Failed to update role');
-        // revert optimistic pending state
         setPendingRoleChange((prev) => {
           const next = { ...prev };
           delete next[userId];
@@ -107,7 +108,7 @@ const AdminUsers: React.FC = () => {
         setUsers((prev) =>
           prev.map((u) => (u.id === user.id ? { ...u, enabled: res.data.data.enabled } : u))
         );
-        toast.success(user.enabled ? 'User disabled' : 'User enabled');
+        toast.success(user.enabled ? t('admin.users.user_disabled') : t('admin.users.user_enabled'));
       })
       .catch(() => toast.error('Failed to update user status'));
   };
@@ -117,7 +118,7 @@ const AdminUsers: React.FC = () => {
       .delete(`/admin/users/${userId}`)
       .then(() => {
         setUsers((prev) => prev.filter((u) => u.id !== userId));
-        toast.success('User deleted');
+        toast.success(t('admin.users.user_deleted'));
       })
       .catch(() => toast.error('Failed to delete user'));
   };
@@ -140,38 +141,40 @@ const AdminUsers: React.FC = () => {
               className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-2"
             >
               <ArrowLeft className="h-3 w-3" />
-              Back to Dashboard
+              {t('admin.users.back')}
             </Link>
-            <h1 className="text-3xl font-bold">User Management</h1>
+            <h1 className="text-3xl font-bold">{t('admin.users.title')}</h1>
             <p className="text-muted-foreground">
-              {users.length} registered {users.length === 1 ? 'user' : 'users'}
+              {users.length !== 1
+                ? t('admin.users.registered_plural', { count: users.length })
+                : t('admin.users.registered_singular', { count: users.length })}
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={fetchUsers} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('admin.users.refresh')}
           </Button>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Registered Users</CardTitle>
+            <CardTitle>{t('admin.users.registered_users')}</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-center text-muted-foreground py-8">Loading users...</p>
+              <p className="text-center text-muted-foreground py-8">{t('admin.users.loading')}</p>
             ) : users.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No users found.</p>
+              <p className="text-center text-muted-foreground py-8">{t('admin.users.no_users')}</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">User</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">Role</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">Status</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">Joined</th>
-                      <th className="text-right py-3 font-medium text-muted-foreground">Actions</th>
+                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_user')}</th>
+                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_role')}</th>
+                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_status')}</th>
+                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_joined')}</th>
+                      <th className="text-right py-3 font-medium text-muted-foreground">{t('admin.users.col_actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -207,7 +210,7 @@ const AdminUsers: React.FC = () => {
                           </td>
                           <td className="py-3 pr-4">
                             <Badge variant={user.enabled ? 'default' : 'secondary'}>
-                              {user.enabled ? 'Active' : 'Disabled'}
+                              {user.enabled ? t('admin.users.status_active') : t('admin.users.status_disabled')}
                             </Badge>
                           </td>
                           <td className="py-3 pr-4 text-muted-foreground">
@@ -221,7 +224,7 @@ const AdminUsers: React.FC = () => {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleToggleEnabled(user)}
-                                title={user.enabled ? 'Disable user' : 'Enable user'}
+                                title={user.enabled ? t('admin.users.disable_user') : t('admin.users.enable_user')}
                               >
                                 {user.enabled ? (
                                   <ShieldOff className="h-4 w-4 text-amber-500" />
@@ -232,26 +235,27 @@ const AdminUsers: React.FC = () => {
 
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <Button variant="ghost" size="sm" title="Delete user">
+                                  <Button variant="ghost" size="sm" title={t('admin.users.delete_title')}>
                                     <Trash2 className="h-4 w-4 text-destructive" />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                                    <AlertDialogTitle>{t('admin.users.delete_title')}</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      This will permanently delete{' '}
-                                      <strong>{user.fullName || user.username}</strong> ({user.email}).
-                                      This action cannot be undone.
+                                      {t('admin.users.delete_confirm', {
+                                        name: user.fullName || user.username,
+                                        email: user.email,
+                                      })}
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() => handleDelete(user.id)}
                                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                     >
-                                      Delete
+                                      {t('admin.users.delete_btn')}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
