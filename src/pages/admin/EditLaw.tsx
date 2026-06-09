@@ -13,6 +13,7 @@ import { useGetLawById, useUpdateLaw } from '@/hooks/useLaws';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateLawRequest, Law } from '@/types/api';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface EditLawForm {
   title: string;
@@ -33,6 +34,7 @@ interface EditLawForm {
 }
 
 const EditLaw: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: law, isLoading } = useGetLawById(id || '');
@@ -124,7 +126,7 @@ const EditLaw: React.FC = () => {
         <Header />
         <main className="container mx-auto px-4 py-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading...</span>
+          <span className="ml-2">{t('admin.form.loading')}</span>
         </main>
         <Footer />
       </div>
@@ -136,23 +138,23 @@ const EditLaw: React.FC = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Edit Law</h1>
+          <h1 className="text-3xl font-bold">{t('admin.edit.law_title')}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Law Details</CardTitle>
+            <CardTitle>{t('admin.edit.law_details')}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title">{t('admin.form.title_required')}</Label>
                   <Input id="title" name="title" value={formData.title} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="type">Type *</Label>
+                  <Label htmlFor="type">{t('admin.form.type_required')}</Label>
                   <Select value={formData.type} onValueChange={v => handleSelectChange('type', v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -166,27 +168,27 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="year">Year *</Label>
+                  <Label htmlFor="year">{t('admin.form.year_required')}</Label>
                   <Input id="year" name="year" type="number" value={String(formData.year)} onChange={handleInputChange} required />
                 </div>
 
                 <div>
-                  <Label htmlFor="enactmentDate">Enactment Date</Label>
+                  <Label htmlFor="enactmentDate">{t('admin.form.enactment_date')}</Label>
                   <Input id="enactmentDate" name="enactmentDate" type="date" value={formData.enactmentDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="commencementDate">Commencement Date</Label>
+                  <Label htmlFor="commencementDate">{t('admin.form.commencement_date')}</Label>
                   <Input id="commencementDate" name="commencementDate" type="date" value={formData.commencementDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Input id="category" name="category" value={formData.category} onChange={handleInputChange} placeholder="e.g., Constitutional, Criminal" />
+                  <Label htmlFor="category">{t('admin.form.category')}</Label>
+                  <Input id="category" name="category" value={formData.category} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">{t('admin.form.status')}</Label>
                   <Select value={formData.status} onValueChange={v => handleSelectChange('status', v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -199,17 +201,17 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="jurisdiction">Jurisdiction</Label>
+                  <Label htmlFor="jurisdiction">{t('admin.form.jurisdiction')}</Label>
                   <Input id="jurisdiction" name="jurisdiction" value={formData.jurisdiction} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="publisher">Publisher</Label>
+                  <Label htmlFor="publisher">{t('admin.form.publisher')}</Label>
                   <Input id="publisher" name="publisher" value={formData.publisher} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="language">Language</Label>
+                  <Label htmlFor="language">{t('admin.form.language')}</Label>
                   <Select value={formData.language} onValueChange={v => handleSelectChange('language', v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -220,32 +222,32 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="summary">Summary</Label>
+                  <Label htmlFor="summary">{t('admin.form.summary')}</Label>
                   <Textarea id="summary" name="summary" value={formData.summary} onChange={handleInputChange} rows={4} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Label htmlFor="tags">{t('admin.form.tags_hint')}</Label>
                   <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="fullText">Full Text</Label>
+                  <Label htmlFor="fullText">{t('admin.form.full_text')}</Label>
                   <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">Related Law IDs (comma-separated)</Label>
+                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
                   <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
                 </div>
 
                 <div>
-                  <Label htmlFor="amendments">Amendments (comma-separated)</Label>
+                  <Label htmlFor="amendments">{t('admin.form.amendments')}</Label>
                   <Input id="amendments" name="amendments" value={formData.amendments} onChange={handleInputChange} />
                 </div>
 
                 <div className="md:col-span-2">
-                  <Label htmlFor="pdfFile">Replace PDF</Label>
+                  <Label htmlFor="pdfFile">{t('admin.form.replace_pdf')}</Label>
                   <div className="mt-2">
                     <Input id="pdfFile" type="file" accept=".pdf" onChange={handleFileChange} className="cursor-pointer" />
                     {pdfFile && (
@@ -261,13 +263,13 @@ const EditLaw: React.FC = () => {
               <div className="flex gap-4">
                 <Button type="submit" disabled={isSaving}>
                   {isSaving ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Saving...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('admin.form.saving')}</>
                   ) : (
-                    <><Upload className="mr-2 h-4 w-4" />Save Changes</>
+                    <><Upload className="mr-2 h-4 w-4" />{t('admin.form.save_changes')}</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
-                  Cancel
+                  {t('admin.form.cancel')}
                 </Button>
               </div>
             </form>
