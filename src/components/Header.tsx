@@ -30,7 +30,9 @@ const Header = () => {
   }, [dark]);
 
   const toggleLanguage = () => {
-    i18n.changeLanguage(isArabic ? 'en' : 'ar');
+    const newLang = isArabic ? 'en' : 'ar';
+    i18n.changeLanguage(newLang);
+    document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
   };
 
   const handleSearch = (e: React.FormEvent) => {
