@@ -463,11 +463,14 @@ const BulkImport: React.FC = () => {
                     <Select value={form.lawType} onValueChange={v => field('lawType', v)}>
                       <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="Constitution">Constitution</SelectItem>
                         <SelectItem value="Act">Act</SelectItem>
+                        <SelectItem value="Agreement">Agreement</SelectItem>
+                        <SelectItem value="Treaty">Treaty</SelectItem>
                         <SelectItem value="Decree">Decree</SelectItem>
                         <SelectItem value="Regulation">Regulation</SelectItem>
                         <SelectItem value="Order">Order</SelectItem>
-                        <SelectItem value="Constitution">Constitution</SelectItem>
+                        <SelectItem value="Ordinance">Ordinance</SelectItem>
                         <SelectItem value="Bill">Bill</SelectItem>
                       </SelectContent>
                     </Select>
