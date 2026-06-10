@@ -5,13 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Building2, Briefcase, Lock, Check, Loader2, Mail, CalendarDays, Shield } from 'lucide-react';
 import type { User as UserType } from '@/types/api';
+import { useTranslation } from 'react-i18next';
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
   ROLE_ADMIN:  { label: 'Administrator', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100' },
@@ -23,19 +23,18 @@ const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user: authUser } = useAuth();
   const { toast } = useToast();
 
   const [profile, setProfile] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Profile edit state
   const [fullName, setFullName] = useState('');
   const [organization, setOrganization] = useState('');
   const [position, setPosition] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
 
-  // Password state
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,7 +48,7 @@ export default function Profile() {
         setOrganization(p.organization ?? '');
         setPosition(p.position ?? '');
       })
-      .catch(() => toast({ title: 'Could not load profile', variant: 'destructive' }))
+      .catch(() => toast({ title: t('profile.loading_error'), variant: 'destructive' }))
       .finally(() => setLoading(false));
   }, []);
 
@@ -59,9 +58,9 @@ export default function Profile() {
     try {
       const updated = await authService.updateProfile({ fullName, organization, position });
       setProfile(updated);
-      toast({ title: 'Profile updated', description: 'Your information has been saved.' });
+      toast({ title: t('profile.saved'), description: t('profile.saved_desc') });
     } catch {
-      toast({ title: 'Update failed', variant: 'destructive' });
+      toast({ title: t('profile.save_failed'), variant: 'destructive' });
     } finally {
       setSavingProfile(false);
     }
@@ -70,20 +69,20 @@ export default function Profile() {
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      toast({ title: 'Passwords do not match', variant: 'destructive' });
+      toast({ title: t('profile.pwd_mismatch'), variant: 'destructive' });
       return;
     }
     if (newPassword.length < 6) {
-      toast({ title: 'Password must be at least 6 characters', variant: 'destructive' });
+      toast({ title: t('profile.pwd_too_short'), variant: 'destructive' });
       return;
     }
     setSavingPassword(true);
     try {
       await authService.changePassword({ oldPassword, newPassword });
       setOldPassword(''); setNewPassword(''); setConfirmPassword('');
-      toast({ title: 'Password changed', description: 'Your password has been updated.' });
+      toast({ title: t('profile.pwd_changed'), description: t('profile.pwd_changed_desc') });
     } catch {
-      toast({ title: 'Password change failed', description: 'Check your current password and try again.', variant: 'destructive' });
+      toast({ title: t('profile.pwd_failed'), description: t('profile.pwd_failed_desc'), variant: 'destructive' });
     } finally {
       setSavingPassword(false);
     }
@@ -102,11 +101,9 @@ export default function Profile() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Profile header card */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                  {/* Avatar */}
                   <div className="h-20 w-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold shrink-0">
                     {initials}
                   </div>
@@ -139,7 +136,7 @@ export default function Profile() {
                     </div>
                     {profile?.createdAt && (
                       <p className="text-xs text-muted-foreground mt-2 flex items-center justify-center sm:justify-start gap-1">
-                        <CalendarDays className="h-3.5 w-3.5" /> Member since {formatDate(profile.createdAt)}
+                        <CalendarDays className="h-3.5 w-3.5" /> {t('profile.member_since')} {formatDate(profile.createdAt)}
                       </p>
                     )}
                   </div>
@@ -148,27 +145,26 @@ export default function Profile() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Edit profile */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
-                    <User className="h-4 w-4" /> Profile Information
+                    <User className="h-4 w-4" /> {t('profile.section_info')}
                   </CardTitle>
-                  <CardDescription>Update your name, organisation, and role title.</CardDescription>
+                  <CardDescription>{t('profile.section_info_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSaveProfile} className="space-y-4">
                     <div className="space-y-1">
-                      <Label>Username</Label>
+                      <Label>{t('profile.username')}</Label>
                       <Input value={profile?.username ?? ''} disabled className="bg-muted/50" />
                     </div>
                     <div className="space-y-1">
-                      <Label>Email</Label>
+                      <Label>{t('profile.email')}</Label>
                       <Input value={profile?.email ?? ''} disabled className="bg-muted/50" />
                     </div>
                     <Separator />
                     <div className="space-y-1">
-                      <Label htmlFor="fullName">Full Name</Label>
+                      <Label htmlFor="fullName">{t('profile.full_name')}</Label>
                       <Input
                         id="fullName"
                         placeholder="e.g. John Garang"
@@ -177,7 +173,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="organization">Organisation</Label>
+                      <Label htmlFor="organization">{t('profile.organization')}</Label>
                       <Input
                         id="organization"
                         placeholder="e.g. Ministry of Justice"
@@ -186,7 +182,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="position">Position / Title</Label>
+                      <Label htmlFor="position">{t('profile.position')}</Label>
                       <Input
                         id="position"
                         placeholder="e.g. Legal Researcher"
@@ -196,24 +192,23 @@ export default function Profile() {
                     </div>
                     <Button type="submit" className="w-full" disabled={savingProfile}>
                       {savingProfile ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
-                      Save Changes
+                      {t('profile.save_btn')}
                     </Button>
                   </form>
                 </CardContent>
               </Card>
 
-              {/* Change password */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
-                    <Lock className="h-4 w-4" /> Account Security
+                    <Lock className="h-4 w-4" /> {t('profile.section_security')}
                   </CardTitle>
-                  <CardDescription>Change your login password.</CardDescription>
+                  <CardDescription>{t('profile.section_security_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleChangePassword} className="space-y-4">
                     <div className="space-y-1">
-                      <Label htmlFor="oldPassword">Current Password</Label>
+                      <Label htmlFor="oldPassword">{t('profile.current_pwd')}</Label>
                       <Input
                         id="oldPassword"
                         type="password"
@@ -223,7 +218,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="newPassword">New Password</Label>
+                      <Label htmlFor="newPassword">{t('profile.new_pwd')}</Label>
                       <Input
                         id="newPassword"
                         type="password"
@@ -233,7 +228,7 @@ export default function Profile() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Label htmlFor="confirmPassword">{t('profile.confirm_pwd')}</Label>
                       <Input
                         id="confirmPassword"
                         type="password"
@@ -242,7 +237,7 @@ export default function Profile() {
                         required
                       />
                       {confirmPassword && newPassword !== confirmPassword && (
-                        <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                        <p className="text-xs text-destructive mt-1">{t('profile.pwd_mismatch')}</p>
                       )}
                     </div>
                     <Button
@@ -252,7 +247,7 @@ export default function Profile() {
                       disabled={savingPassword || !oldPassword || !newPassword || newPassword !== confirmPassword}
                     >
                       {savingPassword ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
-                      Change Password
+                      {t('profile.change_pwd_btn')}
                     </Button>
                   </form>
                 </CardContent>
