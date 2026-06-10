@@ -5,7 +5,8 @@
     "notices": "الإشعارات القانونية",
     "opinions": "الآراء القضائية",
     "directory": "دليل السلطة القضائية",
-    "guide": "دليل المواطن"
+    "guide": "دليل المواطن",
+    "peace_agreements": "اتفاقيات السلام"
   },
   "header": {
     "title": "تقارير قانون جنوب السودان",
@@ -16,7 +17,10 @@
     "register": "إنشاء حساب",
     "my_account": "حسابي",
     "my_library": "مكتبتي",
+    "my_profile": "ملفي الشخصي",
     "admin_dashboard": "لوحة الإدارة",
+    "dashboard": "لوحة التحكم",
+    "ticker_latest": "الأحدث",
     "logout": "تسجيل الخروج"
   },
   "hero": {
@@ -33,7 +37,39 @@
     "quick_notices_title": "الإشعارات القانونية",
     "quick_notices_desc": "الجريدة الرسمية والإعلانات",
     "quick_directory_title": "دليل السلطة القضائية",
-    "quick_directory_desc": "المحاكم والقضاة ومعلومات الاتصال"
+    "quick_directory_desc": "المحاكم والقضاة ومعلومات الاتصال",
+    "national_repository": "المستودع القانوني الوطني",
+    "public_access": "وصول عام قابل للبحث إلى السجلات القانونية",
+    "main_title": "أرشيف قانون جنوب السودان",
+    "main_desc": "بوابة بحثية متخصصة للقوانين والأحكام والإشعارات القانونية واتفاقيات السلام والوثائق القانونية الرسمية.",
+    "quick_searches": "عمليات بحث سريعة:",
+    "open_section": "فتح القسم",
+    "featured_materials": "المواد المميزة",
+    "scope_all": "الكل",
+    "scope_laws": "القوانين",
+    "scope_judgments": "الأحكام",
+    "scope_notices": "الإشعارات",
+    "scope_agreements": "اتفاقيات السلام",
+    "entrance_laws_title": "قوانين جنوب السودان",
+    "entrance_laws_desc": "تصفح التشريعات والمواد الدستورية والأدوات القانونية.",
+    "entrance_judgments_title": "الأحكام القضائية",
+    "entrance_judgments_desc": "ابحث في قرارات المحاكم وأرقام القضايا والأطراف والنتائج القضائية.",
+    "entrance_notices_title": "الإشعارات القانونية",
+    "entrance_notices_desc": "راجع إدخالات الجريدة الرسمية والإشعارات العامة والمنشورات القانونية الرسمية.",
+    "entrance_agreements_title": "اتفاقيات السلام",
+    "entrance_agreements_desc": "ابحث عن R-ARCSS وCPA وARCSS والوثائق الدستورية ذات الصلة.",
+    "trust_title": "إشارات ثقة الأرشيف",
+    "trust_desc": "إعطاء الأولوية للمصدر والتاريخ والحالة والاستشهاد والمعرفات القانونية في كل وثيقة قانونية عامة.",
+    "trust_row1_label": "التركيز الأساسي",
+    "trust_row1_value": "النص القانوني المقروء",
+    "trust_row2_label": "نموذج الأرشيف",
+    "trust_row2_value": "بحث، استشهاد، تحقق",
+    "trust_row3_label": "استخدام الألوان الوطنية",
+    "trust_row3_value": "نبرات لونية مضبوطة",
+    "qs_constitution": "الدستور",
+    "qs_land_rights": "حقوق الأراضي",
+    "qs_criminal_code": "قانون العقوبات",
+    "qs_investment": "الاستثمار"
   },
   "featured": {
     "laws_label": "القوانين واللوائح",
@@ -45,7 +81,11 @@
     "view_all": "عرض الكل",
     "no_judgments": "لا توجد أحكام بعد.",
     "no_laws": "لا توجد قوانين بعد.",
-    "no_notices": "لا توجد إشعارات قانونية بعد."
+    "no_notices": "لا توجد إشعارات قانونية بعد.",
+    "archive_overview": "نظرة عامة على الأرشيف",
+    "latest_records": "أحدث السجلات القانونية العامة",
+    "latest_records_desc": "تُعرض القوانين والأحكام والإشعارات الأخيرة كسجلات بحثية مع التاريخ والحالة ومصادر المرجع.",
+    "search_archive": "البحث في الأرشيف"
   },
   "footer": {
     "description": "المستودع الإلكتروني الرسمي للنظام القانوني لجنوب السودان، يوفر وصولاً شاملاً للأحكام والقوانين والإشعارات القانونية والموارد القضائية للمحترفين القانونيين والباحثين والجمهور.",
@@ -107,7 +147,10 @@
     "related_laws": "القوانين ذات الصلة",
     "amendments_label": "التعديلات",
     "view_document": "عرض المستند",
-    "no_pdf": "لا يوجد ملف PDF"
+    "no_pdf": "لا يوجد ملف PDF",
+    "doc_details": "تفاصيل المستند",
+    "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا المستند.",
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا المستند."
   },
   "judgments": {
     "page_title": "الأحكام وقانون القضايا",
@@ -142,7 +185,11 @@
     "cited_laws": "القوانين المستشهد بها",
     "cited_cases": "القضايا المستشهد بها",
     "view_document": "عرض المستند",
-    "no_pdf": "لا يوجد ملف PDF"
+    "no_pdf": "لا يوجد ملف PDF",
+    "case_details": "تفاصيل القضية",
+    "court_level": "مستوى المحكمة",
+    "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا الحكم.",
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا الحكم."
   },
   "notices": {
     "page_title": "الإشعارات القانونية والجريدة الرسمية",
@@ -185,7 +232,11 @@
     "related_laws": "القوانين ذات الصلة",
     "amends": "يعدّل",
     "view_document": "عرض المستند",
-    "no_pdf": "لا يوجد ملف PDF"
+    "no_pdf": "لا يوجد ملف PDF",
+    "notice_details": "تفاصيل الإشعار",
+    "gazette_issue": "إصدار الجريدة الرسمية",
+    "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا الإشعار.",
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا الإشعار."
   },
   "search": {
     "page_title": "البحث في الأرشيف القانوني",
@@ -523,6 +574,43 @@
     "showing": "عرض",
     "previous": "السابق",
     "next": "التالي",
-    "found": "وجد"
+    "found": "وجد",
+    "home": "الرئيسية",
+    "print": "طباعة",
+    "type": "النوع",
+    "category": "الفئة",
+    "status": "الحالة",
+    "tab_text": "النص",
+    "tab_pdf": "PDF",
+    "tab_metadata": "البيانات الوصفية",
+    "download_pdf_link": "تنزيل ملف PDF",
+    "fulltext_pdf_suffix": "لقراءة النص الكامل."
+  },
+  "profile": {
+    "loading_error": "تعذّر تحميل الملف الشخصي",
+    "saved": "تم تحديث الملف الشخصي",
+    "saved_desc": "تم حفظ معلوماتك.",
+    "save_failed": "فشل التحديث",
+    "pwd_changed": "تم تغيير كلمة المرور",
+    "pwd_changed_desc": "تم تحديث كلمة مرورك.",
+    "pwd_failed": "فشل تغيير كلمة المرور",
+    "pwd_failed_desc": "تحقق من كلمة مرورك الحالية وحاول مجدداً.",
+    "pwd_mismatch": "كلمتا المرور غير متطابقتين",
+    "pwd_too_short": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+    "section_info": "معلومات الملف الشخصي",
+    "section_info_desc": "تحديث اسمك ومؤسستك ولقبك.",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "full_name": "الاسم الكامل",
+    "organization": "المؤسسة",
+    "position": "المنصب / المسمى الوظيفي",
+    "save_btn": "حفظ التغييرات",
+    "section_security": "أمان الحساب",
+    "section_security_desc": "تغيير كلمة مرور تسجيل الدخول.",
+    "current_pwd": "كلمة المرور الحالية",
+    "new_pwd": "كلمة المرور الجديدة",
+    "confirm_pwd": "تأكيد كلمة المرور الجديدة",
+    "change_pwd_btn": "تغيير كلمة المرور",
+    "member_since": "عضو منذ"
   }
 }
