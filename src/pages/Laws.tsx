@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
-import { Eye, Download, FileText, Calendar, BookOpen, ChevronRight, Loader2, SlidersHorizontal, X } from "lucide-react";
+import { Download, Eye, FileText, Calendar, ChevronRight, Loader2, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -166,79 +166,47 @@ const Laws = () => {
                     {totalElements} {totalElements !== 1 ? t("laws.found_plural") : t("laws.found_singular")}
                   </p>
                 )}
-                <div className="space-y-4">
+                <div className="divide-y divide-border border border-border rounded-md bg-card">
                   {laws.map((law, idx) => (
-                    <Card key={law.id || law.title || idx} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-foreground mb-2">{law.title}</h3>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              <Badge variant="secondary">{law.type}</Badge>
-                              {law.category && <Badge variant="outline">{law.category}</Badge>}
-                              {law.year && <Badge variant="outline">{law.year}</Badge>}
-                              <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                                {law.status || "Active"}
-                              </Badge>
-                              {isAdmin && law.id
-                                ? <DocStatusDropdown id={law.id} collection="laws" current={law.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
-                                : verificationBadge(law.verificationStatus)
-                              }
-                            </div>
-                          </div>
-                          <div className="flex gap-2 ml-4">
-                            <Link to={`/laws/${law.id}`}>
-                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
-                            </Link>
-                            {law.pdfUrl && (
-                              <Button size="sm" variant="outline" asChild>
-                                <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                                  <Download className="h-4 w-4 mr-1" /> {t("laws.pdf")}
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-muted-foreground">
-                          {law.enactmentDate && (
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4" />
-                              <span>{t("laws.enacted")}: {new Date(law.enactmentDate).toLocaleDateString()}</span>
-                            </div>
+                    <div key={law.id || law.title || idx} className="flex items-start gap-4 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <Link to={`/laws/${law.id}`} className="text-sm font-semibold text-foreground hover:text-primary leading-snug block">
+                          {law.title}
+                        </Link>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                          {law.type && <Badge variant="secondary" className="h-5 text-xs">{law.type}</Badge>}
+                          {law.category && <Badge variant="outline" className="h-5 text-xs">{law.category}</Badge>}
+                          {law.year && <span>{law.year}</span>}
+                          {law.enactmentDate && !law.year && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />{new Date(law.enactmentDate).toLocaleDateString()}
+                            </span>
                           )}
-                          {law.jurisdiction && (
-                            <div className="flex items-center gap-2">
-                              <BookOpen className="h-4 w-4" />
-                              <span>{t("laws.jurisdiction")}: {law.jurisdiction}</span>
-                            </div>
+                          {law.status && (
+                            <span className="font-medium text-green-700 dark:text-green-400">{law.status}</span>
                           )}
+                          {isAdmin && law.id
+                            ? <DocStatusDropdown id={law.id} collection="laws" current={law.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                            : verificationBadge(law.verificationStatus)
+                          }
                         </div>
-
-                        {law.summary && <p className="text-foreground mb-3 line-clamp-3">{law.summary}</p>}
-
-                        {law.tags && law.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {law.tags.map((tag, i) => <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>)}
-                          </div>
+                        {law.summary && (
+                          <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{law.summary}</p>
                         )}
-
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs text-muted-foreground">
-                            {law.lastAmended
-                              ? `${t("laws.last_amended")}: ${new Date(law.lastAmended).toLocaleDateString()}`
-                              : law.enactmentDate
-                              ? `${t("laws.enacted")}: ${new Date(law.enactmentDate).toLocaleDateString()}`
-                              : ""}
-                          </div>
-                          <Link to={`/laws/${law.id}`}>
-                            <Button variant="ghost" size="sm" className="text-primary">
-                              {t("laws.view_details")} <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                        <Link to={`/laws/${law.id}`}>
+                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">{t("laws.view")}</Button>
+                        </Link>
+                        {law.pdfUrl && (
+                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" asChild>
+                            <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
+                              <Download className="h-3 w-3 mr-1" /> PDF
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   ))}
 
                   {!activeQuery.isLoading && laws.length === 0 && (
