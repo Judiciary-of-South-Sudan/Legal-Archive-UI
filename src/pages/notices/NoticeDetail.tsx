@@ -251,6 +251,12 @@ const NoticeDetail: React.FC = () => {
                     </div>
                   ))}
                 </dl>
+                {notice.frbrUri && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">{t('notices.frbr_uri')}</dt>
+                    <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{notice.frbrUri}</dd>
+                  </div>
+                )}
               </div>
 
               {notice.tags && notice.tags.length > 0 && (
