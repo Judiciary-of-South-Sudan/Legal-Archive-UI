@@ -41,6 +41,10 @@ import EditNotice from './pages/admin/EditNotice';
 import AdminUsers from './pages/admin/Users';
 import BulkImport from './pages/admin/BulkImport';
 import SearchPage from './pages/Search';
+import Decrees from './pages/Decrees';
+import DecreeDetail from './pages/decrees/DecreeDetail';
+import UploadDecree from './pages/admin/UploadDecree';
+import EditDecree from './pages/admin/EditDecree';
 import Library from './pages/Library';
 import Profile from './pages/Profile';
 import ScrollToTop from './components/ScrollToTop';
@@ -101,6 +105,8 @@ const App = () => (
             <Route path="/notices" element={<LegalNotices />} />
             <Route path="/notices/:id" element={<NoticeDetail />} />
             <Route path="/notices/:id/document" element={<NoticeDocument />} />
+            <Route path="/decrees" element={<Decrees />} />
+            <Route path="/decrees/:id" element={<DecreeDetail />} />
 
             {/* Admin Routes - Protected */}
             <Route path="/admin/dashboard" element={
@@ -137,6 +143,16 @@ const App = () => (
             <Route path="/admin/edit-notice/:id" element={
               <ProtectedRoute requireEditor={true}>
                 <EditNotice />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/upload-decree" element={
+              <ProtectedRoute requireEditor={true}>
+                <UploadDecree />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/edit-decree/:id" element={
+              <ProtectedRoute requireEditor={true}>
+                <EditDecree />
               </ProtectedRoute>
             } />
             <Route path="/admin/users" element={
