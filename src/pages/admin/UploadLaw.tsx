@@ -29,6 +29,9 @@ const AdminUploadLaw: React.FC = () => {
     category: '',
     jurisdiction: 'South Sudan',
     publisher: '',
+    gazetteVolume: '',
+    gazetteIssue: '',
+    gazetteDate: '',
     status: 'Active',
     summary: '',
     tags: '',
@@ -162,6 +165,23 @@ const AdminUploadLaw: React.FC = () => {
                 <div>
                   <Label htmlFor="publisher">{t('admin.form.publisher')}</Label>
                   <Input id="publisher" name="publisher" value={formData.publisher} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteVolume">{t('laws.gazette_volume')}</Label>
+                  <Input id="gazetteVolume" name="gazetteVolume" value={formData.gazetteVolume} onChange={handleInputChange}
+                    placeholder="e.g., Vol. XV" />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteIssue">{t('laws.gazette_issue')}</Label>
+                  <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange}
+                    placeholder="e.g., No. 23" />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteDate">{t('laws.gazette_date')}</Label>
+                  <Input id="gazetteDate" name="gazetteDate" type="date" value={formData.gazetteDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
