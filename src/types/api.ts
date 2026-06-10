@@ -94,6 +94,9 @@ export interface Law {
   issuingAuthority?: string;
   ministry?: string;
   publisher?: string;
+  gazetteVolume?: string;
+  gazetteIssue?: string;
+  gazetteDate?: string;
   status?: string;
   summary?: string;
   fullText?: string;
@@ -128,6 +131,9 @@ export interface CreateLawRequest {
   issuingAuthority?: string;
   ministry?: string;
   publisher?: string;
+  gazetteVolume?: string;
+  gazetteIssue?: string;
+  gazetteDate?: string;
   status?: string;
   summary?: string;
   fullText?: string;
