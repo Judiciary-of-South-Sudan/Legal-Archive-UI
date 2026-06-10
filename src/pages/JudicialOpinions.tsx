@@ -1,58 +1,24 @@
-import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Gavel, Calendar } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Construction } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
-const JudicialOpinions = () => {
-  const opinions = [
-    {
-      id: 1,
-      title: "Opinion on Land Tenure Reform",
-      date: "2023-11-10",
-      author: "Hon. Chief Justice Makuei Deng",
-      summary: "A judicial interpretation regarding the customary vs. statutory land tenure framework in rural areas."
-    },
-    {
-      id: 2,
-      title: "Judicial Review of Bail Conditions",
-      date: "2024-01-05",
-      author: "Hon. Justice Sarah Oryem",
-      summary: "Opinion on the overuse of stringent bail requirements in minor criminal offenses."
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-background text-slate-800">
-      <Header />
-
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-6 text-blue-800">Judicial Opinions</h1>
-        <p className="text-muted-foreground mb-6">
-          Explore advisory opinions and formal legal interpretations issued by the judiciary on emerging legal matters.
-        </p>
-
-        <div className="space-y-6">
-          {opinions.map((opinion) => (
-            <Card key={opinion.id}>
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-2 text-blue-700">{opinion.title}</h2>
-                <div className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  {opinion.date}
-                  <Gavel className="h-4 w-4 ml-4" />
-                  {opinion.author}
-                </div>
-                <p>{opinion.summary}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </main>
-
-      <Footer />
-    </div>
-  );
-};
+const JudicialOpinions = () => (
+  <div className="min-h-screen bg-background">
+    <Header />
+    <main className="container mx-auto flex flex-col items-center justify-center px-4 py-24 text-center">
+      <Construction className="mb-6 h-14 w-14 text-muted-foreground" />
+      <h1 className="text-2xl font-bold text-foreground">Judicial Opinions</h1>
+      <p className="mt-3 max-w-md text-muted-foreground">
+        This section is under development. Official advisory opinions and legal interpretations will be published here once sourced and verified.
+      </p>
+      <Button asChild variant="outline" className="mt-8">
+        <Link to="/">Return to Home</Link>
+      </Button>
+    </main>
+    <Footer />
+  </div>
+);
 
 export default JudicialOpinions;
