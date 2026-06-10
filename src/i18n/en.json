@@ -5,7 +5,8 @@
     "notices": "Legal Notices",
     "opinions": "Judicial Opinions",
     "directory": "Judiciary Directory",
-    "guide": "Citizen's Guide"
+    "guide": "Citizen's Guide",
+    "peace_agreements": "Peace Agreements"
   },
   "header": {
     "title": "South Sudan Law Reports",
@@ -16,7 +17,10 @@
     "register": "Register",
     "my_account": "My Account",
     "my_library": "My Library",
+    "my_profile": "My Profile",
     "admin_dashboard": "Admin Dashboard",
+    "dashboard": "Dashboard",
+    "ticker_latest": "Latest",
     "logout": "Logout"
   },
   "hero": {
@@ -33,7 +37,39 @@
     "quick_notices_title": "Legal Notices",
     "quick_notices_desc": "Official gazette and proclamations",
     "quick_directory_title": "Judiciary Directory",
-    "quick_directory_desc": "Courts, judges, and contact information"
+    "quick_directory_desc": "Courts, judges, and contact information",
+    "national_repository": "National Legal Repository",
+    "public_access": "Searchable public access to legal records",
+    "main_title": "South Sudan Law Archive",
+    "main_desc": "A professional research gateway for laws, judgments, legal notices, peace agreements and official public legal documents.",
+    "quick_searches": "Quick searches:",
+    "open_section": "Open section",
+    "featured_materials": "Featured materials",
+    "scope_all": "All",
+    "scope_laws": "Laws",
+    "scope_judgments": "Judgments",
+    "scope_notices": "Notices",
+    "scope_agreements": "Peace Agreements",
+    "entrance_laws_title": "Laws of South Sudan",
+    "entrance_laws_desc": "Browse legislation, constitutional materials and statutory instruments.",
+    "entrance_judgments_title": "Judgments",
+    "entrance_judgments_desc": "Search court decisions, case numbers, parties and judicial outcomes.",
+    "entrance_notices_title": "Legal Notices",
+    "entrance_notices_desc": "Review gazette entries, public notices and official legal publications.",
+    "entrance_agreements_title": "Peace Agreements",
+    "entrance_agreements_desc": "Find R-ARCSS, CPA, ARCSS and related constitutional instruments.",
+    "trust_title": "Archive Trust Signals",
+    "trust_desc": "Prioritize source, date, status, citation and canonical identifiers on every public legal document.",
+    "trust_row1_label": "Primary focus",
+    "trust_row1_value": "Readable legal text",
+    "trust_row2_label": "Archive model",
+    "trust_row2_value": "Search, cite, verify",
+    "trust_row3_label": "National color use",
+    "trust_row3_value": "Restrained accents",
+    "qs_constitution": "constitution",
+    "qs_land_rights": "land rights",
+    "qs_criminal_code": "criminal code",
+    "qs_investment": "investment"
   },
   "featured": {
     "laws_label": "Laws & Regulations",
@@ -45,7 +81,11 @@
     "view_all": "View all",
     "no_judgments": "No judgments yet.",
     "no_laws": "No laws yet.",
-    "no_notices": "No legal notices yet."
+    "no_notices": "No legal notices yet.",
+    "archive_overview": "Archive Overview",
+    "latest_records": "Latest public legal records",
+    "latest_records_desc": "Recent laws, judgments and notices are presented as research records with date, status and source cues.",
+    "search_archive": "Search archive"
   },
   "footer": {
     "description": "The official online repository for South Sudan's legal system, providing comprehensive access to judgments, laws, legal notices, and judicial resources for legal professionals, researchers, and the public.",
@@ -107,7 +147,10 @@
     "related_laws": "Related Laws",
     "amendments_label": "Amendments",
     "view_document": "View Document",
-    "no_pdf": "No PDF available"
+    "no_pdf": "No PDF available",
+    "doc_details": "Document Details",
+    "fulltext_unavailable": "Full text has not been extracted for this document.",
+    "no_pdf_detail": "No PDF available for this document."
   },
   "judgments": {
     "page_title": "Judgments & Case Law",
@@ -142,7 +185,11 @@
     "cited_laws": "Cited Laws",
     "cited_cases": "Cited Cases",
     "view_document": "View Document",
-    "no_pdf": "No PDF available"
+    "no_pdf": "No PDF available",
+    "case_details": "Case Details",
+    "court_level": "Court Level",
+    "fulltext_unavailable": "Full text has not been extracted for this judgment.",
+    "no_pdf_detail": "No PDF available for this judgment."
   },
   "notices": {
     "page_title": "Legal Notices & Gazette",
@@ -185,7 +232,11 @@
     "related_laws": "Related Laws",
     "amends": "Amends",
     "view_document": "View Document",
-    "no_pdf": "No PDF available"
+    "no_pdf": "No PDF available",
+    "notice_details": "Notice Details",
+    "gazette_issue": "Gazette Issue",
+    "fulltext_unavailable": "Full text has not been extracted for this notice.",
+    "no_pdf_detail": "No PDF available for this notice."
   },
   "search": {
     "page_title": "Search the Legal Archive",
@@ -523,6 +574,43 @@
     "showing": "Showing",
     "previous": "Previous",
     "next": "Next",
-    "found": "found"
+    "found": "found",
+    "home": "Home",
+    "print": "Print",
+    "type": "Type",
+    "category": "Category",
+    "status": "Status",
+    "tab_text": "Text",
+    "tab_pdf": "PDF",
+    "tab_metadata": "Metadata",
+    "download_pdf_link": "Download the PDF",
+    "fulltext_pdf_suffix": "to read the full text."
+  },
+  "profile": {
+    "loading_error": "Could not load profile",
+    "saved": "Profile updated",
+    "saved_desc": "Your information has been saved.",
+    "save_failed": "Update failed",
+    "pwd_changed": "Password changed",
+    "pwd_changed_desc": "Your password has been updated.",
+    "pwd_failed": "Password change failed",
+    "pwd_failed_desc": "Check your current password and try again.",
+    "pwd_mismatch": "Passwords do not match",
+    "pwd_too_short": "Password must be at least 6 characters",
+    "section_info": "Profile Information",
+    "section_info_desc": "Update your name, organisation, and role title.",
+    "username": "Username",
+    "email": "Email",
+    "full_name": "Full Name",
+    "organization": "Organisation",
+    "position": "Position / Title",
+    "save_btn": "Save Changes",
+    "section_security": "Account Security",
+    "section_security_desc": "Change your login password.",
+    "current_pwd": "Current Password",
+    "new_pwd": "New Password",
+    "confirm_pwd": "Confirm New Password",
+    "change_pwd_btn": "Change Password",
+    "member_since": "Member since"
   }
 }
