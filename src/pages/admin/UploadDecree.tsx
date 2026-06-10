@@ -70,7 +70,7 @@ const UploadDecree: React.FC = () => {
         pdfUrl = uploadRes.data.data || '';
       }
 
-      await createDecreeMutation.mutateAsync({
+      const created = await createDecreeMutation.mutateAsync({
         decreeNumber: formData.decreeNumber || undefined,
         title: formData.title,
         decreeType: formData.decreeType,
@@ -87,7 +87,7 @@ const UploadDecree: React.FC = () => {
         verificationStatus: 'DRAFT',
       });
 
-      navigate('/admin');
+      navigate(created?.id ? `/decrees/${created.id}` : '/admin/dashboard');
     } catch {
       toast.error(t('decrees.upload_error'));
     } finally {
