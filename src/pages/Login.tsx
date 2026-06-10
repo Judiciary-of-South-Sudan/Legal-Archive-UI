@@ -99,6 +99,11 @@ const Login: React.FC = () => {
                 t("login.btn")
               )}
             </Button>
+            <div className="text-sm text-center">
+              <Link to="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
+                {t("login.forgot_password")}
+              </Link>
+            </div>
             <div className="text-sm text-center text-gray-600">
               {t("login.no_account")}{" "}
               <Link to="/register" className="text-primary hover:underline font-medium">
