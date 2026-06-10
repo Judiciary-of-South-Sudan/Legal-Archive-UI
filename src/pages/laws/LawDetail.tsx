@@ -238,6 +238,9 @@ const LawDetail: React.FC = () => {
                     { label: t('laws.last_amended'), value: law.lastAmended && new Date(law.lastAmended).toLocaleDateString() },
                     { label: t('laws.jurisdiction'), value: law.jurisdiction },
                     { label: t('laws.publisher'), value: law.publisher },
+                    { label: t('laws.gazette_volume'), value: law.gazetteVolume },
+                    { label: t('laws.gazette_issue'), value: law.gazetteIssue },
+                    { label: t('laws.gazette_date'), value: law.gazetteDate },
                     { label: t('laws.language'), value: law.language },
                     { label: t('common.category'), value: law.category },
                     { label: t('common.type'), value: law.type },
@@ -248,6 +251,12 @@ const LawDetail: React.FC = () => {
                     </div>
                   ))}
                 </dl>
+                {law.frbrUri && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">{t('laws.frbr_uri')}</dt>
+                    <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{law.frbrUri}</dd>
+                  </div>
+                )}
               </div>
 
               {law.tags && law.tags.length > 0 && (
