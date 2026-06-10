@@ -48,6 +48,8 @@ import EditDecree from './pages/admin/EditDecree';
 import Library from './pages/Library';
 import Profile from './pages/Profile';
 import ScrollToTop from './components/ScrollToTop';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +73,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/judgments" element={<Judgments />} />
             <Route path="/laws" element={<Laws />} />
             <Route path="/notices" element={<LegalNotices />} />
