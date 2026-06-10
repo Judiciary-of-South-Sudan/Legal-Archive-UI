@@ -150,7 +150,11 @@
     "no_pdf": "No PDF available",
     "doc_details": "Document Details",
     "fulltext_unavailable": "Full text has not been extracted for this document.",
-    "no_pdf_detail": "No PDF available for this document."
+    "no_pdf_detail": "No PDF available for this document.",
+    "gazette_volume": "Gazette Volume",
+    "gazette_issue": "Gazette Issue",
+    "gazette_date": "Gazette Date",
+    "frbr_uri": "AKN Identifier"
   },
   "judgments": {
     "page_title": "Judgments & Case Law",
@@ -189,7 +193,8 @@
     "case_details": "Case Details",
     "court_level": "Court Level",
     "fulltext_unavailable": "Full text has not been extracted for this judgment.",
-    "no_pdf_detail": "No PDF available for this judgment."
+    "no_pdf_detail": "No PDF available for this judgment.",
+    "frbr_uri": "AKN Identifier"
   },
   "notices": {
     "page_title": "Legal Notices & Gazette",
@@ -236,7 +241,8 @@
     "notice_details": "Notice Details",
     "gazette_issue": "Gazette Issue",
     "fulltext_unavailable": "Full text has not been extracted for this notice.",
-    "no_pdf_detail": "No PDF available for this notice."
+    "no_pdf_detail": "No PDF available for this notice.",
+    "frbr_uri": "AKN Identifier"
   },
   "search": {
     "page_title": "Search the Legal Archive",
