@@ -146,6 +146,51 @@ export interface CreateLawRequest {
   language?: string;
 }
 
+// Republican Decree Types
+export interface RepublicanDecree {
+  id: string;
+  decreeNumber?: string;
+  title: string;
+  decreeDate?: string;
+  year?: number;
+  decreeType?: string;
+  issuedBy?: string;
+  subject?: string;
+  personnel?: string[];
+  summary?: string;
+  fullText?: string;
+  pdfUrl?: string;
+  htmlUrl?: string;
+  frbrUri?: string;
+  tags?: string[];
+  language?: string;
+  verificationStatus?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  viewCount: number;
+  downloadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDecreeRequest {
+  decreeNumber?: string;
+  title: string;
+  decreeDate?: string;
+  year?: number;
+  decreeType?: string;
+  issuedBy?: string;
+  subject?: string;
+  personnel?: string[];
+  summary?: string;
+  fullText?: string;
+  pdfUrl?: string;
+  htmlUrl?: string;
+  frbrUri?: string;
+  tags?: string[];
+  language?: string;
+}
+
 export interface LawStats {
   totalLaws: number;
   activeCount: number;
