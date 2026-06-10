@@ -150,7 +150,11 @@
     "no_pdf": "لا يوجد ملف PDF",
     "doc_details": "تفاصيل المستند",
     "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا المستند.",
-    "no_pdf_detail": "لا يوجد ملف PDF لهذا المستند."
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا المستند.",
+    "gazette_volume": "مجلد الجريدة الرسمية",
+    "gazette_issue": "إصدار الجريدة الرسمية",
+    "gazette_date": "تاريخ الجريدة الرسمية",
+    "frbr_uri": "معرّف AKN"
   },
   "judgments": {
     "page_title": "الأحكام وقانون القضايا",
@@ -189,7 +193,8 @@
     "case_details": "تفاصيل القضية",
     "court_level": "مستوى المحكمة",
     "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا الحكم.",
-    "no_pdf_detail": "لا يوجد ملف PDF لهذا الحكم."
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا الحكم.",
+    "frbr_uri": "معرّف AKN"
   },
   "notices": {
     "page_title": "الإشعارات القانونية والجريدة الرسمية",
@@ -236,7 +241,8 @@
     "notice_details": "تفاصيل الإشعار",
     "gazette_issue": "إصدار الجريدة الرسمية",
     "fulltext_unavailable": "لم يتم استخراج النص الكامل لهذا الإشعار.",
-    "no_pdf_detail": "لا يوجد ملف PDF لهذا الإشعار."
+    "no_pdf_detail": "لا يوجد ملف PDF لهذا الإشعار.",
+    "frbr_uri": "معرّف AKN"
   },
   "search": {
     "page_title": "البحث في الأرشيف القانوني",
