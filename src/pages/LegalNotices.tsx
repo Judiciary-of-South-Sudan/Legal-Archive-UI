@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
-import { Download, Eye, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight, SlidersHorizontal, X } from "lucide-react";
+import { Download, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -147,74 +147,47 @@ const LegalNotices = () => {
                     {totalElements} {totalElements !== 1 ? t("notices.found_plural") : t("notices.found_singular")}
                   </p>
                 )}
-                <div className="space-y-4">
+                <div className="divide-y divide-border border border-border rounded-md bg-card">
                   {notices.map((notice) => (
-                    <Card key={notice.id} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-foreground mb-2">{notice.title}</h3>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              <Badge variant="secondary">{notice.type}</Badge>
-                              {notice.gazetteIssue && <Badge variant="outline">{notice.gazetteIssue}</Badge>}
-                              {notice.issuingAuthority && <Badge variant="outline">{notice.issuingAuthority}</Badge>}
-                              {notice.status && (
-                                <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                                  {notice.status}
-                                </Badge>
-                              )}
-                              {isAdmin && notice.id
-                                ? <DocStatusDropdown id={notice.id} collection="notices" current={notice.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
-                                : verificationBadge(notice.verificationStatus)
-                              }
-                            </div>
-
-                            {notice.tags && notice.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-3">
-                                {notice.tags.map((tag, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">{tag}</Badge>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex gap-2 ml-4">
-                            <Link to={`/notices/${notice.id}`}>
-                              <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" />{t("notices.view")}</Button>
-                            </Link>
-                            {notice.pdfUrl && (
-                              <Button size="sm" variant="outline" asChild>
-                                <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
-                                  <Download className="h-4 w-4 mr-1" />{t("notices.pdf")}
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm text-muted-foreground">
+                    <div key={notice.id} className="flex items-start gap-4 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                      <div className="flex-1 min-w-0">
+                        <Link to={`/notices/${notice.id}`} className="text-sm font-semibold text-foreground hover:text-primary leading-snug block">
+                          {notice.title}
+                        </Link>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                          {notice.type && <Badge variant="secondary" className="h-5 text-xs">{notice.type}</Badge>}
+                          {notice.gazetteIssue && <Badge variant="outline" className="h-5 text-xs">{notice.gazetteIssue}</Badge>}
                           {notice.publicationDate && (
-                            <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4" />
-                              <span>{t("notices.published")}: {new Date(notice.publicationDate).toLocaleDateString()}</span>
-                            </div>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />{new Date(notice.publicationDate).toLocaleDateString()}
+                            </span>
                           )}
-                          <div className="flex items-center gap-2">
-                            <FileText className="h-4 w-4" />
-                            <span>{t("notices.authority")}: {notice.issuingAuthority}</span>
-                          </div>
+                          {notice.issuingAuthority && <span>{notice.issuingAuthority}</span>}
+                          {notice.status && (
+                            <span className="font-medium text-green-700 dark:text-green-400">{notice.status}</span>
+                          )}
+                          {isAdmin && notice.id
+                            ? <DocStatusDropdown id={notice.id} collection="notices" current={notice.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                            : verificationBadge(notice.verificationStatus)
+                          }
                         </div>
-
-                        {notice.summary && <p className="text-foreground mb-4 line-clamp-3">{notice.summary}</p>}
-
-                        <div className="flex justify-end">
-                          <Link to={`/notices/${notice.id}`}>
-                            <Button variant="ghost" size="sm" className="text-primary">
-                              {t("notices.view_details")} <ChevronRight className="h-4 w-4 ml-1" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        {notice.summary && (
+                          <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{notice.summary}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                        <Link to={`/notices/${notice.id}`}>
+                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">{t("notices.view")}</Button>
+                        </Link>
+                        {notice.pdfUrl && (
+                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" asChild>
+                            <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
+                              <Download className="h-3 w-3 mr-1" /> PDF
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   ))}
 
                   {notices.length === 0 && (
