@@ -1,109 +1,202 @@
 import { useState } from "react";
-import { FileText, Scale, Book, Users, Search } from "lucide-react";
+import { ArrowRight, BookOpen, FileText, Gavel, Landmark, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const Hero = () => {
   const [query, setQuery] = useState("");
+  const [scope, setScope] = useState("all");
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const suffix = scope === "all" ? "" : `&type=${encodeURIComponent(scope)}`;
+    navigate(`/search?q=${encodeURIComponent(trimmed)}${suffix}`);
   };
 
-  const quickLinks = [
+  const scopes = [
+    { label: t("hero.scope_all"), value: "all" },
+    { label: t("hero.scope_laws"), value: "laws" },
+    { label: t("hero.scope_judgments"), value: "judgments" },
+    { label: t("hero.scope_notices"), value: "notices" },
+    { label: t("hero.scope_agreements"), value: "agreements" },
+  ];
+
+  const archiveEntrances = [
     {
-      icon: <FileText className="h-6 w-6" />,
-      title: t("hero.quick_judgments_title"),
-      description: t("hero.quick_judgments_desc"),
-      href: "/judgments",
-    },
-    {
-      icon: <Book className="h-6 w-6" />,
-      title: t("hero.quick_laws_title"),
-      description: t("hero.quick_laws_desc"),
+      icon: <BookOpen className="h-5 w-5" />,
+      title: t("hero.entrance_laws_title"),
+      description: t("hero.entrance_laws_desc"),
       href: "/laws",
     },
     {
-      icon: <Scale className="h-6 w-6" />,
-      title: t("hero.quick_notices_title"),
-      description: t("hero.quick_notices_desc"),
+      icon: <Gavel className="h-5 w-5" />,
+      title: t("hero.entrance_judgments_title"),
+      description: t("hero.entrance_judgments_desc"),
+      href: "/judgments",
+    },
+    {
+      icon: <FileText className="h-5 w-5" />,
+      title: t("hero.entrance_notices_title"),
+      description: t("hero.entrance_notices_desc"),
       href: "/notices",
     },
     {
-      icon: <Users className="h-6 w-6" />,
-      title: t("hero.quick_directory_title"),
-      description: t("hero.quick_directory_desc"),
-      href: "/directory",
+      icon: <Landmark className="h-5 w-5" />,
+      title: t("hero.entrance_agreements_title"),
+      description: t("hero.entrance_agreements_desc"),
+      href: "/search?q=peace%20agreement",
     },
   ];
 
+  const featuredMaterials = [
+    { label: "Transitional Constitution", href: "/laws/constitution" },
+    { label: "R-ARCSS 2018", href: "/search?q=R-ARCSS%202018" },
+    { label: "CPA 2005", href: "/search?q=CPA%202005" },
+    { label: "Core Acts", href: "/laws/acts" },
+  ];
+
+  const quickSearchTerms = [
+    { label: t("hero.qs_constitution"), value: "constitution" },
+    { label: t("hero.qs_land_rights"), value: "land rights" },
+    { label: t("hero.qs_criminal_code"), value: "criminal code" },
+    { label: t("hero.qs_investment"), value: "investment" },
+  ];
+
   return (
-    <section className="gradient-hero text-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            {t("hero.title")}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            {t("hero.subtitle")}
-          </p>
-
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("hero.search_placeholder")}
-                className="pl-10 h-12 bg-white/10 border-white/30 text-white placeholder:text-white/60 focus:bg-white/20"
-              />
+    <section className="archive-shell border-b border-border">
+      <div className="container mx-auto px-4 py-10 md:py-14">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div>
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <span className="archive-section-label">{t("hero.national_repository")}</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+              <span className="text-sm text-muted-foreground">{t("hero.public_access")}</span>
             </div>
-            <Button type="submit" size="lg" variant="secondary" className="text-primary h-12 px-8">
-              {t("hero.search_btn")}
-            </Button>
-          </form>
 
-          <div className="flex flex-wrap justify-center gap-2 text-sm text-white/70">
-            <span>{t("hero.try")}</span>
-            {["constitution", "land rights", "criminal code", "investment"].map((term) => (
-              <button
-                key={term}
-                type="button"
-                className="underline underline-offset-2 hover:text-white transition-colors"
-                onClick={() => navigate(`/search?q=${encodeURIComponent(term)}`)}
-              >
-                {term}
-              </button>
-            ))}
+            <h2 className="max-w-4xl text-4xl font-bold leading-tight tracking-normal text-foreground md:text-5xl">
+              {t("hero.main_title")}
+            </h2>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
+              {t("hero.main_desc")}
+            </p>
+
+            <form onSubmit={handleSearch} className="mt-8 max-w-4xl rounded-md border border-border bg-card p-3 shadow-sm">
+              <div className="flex flex-col gap-3 md:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={t("hero.search_placeholder")}
+                    className="h-12 rounded-md border-border bg-background pl-12 text-base"
+                  />
+                </div>
+                <Button type="submit" size="lg" className="h-12 px-6">
+                  {t("hero.search_btn")}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {scopes.map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setScope(item.value)}
+                    className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+                      scope === item.value
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </form>
+
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span>{t("hero.quick_searches")}</span>
+              {quickSearchTerms.map((term) => (
+                <button
+                  key={term.value}
+                  type="button"
+                  className="rounded-sm text-primary underline-offset-4 hover:underline"
+                  onClick={() => navigate(`/search?q=${encodeURIComponent(term.value)}`)}
+                >
+                  {term.label}
+                </button>
+              ))}
+            </div>
           </div>
+
+          <aside className="archive-card rounded-md p-5">
+            <div className="flex items-start gap-3">
+              <div className="rounded-md bg-green-50 p-2 text-green-700 dark:bg-green-950 dark:text-green-300">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">{t("hero.trust_title")}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("hero.trust_desc")}
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 space-y-3 border-t border-border pt-5 text-sm">
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">{t("hero.trust_row1_label")}</span>
+                <span className="font-medium text-foreground">{t("hero.trust_row1_value")}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">{t("hero.trust_row2_label")}</span>
+                <span className="font-medium text-foreground">{t("hero.trust_row2_value")}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-muted-foreground">{t("hero.trust_row3_label")}</span>
+                <span className="font-medium text-foreground">{t("hero.trust_row3_value")}</span>
+              </div>
+            </div>
+          </aside>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-          {quickLinks.map((link, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow duration-300 bg-white/10 backdrop-blur border-white/20">
-              <CardContent className="p-6">
-                <div className="text-accent mb-4">{link.icon}</div>
-                <h3 className="text-lg font-semibold mb-2 text-white">{link.title}</h3>
-                <p className="text-white/80 text-sm mb-4">{link.description}</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-accent hover:text-accent-foreground hover:bg-accent/20 p-0"
-                  asChild
-                >
-                  <Link to={link.href}>{t("hero.access_now")}</Link>
-                </Button>
-              </CardContent>
-            </Card>
+        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {archiveEntrances.map((link) => (
+            <Link
+              key={link.href}
+              to={link.href}
+              className="archive-card group rounded-md p-5 transition-colors hover:border-primary"
+            >
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-secondary text-primary">
+                {link.icon}
+              </div>
+              <h3 className="font-semibold text-foreground group-hover:text-primary">{link.title}</h3>
+              <p className="mt-2 min-h-16 text-sm leading-6 text-muted-foreground">{link.description}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                {t("hero.open_section")} <ArrowRight className="h-4 w-4" />
+              </span>
+            </Link>
           ))}
+        </div>
+
+        <div className="mt-8 flex flex-col gap-3 rounded-md border border-border bg-card p-4 sm:flex-row sm:items-center">
+          <span className="archive-section-label shrink-0">{t("hero.featured_materials")}</span>
+          <div className="flex flex-wrap gap-2">
+            {featuredMaterials.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:border-primary hover:text-primary"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
