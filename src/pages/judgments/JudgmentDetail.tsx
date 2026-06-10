@@ -279,6 +279,12 @@ const JudgmentDetail: React.FC = () => {
                     <dd className="text-sm font-medium text-foreground mt-0.5">{judgment.judges.join(', ')}</dd>
                   </div>
                 )}
+                {judgment.frbrUri && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">{t('judgments.frbr_uri')}</dt>
+                    <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{judgment.frbrUri}</dd>
+                  </div>
+                )}
               </div>
 
               {judgment.tags && judgment.tags.length > 0 && (
