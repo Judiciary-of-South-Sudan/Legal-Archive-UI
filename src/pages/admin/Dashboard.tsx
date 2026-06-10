@@ -427,6 +427,7 @@ const AdminDashboard: React.FC = () => {
                       { to: '/admin/upload-law',      icon: <FileText className="h-5 w-5" />,    label: 'Law',         color: 'text-blue-600 bg-blue-50 dark:bg-blue-950/60' },
                       { to: '/admin/upload-judgment',  icon: <Gavel className="h-5 w-5" />,       label: 'Judgment',    color: 'text-purple-600 bg-purple-50 dark:bg-purple-950/60' },
                       { to: '/admin/upload-notice',    icon: <FileWarning className="h-5 w-5" />, label: 'Notice',      color: 'text-amber-600 bg-amber-50 dark:bg-amber-950/60' },
+                      { to: '/admin/upload-decree',    icon: <Scale className="h-5 w-5" />,       label: 'Decree',      color: 'text-green-700 bg-green-50 dark:bg-green-950/60' },
                       ...(isAdmin() ? [{ to: '/admin/bulk-import', icon: <Layers className="h-5 w-5" />, label: 'Bulk Import', color: 'text-green-600 bg-green-50 dark:bg-green-950/60' }] : []),
                     ],
                   },
