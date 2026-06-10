@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
-import { Download, Eye, Calendar, Gavel, Loader2, ChevronRight, SlidersHorizontal, X } from "lucide-react";
+import { Download, Calendar, Gavel, Loader2, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -146,80 +146,48 @@ const Judgments = () => {
                 {totalElements} {totalElements !== 1 ? t("judgments.found_plural") : t("judgments.found_singular")}
               </p>
             )}
-            <div className="space-y-6">
+            <div className="divide-y divide-border border border-border rounded-md bg-card">
               {judgments.map((judgment, idx) => (
-                <Card key={judgment.id || idx} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-foreground mb-2">{judgment.caseName}</h3>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge variant="secondary">{judgment.courtLevel}</Badge>
-                          {judgment.caseType && <Badge variant="outline">{judgment.caseType}</Badge>}
-                          {judgment.caseNumber && <Badge variant="outline">{judgment.caseNumber}</Badge>}
-                          {judgment.status && (
-                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-                              {judgment.status}
-                            </Badge>
-                          )}
-                          {isAdmin && judgment.id
-                            ? <DocStatusDropdown id={judgment.id} collection="judgments" current={judgment.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
-                            : verificationBadge(judgment.verificationStatus)
-                          }
-                        </div>
-                      </div>
-                      <div className="flex gap-2 ml-4">
-                        <Link to={`/judgments/${judgment.id}`}>
-                          <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" />{t("judgments.view")}</Button>
-                        </Link>
-                        {judgment.pdfUrl && (
-                          <Button size="sm" variant="outline" asChild>
-                            <a href={resolveFileUrl(judgment.pdfUrl)} target="_blank" rel="noreferrer">
-                              <Download className="h-4 w-4 mr-1" />{t("judgments.pdf")}
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-muted-foreground">
+                <div key={judgment.id || idx} className="flex items-start gap-4 px-4 py-3 hover:bg-secondary/40 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <Link to={`/judgments/${judgment.id}`} className="text-sm font-semibold text-foreground hover:text-primary leading-snug block">
+                      {judgment.caseName}
+                    </Link>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      {judgment.courtLevel && <Badge variant="secondary" className="h-5 text-xs">{judgment.courtLevel}</Badge>}
+                      {judgment.caseType && <Badge variant="outline" className="h-5 text-xs">{judgment.caseType}</Badge>}
+                      {judgment.caseNumber && <span className="font-mono">{judgment.caseNumber}</span>}
                       {judgment.judgmentDate && (
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>{t("judgments.date")}: {new Date(judgment.judgmentDate).toLocaleDateString()}</span>
-                        </div>
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />{new Date(judgment.judgmentDate).toLocaleDateString()}
+                        </span>
                       )}
-                      {judgment.judges && judgment.judges.length > 0 && (
-                        <div className="flex items-center gap-2">
-                          <Gavel className="h-4 w-4" />
-                          <span>{t("judgments.judges")}: {judgment.judges.join(", ")}</span>
-                        </div>
+                      {judgment.courtName && <span>{judgment.courtName}</span>}
+                      {judgment.status && (
+                        <span className="font-medium text-green-700 dark:text-green-400">{judgment.status}</span>
                       )}
-                      {judgment.courtName && <div>{t("judgments.court")}: {judgment.courtName}</div>}
+                      {isAdmin && judgment.id
+                        ? <DocStatusDropdown id={judgment.id} collection="judgments" current={judgment.verificationStatus || 'DRAFT'} onChanged={() => activeQuery.refetch()} />
+                        : verificationBadge(judgment.verificationStatus)
+                      }
                     </div>
-
-                    {judgment.parties && <p className="text-sm font-medium mb-2">{t("judgments.parties")}: {judgment.parties}</p>}
-                    {judgment.summary && <p className="text-foreground mb-3 line-clamp-3">{judgment.summary}</p>}
-                    {judgment.verdict && <p className="text-sm font-medium text-primary mb-2">{t("judgments.verdict")}: {judgment.verdict}</p>}
-
-                    {judgment.tags && judgment.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {judgment.tags.map((tag, i) => <Badge key={i} variant="outline" className="text-xs">{tag}</Badge>)}
-                      </div>
+                    {judgment.parties && (
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{judgment.parties}</p>
                     )}
-
-                    <div className="flex items-center justify-between mt-4">
-                      <div className="text-xs text-muted-foreground">
-                        {judgment.jurisdiction ? `${t("judgments.jurisdiction")}: ${judgment.jurisdiction}` : ""}
-                      </div>
-                      <Link to={`/judgments/${judgment.id}`}>
-                        <Button variant="ghost" size="sm" className="text-primary">
-                          {t("judgments.view_details")} <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0 pt-0.5">
+                    <Link to={`/judgments/${judgment.id}`}>
+                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">{t("judgments.view")}</Button>
+                    </Link>
+                    {judgment.pdfUrl && (
+                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" asChild>
+                        <a href={resolveFileUrl(judgment.pdfUrl)} target="_blank" rel="noreferrer">
+                          <Download className="h-3 w-3 mr-1" /> PDF
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
               ))}
 
               {judgments.length === 0 && (
