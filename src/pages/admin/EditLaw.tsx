@@ -24,6 +24,9 @@ interface EditLawForm {
   category: string;
   jurisdiction: string;
   publisher: string;
+  gazetteVolume: string;
+  gazetteIssue: string;
+  gazetteDate: string;
   status: string;
   summary: string;
   tags: string;
@@ -55,6 +58,9 @@ const EditLaw: React.FC = () => {
         category: law.category || '',
         jurisdiction: law.jurisdiction || 'South Sudan',
         publisher: law.publisher || '',
+        gazetteVolume: law.gazetteVolume || '',
+        gazetteIssue: law.gazetteIssue || '',
+        gazetteDate: law.gazetteDate || '',
         status: law.status || 'Active',
         summary: law.summary || '',
         tags: (law.tags || []).join(', '),
@@ -91,6 +97,9 @@ const EditLaw: React.FC = () => {
         category: formData.category || undefined,
         jurisdiction: formData.jurisdiction || undefined,
         publisher: formData.publisher || undefined,
+        gazetteVolume: formData.gazetteVolume || undefined,
+        gazetteIssue: formData.gazetteIssue || undefined,
+        gazetteDate: formData.gazetteDate || undefined,
         status: formData.status || undefined,
         summary: formData.summary || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
@@ -211,6 +220,23 @@ const EditLaw: React.FC = () => {
                 <div>
                   <Label htmlFor="publisher">{t('admin.form.publisher')}</Label>
                   <Input id="publisher" name="publisher" value={formData.publisher} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteVolume">{t('laws.gazette_volume')}</Label>
+                  <Input id="gazetteVolume" name="gazetteVolume" value={formData.gazetteVolume} onChange={handleInputChange}
+                    placeholder="e.g., Vol. XV" />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteIssue">{t('laws.gazette_issue')}</Label>
+                  <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange}
+                    placeholder="e.g., No. 23" />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteDate">{t('laws.gazette_date')}</Label>
+                  <Input id="gazetteDate" name="gazetteDate" type="date" value={formData.gazetteDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
