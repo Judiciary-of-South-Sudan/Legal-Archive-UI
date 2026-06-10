@@ -15,24 +15,24 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 218 20% 10%;
+    --background: 42 36% 98%;
+    --foreground: 220 26% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 218 20% 10%;
+    --card-foreground: 220 26% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 218 20% 10%;
+    --popover-foreground: 220 26% 14%;
 
     /* Primary: SS Flag Blue #003DA5 */
     --primary: 218 100% 32%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 218 20% 94%;
-    --secondary-foreground: 218 30% 20%;
+    --secondary: 214 38% 96%;
+    --secondary-foreground: 217 33% 17%;
 
-    --muted: 218 15% 95%;
-    --muted-foreground: 218 10% 45%;
+    --muted: 42 26% 94%;
+    --muted-foreground: 218 12% 42%;
 
     /* Accent: SS Flag Gold #FCDD09 */
     --accent: 52 98% 51%;
@@ -45,16 +45,21 @@
     --ss-green:  139 90%  28%;   /* #078930 */
     --ss-black:  0   0%   0%;    /* #000000 */
     --ss-white:  0   0%   100%;  /* #FFFFFF */
+    --archive-ink: 220 26% 14%;
+    --archive-charcoal: 217 33% 17%;
+    --archive-paper: 42 36% 96%;
+    --archive-mist: 214 38% 97%;
+    --archive-border: 214 24% 88%;
 
     /* Destructive uses the flag red */
     --destructive: 358 85% 46%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 218 20% 88%;
-    --input: 218 20% 88%;
+    --border: 214 24% 88%;
+    --input: 214 24% 88%;
     --ring: 218 100% 32%;
 
-    --radius: 0.5rem;
+    --radius: 0.375rem;
 
     --sidebar-background: 218 30% 98%;
     --sidebar-foreground: 218 20% 25%;
@@ -117,16 +122,20 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
+
+  ::selection {
+    background: hsl(var(--ss-gold) / 0.45);
+  }
 }
 
 @layer components {
   /* Hero gradient: flag black → flag blue */
   .gradient-hero {
     background: linear-gradient(
-      150deg,
-      hsl(0 0% 8%)        0%,
-      hsl(218 100% 22%)  35%,
-      hsl(218 100% 36%) 100%
+      135deg,
+      hsl(var(--archive-charcoal)) 0%,
+      hsl(218 100% 22%) 58%,
+      hsl(218 100% 30%) 100%
     );
   }
 
@@ -139,7 +148,7 @@
 
   /* Thin decorative bar showing the 3 flag horizontal stripes */
   .flag-stripe-bar {
-    height: 4px;
+    height: 5px;
     background: linear-gradient(
       to right,
       #000000  0%   33%,
@@ -153,6 +162,31 @@
 
   .news-ticker {
     animation: scroll-left 30s linear infinite;
+  }
+
+  .archive-shell {
+    background:
+      linear-gradient(180deg, hsl(var(--archive-mist)) 0%, hsl(var(--background)) 42%),
+      hsl(var(--background));
+  }
+
+  .archive-card {
+    border: 1px solid hsl(var(--archive-border));
+    background: hsl(var(--card));
+    box-shadow: 0 1px 2px hsl(var(--archive-charcoal) / 0.05);
+  }
+
+  .archive-section-label {
+    color: hsl(var(--primary));
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .document-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.8;
   }
 
   @keyframes scroll-left {
