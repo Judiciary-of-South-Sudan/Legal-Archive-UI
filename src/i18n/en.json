@@ -354,7 +354,38 @@
     "register_link": "Register here",
     "back_home": "Back to Home",
     "success": "Login successful",
-    "error": "Login failed. Please check your credentials."
+    "error": "Login failed. Please check your credentials.",
+    "forgot_password": "Forgot your password?"
+  },
+  "forgot_password": {
+    "title": "Reset Password",
+    "description": "Enter your email address and we will send you a reset link.",
+    "email_label": "Email Address",
+    "email_placeholder": "you@example.com",
+    "submit": "Send Reset Link",
+    "sending": "Sending...",
+    "sent_title": "Check your email",
+    "sent_desc": "If that address is registered, a reset link is on its way. Check your spam folder if it doesn't arrive within a few minutes.",
+    "back_login": "Back to Login",
+    "error": "Something went wrong. Please try again."
+  },
+  "reset_password": {
+    "title": "Set New Password",
+    "description": "Enter a new password for your account.",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "password_placeholder": "At least 8 characters",
+    "confirm_placeholder": "Re-enter your password",
+    "submit": "Reset Password",
+    "saving": "Saving...",
+    "mismatch": "Passwords do not match.",
+    "too_short": "Password must be at least 8 characters.",
+    "success_toast": "Password reset successfully.",
+    "success_title": "Password updated",
+    "success_desc": "Redirecting you to login...",
+    "invalid_link": "This reset link is invalid or has expired.",
+    "request_new": "Request a new reset link",
+    "error": "Reset failed. The link may have expired."
   },
   "register": {
     "title": "Create an Account",
