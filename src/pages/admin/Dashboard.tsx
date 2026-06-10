@@ -57,6 +57,7 @@ interface ReviewItem {
   title: string;
   subType: string;
   year: number;
+  verificationStatus: 'DRAFT' | 'UNDER_REVIEW' | 'PUBLISHED';
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -264,7 +265,7 @@ const AdminDashboard: React.FC = () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             {isAdmin() && (
               <TabsTrigger value="review" className="relative">
-                Review
+                Unpublished
                 {reviewQueue.length > 0 && (
                   <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
                     {reviewQueue.length}
@@ -370,7 +371,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-3">
                       <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" />
-                        {(stats?.underReviewLaws ?? 0) + (stats?.underReviewJudgments ?? 0) + (stats?.underReviewNotices ?? 0)} documents awaiting review
+                        {(stats?.underReviewLaws ?? 0) + (stats?.underReviewJudgments ?? 0) + (stats?.underReviewNotices ?? 0)} documents under review — see Unpublished tab
                       </p>
                     </div>
                   )}
@@ -466,24 +467,24 @@ const AdminDashboard: React.FC = () => {
             </Card>
           </TabsContent>
 
-          {/* ──────────────── REVIEW TAB ──────────────── */}
+          {/* ──────────────── UNPUBLISHED TAB ──────────────── */}
           <TabsContent value="review" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4 text-amber-500" /> Document Review Queue
+                      <ShieldCheck className="h-4 w-4 text-amber-500" /> Unpublished Documents
                     </CardTitle>
                     <CardDescription>
                       {reviewQueue.length === 0
-                        ? 'No documents currently awaiting review'
-                        : `${reviewQueue.length} document${reviewQueue.length > 1 ? 's' : ''} awaiting your decision`}
+                        ? 'All documents are published'
+                        : `${reviewQueue.length} document${reviewQueue.length > 1 ? 's' : ''} not yet visible to the public`}
                     </CardDescription>
                   </div>
                   {reviewQueue.length > 0 && (
                     <span className="text-sm font-semibold text-amber-600 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-full">
-                      {reviewQueue.length} pending
+                      {reviewQueue.length} unpublished
                     </span>
                   )}
                 </div>
@@ -494,10 +495,9 @@ const AdminDashboard: React.FC = () => {
                     <div className="p-4 rounded-full bg-green-50 dark:bg-green-950/40">
                       <CheckCircle2 className="h-8 w-8 text-green-500" />
                     </div>
-                    <p className="text-sm font-medium">All clear</p>
+                    <p className="text-sm font-medium">All clear — everything is published</p>
                     <p className="text-xs text-muted-foreground">
-                      Documents move here when their status is set to "Under Review". <br />
-                      Use the status dropdown on any document to send it for review.
+                      Draft and under-review documents appear here so you can publish or reject them.
                     </p>
                   </div>
                 ) : (
@@ -538,6 +538,14 @@ const AdminDashboard: React.FC = () => {
                               </Link>
                             </div>
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                              {/* Verification status badge */}
+                              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                item.verificationStatus === 'UNDER_REVIEW'
+                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300'
+                                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                              }`}>
+                                {item.verificationStatus === 'UNDER_REVIEW' ? 'Under Review' : 'Draft'}
+                              </span>
                               {item.subType && (
                                 <span className="text-xs text-muted-foreground">{item.subType}</span>
                               )}
@@ -545,7 +553,7 @@ const AdminDashboard: React.FC = () => {
                                 <span className="text-xs text-muted-foreground">{item.year}</span>
                               )}
                               <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Clock className="h-3 w-3" /> Submitted by {item.createdBy || 'unknown'}
+                                <Clock className="h-3 w-3" /> Uploaded by {item.createdBy || 'unknown'}
                               </span>
                             </div>
                           </div>
