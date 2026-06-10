@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslation } from "react-i18next";
@@ -30,7 +31,6 @@ import {
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
-  const [tickerItems, setTickerItems] = useState<string[]>([]);
   const { isAuthenticated, user, logout, isAdmin, isEditor } = useAuth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -38,26 +38,33 @@ const Header = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  useEffect(() => {
-    Promise.allSettled([
-      apiClient.get("/laws?size=4&sort=createdAt,desc"),
-      apiClient.get("/judgments?size=4&sort=createdAt,desc"),
-      apiClient.get("/legal-notices?size=4&sort=createdAt,desc"),
-    ]).then(([lawsRes, judgmentsRes, noticesRes]) => {
-      const items: { label: string; createdAt: string }[] = [];
-      const laws = lawsRes.status === "fulfilled" ? (lawsRes.value.data?.data?.content ?? []) : [];
-      const judgments = judgmentsRes.status === "fulfilled" ? (judgmentsRes.value.data?.data?.content ?? []) : [];
-      const notices = noticesRes.status === "fulfilled" ? (noticesRes.value.data?.data?.content ?? []) : [];
+  const { data: recentLawsData } = useQuery({
+    queryKey: ['ticker', 'laws'],
+    queryFn: () => apiClient.get('/laws?size=4&sort=createdAt,desc'),
+    staleTime: 30 * 60 * 1000,
+  });
+  const { data: recentJudgmentsData } = useQuery({
+    queryKey: ['ticker', 'judgments'],
+    queryFn: () => apiClient.get('/judgments?size=4&sort=createdAt,desc'),
+    staleTime: 30 * 60 * 1000,
+  });
+  const { data: recentNoticesData } = useQuery({
+    queryKey: ['ticker', 'notices'],
+    queryFn: () => apiClient.get('/legal-notices?size=4&sort=createdAt,desc'),
+    staleTime: 30 * 60 * 1000,
+  });
 
-      laws.forEach((d: Record<string, string>) => items.push({ label: `${d.type || "Law"}: ${d.title}`, createdAt: d.createdAt ?? "" }));
-      judgments.forEach((d: Record<string, string>) => items.push({ label: `Judgment: ${d.caseName}`, createdAt: d.createdAt ?? "" }));
-      notices.forEach((d: Record<string, string>) => items.push({ label: `Notice: ${d.title}`, createdAt: d.createdAt ?? "" }));
-
-      items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      const labels = items.slice(0, 6).map((i) => i.label);
-      if (labels.length > 0) setTickerItems(labels);
-    });
-  }, []);
+  const tickerItems = useMemo(() => {
+    const laws: Record<string, string>[] = recentLawsData?.data?.data?.content ?? [];
+    const judgments: Record<string, string>[] = recentJudgmentsData?.data?.data?.content ?? [];
+    const notices: Record<string, string>[] = recentNoticesData?.data?.data?.content ?? [];
+    const items: { label: string; createdAt: string }[] = [];
+    laws.forEach((d) => items.push({ label: `${d.type || "Law"}: ${d.title}`, createdAt: d.createdAt ?? "" }));
+    judgments.forEach((d) => items.push({ label: `Judgment: ${d.caseName}`, createdAt: d.createdAt ?? "" }));
+    notices.forEach((d) => items.push({ label: `Notice: ${d.title}`, createdAt: d.createdAt ?? "" }));
+    items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return items.slice(0, 6).map((i) => i.label);
+  }, [recentLawsData, recentJudgmentsData, recentNoticesData]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
