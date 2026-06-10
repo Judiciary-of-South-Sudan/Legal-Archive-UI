@@ -85,6 +85,7 @@ const Header = () => {
     { name: t("nav.laws"), href: "/laws" },
     { name: t("nav.judgments"), href: "/judgments" },
     { name: t("nav.notices"), href: "/notices" },
+    { name: t("nav.decrees"), href: "/decrees" },
     { name: t("nav.peace_agreements"), href: "/search?q=peace%20agreement" },
     { name: t("nav.guide"), href: "/resources" },
   ];
