@@ -14,16 +14,35 @@ import { useSearchJudgments } from "@/hooks/useJudgments";
 import { useSearchNotices } from "@/hooks/useNotices";
 import { useTranslation } from "react-i18next";
 
+const PAGE_SIZE = 20;
+
+const Pagination = ({ page, totalPages, onPrev, onNext }: { page: number; totalPages: number; onPrev: () => void; onNext: () => void }) => {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex items-center justify-center gap-3 pt-4">
+      <Button variant="outline" size="sm" onClick={onPrev} disabled={page === 0}>Previous</Button>
+      <span className="text-sm text-muted-foreground">Page {page + 1} of {totalPages}</span>
+      <Button variant="outline" size="sm" onClick={onNext} disabled={page >= totalPages - 1}>Next</Button>
+    </div>
+  );
+};
+
 const SearchPage = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [inputValue, setInputValue] = useState(searchParams.get("q") || "");
+  const [lawsPage, setLawsPage] = useState(0);
+  const [judgmentsPage, setJudgmentsPage] = useState(0);
+  const [noticesPage, setNoticesPage] = useState(0);
 
   const query = searchParams.get("q") || "";
   const lastRecordedQuery = useRef("");
 
   useEffect(() => {
     setInputValue(query);
+    setLawsPage(0);
+    setJudgmentsPage(0);
+    setNoticesPage(0);
   }, [query]);
 
   useEffect(() => {
@@ -40,14 +59,18 @@ const SearchPage = () => {
     }
   };
 
-  const lawsResult = useSearchLaws({ query, page: 0, size: 20 });
-  const judgmentsResult = useSearchJudgments({ query, page: 0, size: 20 });
-  const noticesResult = useSearchNotices({ query, page: 0, size: 20 });
+  const lawsResult = useSearchLaws({ query, page: lawsPage, size: PAGE_SIZE });
+  const judgmentsResult = useSearchJudgments({ query, page: judgmentsPage, size: PAGE_SIZE });
+  const noticesResult = useSearchNotices({ query, page: noticesPage, size: PAGE_SIZE });
 
   const lawsCount = lawsResult.data?.totalElements ?? 0;
   const judgmentsCount = judgmentsResult.data?.totalElements ?? 0;
   const noticesCount = noticesResult.data?.totalElements ?? 0;
   const totalCount = lawsCount + judgmentsCount + noticesCount;
+
+  const lawsTotalPages = lawsResult.data?.totalPages ?? 1;
+  const judgmentsTotalPages = judgmentsResult.data?.totalPages ?? 1;
+  const noticesTotalPages = noticesResult.data?.totalPages ?? 1;
 
   const isLoading = lawsResult.isLoading || judgmentsResult.isLoading || noticesResult.isLoading;
 
@@ -170,19 +193,22 @@ const SearchPage = () => {
                     ) : lawsResult.data?.content.length === 0 ? (
                       <Empty message={t("search.no_laws", { query })} />
                     ) : (
-                      lawsResult.data?.content.map((law) => (
-                        <ResultCard
-                          key={law.id}
-                          href={`/laws/${law.id}`}
-                          icon={<BookOpen className="h-4 w-4" />}
-                          type={t("search.type_law")}
-                          typeColor="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-                          title={law.title}
-                          meta={[law.type, law.year?.toString(), law.category, law.status].filter(Boolean) as string[]}
-                          summary={law.summary}
-                          date={law.enactmentDate}
-                        />
-                      ))
+                      <>
+                        {lawsResult.data?.content.map((law) => (
+                          <ResultCard
+                            key={law.id}
+                            href={`/laws/${law.id}`}
+                            icon={<BookOpen className="h-4 w-4" />}
+                            type={t("search.type_law")}
+                            typeColor="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+                            title={law.title}
+                            meta={[law.type, law.year?.toString(), law.category, law.status].filter(Boolean) as string[]}
+                            summary={law.summary}
+                            date={law.enactmentDate}
+                          />
+                        ))}
+                        <Pagination page={lawsPage} totalPages={lawsTotalPages} onPrev={() => setLawsPage(p => p - 1)} onNext={() => setLawsPage(p => p + 1)} />
+                      </>
                     )}
                   </TabsContent>
 
@@ -192,20 +218,23 @@ const SearchPage = () => {
                     ) : judgmentsResult.data?.content.length === 0 ? (
                       <Empty message={t("search.no_judgments", { query })} />
                     ) : (
-                      judgmentsResult.data?.content.map((j) => (
-                        <ResultCard
-                          key={j.id}
-                          href={`/judgments/${j.id}`}
-                          icon={<Gavel className="h-4 w-4" />}
-                          type={t("search.type_judgment")}
-                          typeColor="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                          title={j.caseName}
-                          meta={[j.courtLevel, j.courtName, j.caseType, j.verdict].filter(Boolean) as string[]}
-                          summary={j.summary}
-                          date={j.judgmentDate}
-                          subTitle={j.caseNumber}
-                        />
-                      ))
+                      <>
+                        {judgmentsResult.data?.content.map((j) => (
+                          <ResultCard
+                            key={j.id}
+                            href={`/judgments/${j.id}`}
+                            icon={<Gavel className="h-4 w-4" />}
+                            type={t("search.type_judgment")}
+                            typeColor="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
+                            title={j.caseName}
+                            meta={[j.courtLevel, j.courtName, j.caseType, j.verdict].filter(Boolean) as string[]}
+                            summary={j.summary}
+                            date={j.judgmentDate}
+                            subTitle={j.caseNumber}
+                          />
+                        ))}
+                        <Pagination page={judgmentsPage} totalPages={judgmentsTotalPages} onPrev={() => setJudgmentsPage(p => p - 1)} onNext={() => setJudgmentsPage(p => p + 1)} />
+                      </>
                     )}
                   </TabsContent>
 
@@ -215,20 +244,23 @@ const SearchPage = () => {
                     ) : noticesResult.data?.content.length === 0 ? (
                       <Empty message={t("search.no_notices", { query })} />
                     ) : (
-                      noticesResult.data?.content.map((n) => (
-                        <ResultCard
-                          key={n.id}
-                          href={`/notices/${n.id}`}
-                          icon={<FileText className="h-4 w-4" />}
-                          type={t("search.type_notice")}
-                          typeColor="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100"
-                          title={n.title}
-                          meta={[n.type, n.issuingAuthority, n.status].filter(Boolean) as string[]}
-                          summary={n.summary}
-                          date={n.publicationDate}
-                          subTitle={n.noticeNumber}
-                        />
-                      ))
+                      <>
+                        {noticesResult.data?.content.map((n) => (
+                          <ResultCard
+                            key={n.id}
+                            href={`/notices/${n.id}`}
+                            icon={<FileText className="h-4 w-4" />}
+                            type={t("search.type_notice")}
+                            typeColor="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100"
+                            title={n.title}
+                            meta={[n.type, n.issuingAuthority, n.status].filter(Boolean) as string[]}
+                            summary={n.summary}
+                            date={n.publicationDate}
+                            subTitle={n.noticeNumber}
+                          />
+                        ))}
+                        <Pagination page={noticesPage} totalPages={noticesTotalPages} onPrev={() => setNoticesPage(p => p - 1)} onNext={() => setNoticesPage(p => p + 1)} />
+                      </>
                     )}
                   </TabsContent>
                 </Tabs>
