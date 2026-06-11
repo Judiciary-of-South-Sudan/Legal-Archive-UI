@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Document, Page, Thumbnail, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Download, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -12,24 +11,21 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 
 type Props = {
   url: string;
-  downloadUrl?: string;
   fullHeight?: boolean;
   showThumbnails?: boolean;
 };
 
-const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, showThumbnails = true }) => {
+const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = true }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const [zoom, setZoom] = useState(1.0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(800);
+  const pagesAreaRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(900);
   const thumbnailRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const isProgrammaticScroll = useRef(false);
 
-  // Track container width for page sizing
+  // Track the width of the pages area for responsive page sizing
   useEffect(() => {
-    const el = containerRef.current;
+    const el = pagesAreaRef.current;
     if (!el) return;
     const observer = new ResizeObserver(([entry]) => {
       setContainerWidth(entry.contentRect.width);
@@ -38,7 +34,24 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
     return () => observer.disconnect();
   }, []);
 
-  // Keep the active thumbnail visible when page changes via scroll
+  // IntersectionObserver: update active page as user scrolls
+  useEffect(() => {
+    if (numPages === 0) return;
+    const observers: IntersectionObserver[] = [];
+    for (let n = 1; n <= numPages; n++) {
+      const el = pageRefs.current[n];
+      if (!el) continue;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setPageNumber(n); },
+        { threshold: 0.4 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    }
+    return () => observers.forEach(obs => obs.disconnect());
+  }, [numPages]);
+
+  // Keep active thumbnail scrolled into view in the sidebar
   useEffect(() => {
     thumbnailRefs.current[pageNumber]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [pageNumber]);
@@ -46,127 +59,97 @@ const PdfViewer: React.FC<Props> = ({ url, downloadUrl, fullHeight = false, show
   const goToPage = useCallback((n: number) => {
     const clamped = Math.max(1, Math.min(n, numPages));
     setPageNumber(clamped);
-    isProgrammaticScroll.current = true;
     pageRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setTimeout(() => { isProgrammaticScroll.current = false; }, 700);
   }, [numPages]);
 
-  // Update page counter as user scrolls
-  const handleScroll = useCallback(() => {
-    if (isProgrammaticScroll.current) return;
-    const container = containerRef.current;
-    if (!container) return;
-    const scrollTop = container.scrollTop;
-    let closest = 1;
-    let closestDist = Infinity;
-    for (let n = 1; n <= numPages; n++) {
-      const el = pageRefs.current[n];
-      if (!el) continue;
-      const dist = Math.abs(el.offsetTop - scrollTop - 40);
-      if (dist < closestDist) { closestDist = dist; closest = n; }
-    }
-    setPageNumber(closest);
-  }, [numPages]);
-
-  return (
-    <div className={`border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900 flex flex-col${fullHeight ? ' h-full' : ''}`}>
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 bg-white dark:bg-gray-800 border-b shrink-0">
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => goToPage(pageNumber - 1)} disabled={pageNumber <= 1}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-sm tabular-nums px-1">{pageNumber} / {numPages || '—'}</span>
-          <Button variant="ghost" size="sm" onClick={() => goToPage(pageNumber + 1)} disabled={pageNumber >= numPages}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.max(+(z - 0.25).toFixed(2), 0.5))} disabled={zoom <= 0.5}>
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <span className="text-sm tabular-nums w-12 text-center">{Math.round(zoom * 100)}%</span>
-          <Button variant="ghost" size="sm" onClick={() => setZoom(z => Math.min(+(z + 0.25).toFixed(2), 3.0))} disabled={zoom >= 3.0}>
-            <ZoomIn className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {downloadUrl && (
-          <Button variant="outline" size="sm" asChild>
-            <a href={downloadUrl} target="_blank" rel="noreferrer" download>
-              <Download className="h-4 w-4 mr-1" /> Download
-            </a>
-          </Button>
-        )}
-      </div>
-
-      {/* Body: thumbnail strip + continuously scrollable pages */}
-      <div className="flex flex-1 overflow-hidden">
+  // fullHeight mode: fixed container with its own scroll (used on the /document page)
+  if (fullHeight) {
+    return (
+      <div className="flex h-full overflow-hidden">
         <Document
           file={url}
           onLoadSuccess={({ numPages: n }) => { setNumPages(n); setPageNumber(1); }}
-          loading={
-            <div className="flex items-center justify-center h-64 w-full">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          }
-          error={
-            <div className="flex items-center justify-center h-64 w-full text-destructive text-sm">
-              Failed to load document.
-            </div>
-          }
+          loading={<div className="flex items-center justify-center h-full w-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
+          error={<div className="flex items-center justify-center h-full w-full text-destructive text-sm">Failed to load document.</div>}
           className="flex flex-1 overflow-hidden w-full"
         >
-          {/* Thumbnail sidebar */}
           {showThumbnails && numPages > 0 && (
-            <div className="w-32 shrink-0 overflow-y-auto bg-gray-200 dark:bg-gray-800 border-r flex flex-col items-center py-2 gap-2">
+            <div className="w-36 shrink-0 overflow-y-auto bg-gray-100 border-r flex flex-col items-center py-3 gap-3">
               {Array.from({ length: numPages }, (_, i) => {
                 const n = i + 1;
                 return (
-                  <button
-                    key={n}
-                    ref={el => { thumbnailRefs.current[n] = el; }}
-                    onClick={() => goToPage(n)}
-                    className={`flex flex-col items-center gap-1 p-1 rounded w-full transition-colors ${
-                      pageNumber === n
-                        ? 'bg-primary/20 ring-1 ring-primary'
-                        : 'hover:bg-gray-300 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <Thumbnail pageNumber={n} width={100} />
-                    <span className="text-xs tabular-nums text-muted-foreground">{n}</span>
+                  <button key={n} ref={el => { thumbnailRefs.current[n] = el; }} onClick={() => goToPage(n)}
+                    className={`flex flex-col items-center gap-1 px-2 py-1 rounded w-full transition-colors ${pageNumber === n ? 'bg-blue-100 ring-1 ring-blue-400' : 'hover:bg-gray-200'}`}>
+                    <Thumbnail pageNumber={n} width={108} />
+                    <span className="text-xs tabular-nums text-gray-500">{n}</span>
                   </button>
                 );
               })}
             </div>
           )}
-
-          {/* Continuous scroll area — all pages stacked */}
-          <div
-            ref={containerRef}
-            onScroll={handleScroll}
-            className="overflow-auto flex flex-col items-center py-6 gap-6 flex-1"
-            style={fullHeight ? {} : { maxHeight: '82vh' }}
-          >
+          <div ref={pagesAreaRef} className="overflow-auto flex flex-col items-center py-8 gap-8 flex-1 bg-gray-200">
             {numPages > 0 && Array.from({ length: numPages }, (_, i) => {
               const n = i + 1;
               return (
                 <div key={n} ref={el => { pageRefs.current[n] = el; }}>
-                  <Page
-                    pageNumber={n}
-                    width={Math.floor(containerWidth * zoom)}
-                    renderTextLayer
-                    renderAnnotationLayer
-                    className="shadow-lg"
-                  />
+                  <Page pageNumber={n} width={Math.floor(containerWidth * 0.92)} renderTextLayer renderAnnotationLayer className="shadow-md" />
                 </div>
               );
             })}
           </div>
         </Document>
       </div>
-    </div>
+    );
+  }
+
+  // Default mode: pages flow naturally with the page, sticky thumbnail sidebar
+  return (
+    <Document
+      file={url}
+      onLoadSuccess={({ numPages: n }) => { setNumPages(n); setPageNumber(1); }}
+      loading={<div className="flex items-center justify-center py-24 w-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
+      error={<div className="flex items-center justify-center py-24 w-full text-destructive text-sm">Failed to load document.</div>}
+      className="flex w-full items-start"
+    >
+      {/* Sticky sidebar */}
+      {showThumbnails && numPages > 0 && (
+        <div className="sticky top-0 h-screen w-40 shrink-0 overflow-y-auto bg-gray-50 border-r border-gray-200 flex flex-col items-center pt-4 pb-4 gap-2">
+          {Array.from({ length: numPages }, (_, i) => {
+            const n = i + 1;
+            return (
+              <button key={n} ref={el => { thumbnailRefs.current[n] = el; }} onClick={() => goToPage(n)}
+                className={`flex flex-col items-center gap-1 px-2 py-1.5 rounded-md w-full transition-all ${
+                  pageNumber === n
+                    ? 'bg-primary/10 ring-1 ring-primary/40'
+                    : 'hover:bg-gray-100'
+                }`}>
+                <Thumbnail pageNumber={n} width={112} />
+                <span className="text-[11px] tabular-nums text-gray-400">{n}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Pages — full width, no cap, natural document feel */}
+      <div ref={pagesAreaRef} className="flex-1 flex flex-col items-center py-6 gap-5 bg-[#e8e8e8]">
+        {numPages > 0 && Array.from({ length: numPages }, (_, i) => {
+          const n = i + 1;
+          return (
+            <div key={n} ref={el => { pageRefs.current[n] = el; }} className="w-full flex justify-center">
+              <Page
+                pageNumber={n}
+                width={Math.floor(containerWidth * 0.97)}
+                renderTextLayer
+                renderAnnotationLayer
+                className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
+              />
+            </div>
+          );
+        })}
+        <div className="h-8" />
+      </div>
+    </Document>
   );
 };
 
