@@ -52,8 +52,8 @@ interface AuditEntry {
 
 interface ReviewItem {
   id: string;
-  documentType: 'Law' | 'Judgment' | 'Notice';
-  collection: 'laws' | 'judgments' | 'notices';
+  documentType: 'Law' | 'Judgment' | 'Notice' | 'Decree';
+  collection: 'laws' | 'judgments' | 'notices' | 'decrees';
   title: string;
   subType: string;
   year: number;
@@ -508,16 +508,19 @@ const AdminDashboard: React.FC = () => {
                         Law:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300',
                         Judgment: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300',
                         Notice:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300',
+                        Decree:   'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300',
                       }[item.documentType];
                       const typeIcon = {
                         Law:      <FileText className="h-4 w-4" />,
                         Judgment: <Gavel className="h-4 w-4" />,
                         Notice:   <FileWarning className="h-4 w-4" />,
+                        Decree:   <Scale className="h-4 w-4" />,
                       }[item.documentType];
                       const detailLink = {
                         Law:      `/laws/${item.id}`,
                         Judgment: `/judgments/${item.id}`,
                         Notice:   `/notices/${item.id}`,
+                        Decree:   `/decrees/${item.id}`,
                       }[item.documentType];
                       const isLoading = reviewLoading[item.id];
 
