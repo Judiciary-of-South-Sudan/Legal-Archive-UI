@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -147,42 +148,52 @@ function MetricCard({ icon, label, value, sub }: { icon: React.ReactNode; label:
 
 const AdminDashboard: React.FC = () => {
   const { isAdmin } = useAuth();
-  const [stats, setStats]       = useState<DashboardStats | null>(null);
-  const [activity, setActivity] = useState<ActivitySummary | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [auditLog, setAuditLog]       = useState<AuditEntry[]>([]);
-  const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>([]);
+  const queryClient = useQueryClient();
   const [reviewLoading, setReviewLoading] = useState<Record<string, boolean>>({});
   const [auditFilter, setAuditFilter] = useState<string>('ALL');
   const [auditLimit, setAuditLimit]   = useState(50);
-  const [loading, setLoading]         = useState(true);
   const [refreshing, setRefreshing]   = useState(false);
 
-  const fetchData = useCallback(async (limit = 50) => {
-    try {
-      const [statsRes, activityRes, analyticsRes, auditRes, reviewRes] = await Promise.all([
-        apiClient.get('/admin/dashboard'),
-        apiClient.get('/admin/activity'),
-        apiClient.get('/admin/analytics'),
-        apiClient.get(`/admin/audit?limit=${limit}`),
-        apiClient.get('/admin/review-queue'),
-      ]);
-      setStats(statsRes.data.data);
-      setActivity(activityRes.data.data);
-      setAnalytics(analyticsRes.data.data);
-      setAuditLog(auditRes.data.data ?? []);
-      setReviewQueue(reviewRes.data.data ?? []);
-    } catch {
-      toast.error('Failed to load dashboard data');
-    }
-  }, []);
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery<DashboardStats>({
+    queryKey: ['admin', 'stats'],
+    queryFn: () => apiClient.get('/admin/dashboard').then(r => r.data.data),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: activity, refetch: refetchActivity } = useQuery<ActivitySummary>({
+    queryKey: ['admin', 'activity'],
+    queryFn: () => apiClient.get('/admin/activity').then(r => r.data.data),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: analytics, refetch: refetchAnalytics } = useQuery<AnalyticsSummary>({
+    queryKey: ['admin', 'analytics'],
+    queryFn: () => apiClient.get('/admin/analytics').then(r => r.data.data),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: auditLog = [], refetch: refetchAudit } = useQuery<AuditEntry[]>({
+    queryKey: ['admin', 'audit', auditLimit],
+    queryFn: () => apiClient.get(`/admin/audit?limit=${auditLimit}`).then(r => r.data.data ?? []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: reviewQueue = [], isLoading: reviewQueueLoading, refetch: refetchReviewQueue } = useQuery<ReviewItem[]>({
+    queryKey: ['admin', 'reviewQueue'],
+    queryFn: () => apiClient.get('/admin/review-queue').then(r => r.data.data ?? []),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const loading = statsLoading || reviewQueueLoading;
 
   const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'DRAFT') => {
     setReviewLoading(prev => ({ ...prev, [item.id]: true }));
     try {
       await apiClient.put(`/admin/${item.collection}/${item.id}/status`, { verificationStatus: action });
-      setReviewQueue(prev => prev.filter(r => r.id !== item.id));
-      setStats(prev => prev ? {
+      queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
+        (prev ?? []).filter(r => r.id !== item.id)
+      );
+      queryClient.setQueryData<DashboardStats>(['admin', 'stats'], prev => prev ? {
         ...prev,
         underReviewLaws:      item.documentType === 'Law'      ? prev.underReviewLaws - 1      : prev.underReviewLaws,
         underReviewJudgments: item.documentType === 'Judgment' ? prev.underReviewJudgments - 1 : prev.underReviewJudgments,
@@ -199,22 +210,14 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData(50).finally(() => setLoading(false));
-  }, [fetchData]);
-
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchData(auditLimit).finally(() => setRefreshing(false));
+    await Promise.all([refetchStats(), refetchActivity(), refetchAnalytics(), refetchAudit(), refetchReviewQueue()]);
+    setRefreshing(false);
     toast.success('Dashboard refreshed');
   };
 
-  const loadMoreAudit = async () => {
-    const next = auditLimit + 50;
-    setAuditLimit(next);
-    const res = await apiClient.get(`/admin/audit?limit=${next}`);
-    setAuditLog(res.data.data ?? []);
-  };
+  const loadMoreAudit = () => setAuditLimit(prev => prev + 50);
 
   const filteredAudit = auditFilter === 'ALL'
     ? auditLog
