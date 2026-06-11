@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import VerifyDocument from '@/components/admin/VerifyDocument';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -150,6 +151,7 @@ const AdminDashboard: React.FC = () => {
   const { isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const [reviewLoading, setReviewLoading] = useState<Record<string, boolean>>({});
+  const [verifyItem, setVerifyItem]   = useState<ReviewItem | null>(null);
   const [auditFilter, setAuditFilter] = useState<string>('ALL');
   const [auditLimit, setAuditLimit]   = useState(50);
   const [refreshing, setRefreshing]   = useState(false);
@@ -186,10 +188,13 @@ const AdminDashboard: React.FC = () => {
 
   const loading = statsLoading || reviewQueueLoading;
 
-  const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'DRAFT') => {
+  const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'DRAFT', comment = '') => {
     setReviewLoading(prev => ({ ...prev, [item.id]: true }));
     try {
-      await apiClient.put(`/admin/${item.collection}/${item.id}/status`, { verificationStatus: action });
+      await apiClient.put(`/admin/${item.collection}/${item.id}/status`, {
+        verificationStatus: action,
+        comment: comment || undefined,
+      });
       queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
         (prev ?? []).filter(r => r.id !== item.id)
       );
@@ -569,21 +574,12 @@ const AdminDashboard: React.FC = () => {
                           <div className="flex items-center gap-2 shrink-0">
                             <Button
                               size="sm"
-                              variant="outline"
                               disabled={isLoading}
-                              onClick={() => handleReviewAction(item, 'DRAFT')}
-                              className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40 hover:border-red-400"
+                              onClick={() => setVerifyItem(item)}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                              <XCircle className="h-3.5 w-3.5 mr-1.5" /> Reject
-                            </Button>
-                            <Button
-                              size="sm"
-                              disabled={isLoading}
-                              onClick={() => handleReviewAction(item, 'PUBLISHED')}
-                              className="bg-green-600 hover:bg-green-700 text-white"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                              {isLoading ? 'Saving…' : 'Approve'}
+                              <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
+                              {isLoading ? 'Saving…' : 'Review'}
                             </Button>
                           </div>
                         </div>
@@ -796,6 +792,12 @@ const AdminDashboard: React.FC = () => {
         </Tabs>
       </main>
       <Footer />
+
+      <VerifyDocument
+        item={verifyItem}
+        onClose={() => setVerifyItem(null)}
+        onAction={handleReviewAction}
+      />
     </div>
   );
 };
