@@ -26,6 +26,7 @@ const LawDetail: React.FC = () => {
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const { mutate: trackDownload } = useIncrementLawDownload();
   const [relatedLawTitles, setRelatedLawTitles] = useState<{ id: string; title: string }[]>([]);
+  const [citedBy, setCitedBy] = useState<{ judgments: any[]; notices: any[] } | null>(null);
 
   useEffect(() => {
     if (!id || !law?.relatedLaws?.length) return;
@@ -34,6 +35,13 @@ const LawDetail: React.FC = () => {
       setRelatedLawTitles(laws.map(l => ({ id: l.id, title: l.title })));
     }).catch(() => {});
   }, [id, law?.relatedLaws?.length]);
+
+  useEffect(() => {
+    if (!id) return;
+    apiClient.get(`/laws/${id}/cited-by`).then(res => {
+      setCitedBy(res.data?.data ?? { judgments: [], notices: [] });
+    }).catch(() => {});
+  }, [id]);
 
   const copyCitation = () => {
     if (!law) return;
@@ -291,6 +299,36 @@ const LawDetail: React.FC = () => {
                       <span key={i} className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground">{a}</span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {citedBy && (citedBy.judgments.length > 0 || citedBy.notices.length > 0) && (
+                <div className="border-t border-border pt-5 space-y-4">
+                  <h3 className="archive-section-label">{t('laws.cited_by')}</h3>
+                  {citedBy.judgments.length > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">{t('laws.cited_by_judgments')}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {citedBy.judgments.map((j: any) => (
+                          <Link key={j.id} to={`/judgments/${j.id}`}>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-muted">{j.caseName ?? j.id}</Badge>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {citedBy.notices.length > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-2">{t('laws.cited_by_notices')}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {citedBy.notices.map((n: any) => (
+                          <Link key={n.id} to={`/notices/${n.id}`}>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-muted">{n.title ?? n.id}</Badge>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
