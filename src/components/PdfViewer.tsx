@@ -4,10 +4,11 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { Loader2 } from 'lucide-react';
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+// CDN worker — avoids the new URL() Vite trick that fails on mobile Safari
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+// Only render pages within ±WINDOW of the current page; rest are white placeholders
+const WINDOW = 5;
 
 type Props = {
   url: string;
@@ -90,9 +91,14 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
           <div ref={pagesAreaRef} className="overflow-auto flex flex-col items-center py-8 gap-8 flex-1 bg-gray-200">
             {numPages > 0 && Array.from({ length: numPages }, (_, i) => {
               const n = i + 1;
+              const pw = Math.floor(containerWidth * 0.92);
+              const inWindow = Math.abs(n - pageNumber) <= WINDOW;
               return (
-                <div key={n} ref={el => { pageRefs.current[n] = el; }}>
-                  <Page pageNumber={n} width={Math.floor(containerWidth * 0.92)} renderTextLayer renderAnnotationLayer className="shadow-md" />
+                <div key={n} ref={el => { pageRefs.current[n] = el; }} className="flex justify-center">
+                  {inWindow
+                    ? <Page pageNumber={n} width={pw} renderTextLayer renderAnnotationLayer className="shadow-md" />
+                    : <div style={{ width: pw, height: Math.floor(pw * 1.414) }} className="bg-white shadow-md" />
+                  }
                 </div>
               );
             })}
@@ -135,15 +141,14 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
       <div ref={pagesAreaRef} className="flex-1 flex flex-col items-center py-6 gap-5 bg-[#e8e8e8]">
         {numPages > 0 && Array.from({ length: numPages }, (_, i) => {
           const n = i + 1;
+          const pw = Math.floor(containerWidth * 0.97);
+          const inWindow = Math.abs(n - pageNumber) <= WINDOW;
           return (
             <div key={n} ref={el => { pageRefs.current[n] = el; }} className="w-full flex justify-center">
-              <Page
-                pageNumber={n}
-                width={Math.floor(containerWidth * 0.97)}
-                renderTextLayer
-                renderAnnotationLayer
-                className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]"
-              />
+              {inWindow
+                ? <Page pageNumber={n} width={pw} renderTextLayer renderAnnotationLayer className="shadow-[0_2px_8px_rgba(0,0,0,0.15)]" />
+                : <div style={{ width: pw, height: Math.floor(pw * 1.414) }} className="bg-white shadow-[0_2px_8px_rgba(0,0,0,0.15)]" />
+              }
             </div>
           );
         })}
