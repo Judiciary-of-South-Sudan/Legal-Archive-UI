@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -41,6 +41,7 @@ const AdminUploadJudgment: React.FC = () => {
 
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const submitActionRef = useRef<'DRAFT' | 'UNDER_REVIEW'>('DRAFT');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -76,6 +77,7 @@ const AdminUploadJudgment: React.FC = () => {
         citedCases: formData.citedCases ? formData.citedCases.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         jurisdiction: formData.jurisdiction,
         language: formData.language,
+        verificationStatus: submitActionRef.current,
       };
 
       const created = await createMutation.mutateAsync(payload) as Judgment;
@@ -199,11 +201,20 @@ const AdminUploadJudgment: React.FC = () => {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit" disabled={isUploading}>
-                  {isUploading ? (
+                <Button type="submit" disabled={isUploading}
+                  onClick={() => { submitActionRef.current = 'DRAFT'; }}>
+                  {isUploading && submitActionRef.current === 'DRAFT' ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('admin.form.uploading')}</>
                   ) : (
-                    <><Upload className="mr-2 h-4 w-4" />{t('admin.upload.judgment_btn')}</>
+                    <><Upload className="mr-2 h-4 w-4" />Save as Draft</>
+                  )}
+                </Button>
+                <Button type="submit" variant="secondary" disabled={isUploading}
+                  onClick={() => { submitActionRef.current = 'UNDER_REVIEW'; }}>
+                  {isUploading && submitActionRef.current === 'UNDER_REVIEW' ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t('admin.form.uploading')}</>
+                  ) : (
+                    <>Submit for Review</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin/dashboard')}>
