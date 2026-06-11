@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -38,6 +38,7 @@ const UploadDecree: React.FC = () => {
   const [personnel, setPersonnel] = useState<string[]>(['']);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const submitActionRef = useRef<'DRAFT' | 'UNDER_REVIEW'>('DRAFT');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -84,7 +85,7 @@ const UploadDecree: React.FC = () => {
         language: formData.language,
         fullText: formData.fullText || undefined,
         pdfUrl: pdfUrl || undefined,
-        verificationStatus: 'DRAFT',
+        verificationStatus: submitActionRef.current,
       });
 
       navigate(created?.id ? `/decrees/${created.id}` : '/admin/dashboard');
@@ -207,11 +208,20 @@ const UploadDecree: React.FC = () => {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <Button type="submit" disabled={isUploading || createDecreeMutation.isPending}>
-                  {(isUploading || createDecreeMutation.isPending) ? (
+                <Button type="submit" disabled={isUploading || createDecreeMutation.isPending}
+                  onClick={() => { submitActionRef.current = 'DRAFT'; }}>
+                  {(isUploading || createDecreeMutation.isPending) && submitActionRef.current === 'DRAFT' ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('common.saving')}</>
                   ) : (
-                    <><Upload className="h-4 w-4 mr-2" /> {t('decrees.submit_upload')}</>
+                    <><Upload className="h-4 w-4 mr-2" />Save as Draft</>
+                  )}
+                </Button>
+                <Button type="submit" variant="secondary" disabled={isUploading || createDecreeMutation.isPending}
+                  onClick={() => { submitActionRef.current = 'UNDER_REVIEW'; }}>
+                  {(isUploading || createDecreeMutation.isPending) && submitActionRef.current === 'UNDER_REVIEW' ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('common.saving')}</>
+                  ) : (
+                    <>Submit for Review</>
                   )}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/admin')}>{t('common.cancel')}</Button>
