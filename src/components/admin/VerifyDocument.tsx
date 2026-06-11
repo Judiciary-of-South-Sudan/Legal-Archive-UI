@@ -41,7 +41,7 @@ interface AuditEntry {
 interface Props {
   item: ReviewItem | null;
   onClose: () => void;
-  onAction: (item: ReviewItem, newStatus: 'PUBLISHED' | 'DRAFT', comment: string) => Promise<void>;
+  onAction: (item: ReviewItem, newStatus: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT', comment: string) => Promise<void>;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
 
   const statusCfg = STATUS_CFG[item.verificationStatus] ?? STATUS_CFG.DRAFT;
 
-  const handleAction = async (newStatus: 'PUBLISHED' | 'DRAFT') => {
+  const handleAction = async (newStatus: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT') => {
     setSubmitting(true);
     try {
       await onAction(item, newStatus, comment);
@@ -99,8 +99,9 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
   };
 
   // Available transitions based on current status
-  const canPublish = item.verificationStatus === 'UNDER_REVIEW';
-  const canReturnToDraft = item.verificationStatus === 'UNDER_REVIEW';
+  const isDraft      = item.verificationStatus === 'DRAFT';
+  const isUnderReview = item.verificationStatus === 'UNDER_REVIEW';
+  const isPublished  = item.verificationStatus === 'PUBLISHED';
 
   return (
     <Dialog open={!!item} onOpenChange={open => { if (!open) onClose(); }}>
@@ -196,7 +197,31 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
             Cancel
           </Button>
           <div className="flex gap-2">
-            {canReturnToDraft && (
+            {/* DRAFT → submit for review or publish directly */}
+            {isDraft && (
+              <Button
+                variant="outline"
+                disabled={submitting}
+                onClick={() => handleAction('UNDER_REVIEW')}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
+              >
+                <Clock className="h-3.5 w-3.5 mr-1.5" />
+                {submitting ? 'Submitting…' : 'Submit for Review'}
+              </Button>
+            )}
+            {isDraft && (
+              <Button
+                disabled={submitting}
+                onClick={() => handleAction('PUBLISHED')}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                {submitting ? 'Publishing…' : 'Publish Directly'}
+              </Button>
+            )}
+
+            {/* UNDER_REVIEW → return to draft or approve */}
+            {isUnderReview && (
               <Button
                 variant="outline"
                 disabled={submitting}
@@ -207,22 +232,24 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 {submitting ? 'Saving…' : 'Return to Draft'}
               </Button>
             )}
-            {canPublish && (
+            {isUnderReview && (
               <Button
                 disabled={submitting}
                 onClick={() => handleAction('PUBLISHED')}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                {submitting ? 'Publishing…' : 'Publish'}
+                {submitting ? 'Publishing…' : 'Approve & Publish'}
               </Button>
             )}
-            {!canPublish && !canReturnToDraft && (
+
+            {/* PUBLISHED → unpublish */}
+            {isPublished && (
               <Button
                 variant="outline"
                 disabled={submitting}
                 onClick={() => handleAction('DRAFT')}
-                className="text-red-600 border-red-200 hover:bg-red-50"
+                className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
               >
                 <XCircle className="h-3.5 w-3.5 mr-1.5" /> Unpublish
               </Button>
