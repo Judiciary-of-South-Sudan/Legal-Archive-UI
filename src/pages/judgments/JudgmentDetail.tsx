@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
+import PdfViewer from '@/components/PdfViewer';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -112,7 +113,7 @@ const JudgmentDetail: React.FC = () => {
   }
 
   const pdfUrl = resolveFileUrl(judgment.pdfUrl);
-  const defaultTab = judgment.fullText ? 'text' : pdfUrl ? 'pdf' : 'metadata';
+  const defaultTab = pdfUrl ? 'pdf' : 'metadata';
 
   const statusColor =
     judgment.status === 'Final' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
@@ -215,43 +216,13 @@ const JudgmentDetail: React.FC = () => {
 
         <Tabs defaultValue={defaultTab}>
           <TabsList>
-            <TabsTrigger value="text">{t('common.tab_text')}</TabsTrigger>
             <TabsTrigger value="pdf">{t('common.tab_pdf')}</TabsTrigger>
             <TabsTrigger value="metadata">{t('common.tab_metadata')}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="text" className="mt-4">
-            {judgment.fullText ? (
-              <div className="archive-card rounded-md p-8">
-                <article className="document-text mx-auto max-w-[72ch] text-[15px] text-foreground whitespace-pre-wrap">
-                  {judgment.fullText}
-                </article>
-              </div>
-            ) : (
-              <div className="archive-card rounded-md py-16 text-center">
-                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">{t('judgments.fulltext_unavailable')}</p>
-                {pdfUrl && (
-                  <p className="text-sm mt-1">
-                    <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                      {t('common.download_pdf_link')}
-                    </a>{' '}
-                    {t('common.fulltext_pdf_suffix')}
-                  </p>
-                )}
-              </div>
-            )}
-          </TabsContent>
-
           <TabsContent value="pdf" className="mt-4">
             {pdfUrl ? (
-              <div className="archive-card overflow-hidden rounded-md">
-                <iframe
-                  src={pdfUrl}
-                  className="w-full h-[80vh]"
-                  title={`${judgment.caseName} — PDF`}
-                />
-              </div>
+              <PdfViewer url={pdfUrl} />
             ) : (
               <div className="archive-card rounded-md py-16 text-center">
                 <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
