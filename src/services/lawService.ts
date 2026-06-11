@@ -25,20 +25,20 @@ export const lawService = {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws/search', { params });
     return response.data.data!;
   },
-  async getLawsByType(type: string, params?: PaginationParams): Promise<PaginatedResponse<Law>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>(`/laws/type/${type}`, { params });
+  async getLawsByType(type: string, params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws/filter', { params: { type, ...params } });
     return response.data.data!;
   },
-  async getLawsByYear(year: number, params?: PaginationParams): Promise<PaginatedResponse<Law>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>(`/laws/year/${year}`, { params });
+  async getLawsByYear(year: number, params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws/filter', { params: { year, ...params } });
     return response.data.data!;
   },
-  async getLawsByCategory(category: string, params?: PaginationParams): Promise<PaginatedResponse<Law>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>(`/laws/category/${category}`, { params });
+  async getLawsByCategory(category: string, params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws/filter', { params: { category, ...params } });
     return response.data.data!;
   },
-  async getLawsByStatus(status: string, params?: PaginationParams): Promise<PaginatedResponse<Law>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>(`/laws/status/${status}`, { params });
+  async getLawsByStatus(status: string, params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Law>>>('/laws/filter', { params: { status, ...params } });
     return response.data.data!;
   },
   async getLawTypes(): Promise<string[]> {
@@ -62,7 +62,7 @@ export const lawService = {
     return response.data.data!;
   },
   async getStatistics(): Promise<LawStats> {
-    const response = await apiClient.get<ApiResponse<LawStats>>('/laws/stats');
+    const response = await apiClient.get<ApiResponse<LawStats>>('/statistics');
     return response.data.data!;
   },
   async getRecentLaws(limit: number = 10): Promise<Law[]> {
