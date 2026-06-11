@@ -69,4 +69,8 @@ export const lawService = {
     const response = await apiClient.get<ApiResponse<Law[]>>('/laws/recent', { params: { limit } });
     return response.data.data!;
   },
+  async getCitedBy(id: string): Promise<{ judgments: any[]; notices: any[] }> {
+    const response = await apiClient.get<ApiResponse<{ judgments: any[]; notices: any[] }>>(`/laws/${id}/cited-by`);
+    return response.data.data!;
+  },
 };
