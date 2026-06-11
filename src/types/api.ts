@@ -134,6 +134,7 @@ export interface CreateLawRequest {
   relatedLaws?: string[];
   amendments?: string[];
   language?: string;
+  verificationStatus?: string;
 }
 
 // Republican Decree Types
@@ -179,6 +180,7 @@ export interface CreateDecreeRequest {
   frbrUri?: string;
   tags?: string[];
   language?: string;
+  verificationStatus?: string;
 }
 
 export interface LawStats {
@@ -244,6 +246,7 @@ export interface CreateJudgmentRequest {
   language?: string;
   pdfUrl?: string;
   status?: string;
+  verificationStatus?: string;
 }
 
 // Legal Notice Types
@@ -302,6 +305,7 @@ export interface CreateLegalNoticeRequest {
   language?: string;
   pdfUrl?: string;
   status?: string;
+  verificationStatus?: string;
 }
 
 // Judicial Opinion Types
@@ -364,7 +368,7 @@ export interface Bookmark {
   id: string;
   userId: string;
   documentId: string;
-  documentType: 'LAW' | 'JUDGMENT' | 'NOTICE';
+  documentType: 'LAW' | 'JUDGMENT' | 'NOTICE' | 'DECREE';
   title: string;
   createdAt: string;
 }
