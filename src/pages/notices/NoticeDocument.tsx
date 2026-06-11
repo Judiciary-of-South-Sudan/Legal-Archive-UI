@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Download, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGetNoticeById } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
@@ -51,11 +51,6 @@ const NoticeDocument: React.FC = () => {
           </Link>
           <h1 className="text-sm font-semibold truncate text-foreground">{notice.title}</h1>
         </div>
-        <Button variant="outline" size="sm" asChild>
-          <a href={pdfUrl} target="_blank" rel="noreferrer" download>
-            <Download className="h-4 w-4 mr-1" /> Download
-          </a>
-        </Button>
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col">
