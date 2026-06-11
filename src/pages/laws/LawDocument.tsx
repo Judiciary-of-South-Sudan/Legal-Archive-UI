@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Download, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useGetLawById } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
@@ -52,11 +52,6 @@ const LawDocument: React.FC = () => {
           </Link>
           <h1 className="text-sm font-semibold truncate text-foreground">{law.title}</h1>
         </div>
-        <Button variant="outline" size="sm" asChild>
-          <a href={pdfUrl} target="_blank" rel="noreferrer" download>
-            <Download className="h-4 w-4 mr-1" /> Download
-          </a>
-        </Button>
       </div>
 
       {/* PDF viewer fills remaining height */}
