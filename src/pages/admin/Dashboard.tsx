@@ -188,26 +188,35 @@ const AdminDashboard: React.FC = () => {
 
   const loading = statsLoading || reviewQueueLoading;
 
-  const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'DRAFT', comment = '') => {
+  const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT', comment = '') => {
     setReviewLoading(prev => ({ ...prev, [item.id]: true }));
     try {
       await apiClient.put(`/admin/${item.collection}/${item.id}/status`, {
         verificationStatus: action,
         comment: comment || undefined,
       });
-      queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
-        (prev ?? []).filter(r => r.id !== item.id)
-      );
-      queryClient.setQueryData<DashboardStats>(['admin', 'stats'], prev => prev ? {
-        ...prev,
-        underReviewLaws:      item.documentType === 'Law'      ? prev.underReviewLaws - 1      : prev.underReviewLaws,
-        underReviewJudgments: item.documentType === 'Judgment' ? prev.underReviewJudgments - 1 : prev.underReviewJudgments,
-        underReviewNotices:   item.documentType === 'Notice'   ? prev.underReviewNotices - 1   : prev.underReviewNotices,
-        publishedLaws:        action === 'PUBLISHED' && item.documentType === 'Law'      ? prev.publishedLaws + 1      : prev.publishedLaws,
-        publishedJudgments:   action === 'PUBLISHED' && item.documentType === 'Judgment' ? prev.publishedJudgments + 1 : prev.publishedJudgments,
-        publishedNotices:     action === 'PUBLISHED' && item.documentType === 'Notice'   ? prev.publishedNotices + 1   : prev.publishedNotices,
-      } : prev);
-      toast.success(action === 'PUBLISHED' ? `"${item.title}" published` : `"${item.title}" returned to draft`);
+      if (action === 'UNDER_REVIEW') {
+        queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
+          (prev ?? []).map(r => r.id === item.id ? { ...r, verificationStatus: 'UNDER_REVIEW' } : r)
+        );
+      } else {
+        queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
+          (prev ?? []).filter(r => r.id !== item.id)
+        );
+        queryClient.setQueryData<DashboardStats>(['admin', 'stats'], prev => prev ? {
+          ...prev,
+          underReviewLaws:      item.documentType === 'Law'      ? prev.underReviewLaws - 1      : prev.underReviewLaws,
+          underReviewJudgments: item.documentType === 'Judgment' ? prev.underReviewJudgments - 1 : prev.underReviewJudgments,
+          underReviewNotices:   item.documentType === 'Notice'   ? prev.underReviewNotices - 1   : prev.underReviewNotices,
+          publishedLaws:        action === 'PUBLISHED' && item.documentType === 'Law'      ? prev.publishedLaws + 1      : prev.publishedLaws,
+          publishedJudgments:   action === 'PUBLISHED' && item.documentType === 'Judgment' ? prev.publishedJudgments + 1 : prev.publishedJudgments,
+          publishedNotices:     action === 'PUBLISHED' && item.documentType === 'Notice'   ? prev.publishedNotices + 1   : prev.publishedNotices,
+        } : prev);
+      }
+      const toastMsg = action === 'PUBLISHED' ? `"${item.title}" published`
+        : action === 'UNDER_REVIEW' ? `"${item.title}" submitted for review`
+        : `"${item.title}" returned to draft`;
+      toast.success(toastMsg);
     } catch {
       toast.error('Action failed');
     } finally {
