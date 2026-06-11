@@ -25,6 +25,7 @@ const JudgmentDetail: React.FC = () => {
   const [citationCopied, setCitationCopied] = useState(false);
   const [citedLawTitles, setCitedLawTitles] = useState<Record<string, string>>({});
   const [citedCaseTitles, setCitedCaseTitles] = useState<Record<string, string>>({});
+  const [casesCircitedBy, setCasesCircitedBy] = useState<any[]>([]);
 
   useEffect(() => {
     if (!judgment?.citedLaws?.length) return;
@@ -47,6 +48,13 @@ const JudgmentDetail: React.FC = () => {
       setCitedCaseTitles(map);
     });
   }, [judgment?.citedCases?.join(',')]);
+
+  useEffect(() => {
+    if (!id) return;
+    apiClient.get(`/judgments/${id}/cited-by`).then(res => {
+      setCasesCircitedBy(res.data?.data ?? []);
+    }).catch(() => {});
+  }, [id]);
 
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
@@ -318,6 +326,19 @@ const JudgmentDetail: React.FC = () => {
                     {judgment.citedCases.map((caseId: string) => (
                       <Link key={caseId} to={`/judgments/${caseId}`}>
                         <Badge variant="outline" className="cursor-pointer hover:bg-muted">{citedCaseTitles[caseId] ?? caseId}</Badge>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {casesCircitedBy.length > 0 && (
+                <div className="border-t border-border pt-5">
+                  <h3 className="archive-section-label mb-3">{t('judgments.cited_by_cases')}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {casesCircitedBy.map((j: any) => (
+                      <Link key={j.id} to={`/judgments/${j.id}`}>
+                        <Badge variant="outline" className="cursor-pointer hover:bg-muted">{j.caseName ?? j.id}</Badge>
                       </Link>
                     ))}
                   </div>
