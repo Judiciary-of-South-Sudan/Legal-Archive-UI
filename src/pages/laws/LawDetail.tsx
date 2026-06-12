@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
-import PdfViewer from '@/components/PdfViewer';
+const PdfViewer = React.lazy(() => import('@/components/PdfViewer'));
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,19 +30,17 @@ const LawDetail: React.FC = () => {
   const [citedBy, setCitedBy] = useState<{ judgments: any[]; notices: any[] } | null>(null);
 
   useEffect(() => {
-    if (!id || !law?.relatedLaws?.length) return;
-    apiClient.get(`/laws/${id}/related`).then(res => {
-      const laws: any[] = res.data?.data ?? [];
-      setRelatedLawTitles(laws.map(l => ({ id: l.id, title: l.title })));
+    if (!id || !law) return;
+    Promise.all([
+      law.relatedLaws?.length
+        ? apiClient.get(`/laws/${id}/related`).then(r => r.data?.data ?? [])
+        : Promise.resolve([]),
+      apiClient.get(`/laws/${id}/cited-by`).then(r => r.data?.data ?? { judgments: [], notices: [] }),
+    ]).then(([related, citedByData]) => {
+      setRelatedLawTitles((related as any[]).map(l => ({ id: l.id, title: l.title })));
+      setCitedBy(citedByData as { judgments: any[]; notices: any[] });
     }).catch(() => {});
-  }, [id, law?.relatedLaws?.length]);
-
-  useEffect(() => {
-    if (!id) return;
-    apiClient.get(`/laws/${id}/cited-by`).then(res => {
-      setCitedBy(res.data?.data ?? { judgments: [], notices: [] });
-    }).catch(() => {});
-  }, [id]);
+  }, [id, law?.id]);
 
   const copyCitation = () => {
     if (!law) return;
@@ -96,7 +94,7 @@ const LawDetail: React.FC = () => {
   }
 
   const pdfUrl = resolveFileUrl(law.pdfUrl);
-  const defaultTab = pdfUrl ? 'pdf' : 'metadata';
+  const defaultTab = pdfUrl ? 'pdf' : law.fullText ? 'text' : 'metadata';
 
   const statusColor =
     law.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
@@ -107,12 +105,12 @@ const LawDetail: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-6 space-y-4 max-w-5xl">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <nav className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t('common.home')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <Link to="/laws" className="hover:text-primary">{t('nav.laws')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground truncate max-w-[40ch]">{law.title}</span>
+          <span className="text-foreground truncate max-w-[16ch] sm:max-w-[40ch]">{law.title}</span>
         </nav>
 
         <div className="archive-card rounded-md p-6">
@@ -192,12 +190,17 @@ const LawDetail: React.FC = () => {
         <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="pdf">{t('common.tab_pdf')}</TabsTrigger>
+            {law.fullText && (
+              <TabsTrigger value="text">{t('common.tab_text', { defaultValue: 'Text' })}</TabsTrigger>
+            )}
             <TabsTrigger value="metadata">{t('common.tab_metadata')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pdf" className="mt-4">
             {pdfUrl ? (
-              <PdfViewer url={pdfUrl} />
+              <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+                <PdfViewer url={pdfUrl} />
+              </Suspense>
             ) : (
               <div className="archive-card rounded-md py-16 text-center">
                 <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
@@ -205,6 +208,14 @@ const LawDetail: React.FC = () => {
               </div>
             )}
           </TabsContent>
+
+          {law.fullText && (
+            <TabsContent value="text" className="mt-4">
+              <div className="archive-card rounded-md p-6">
+                <div className="text-sm leading-8 text-foreground whitespace-pre-wrap">{law.fullText}</div>
+              </div>
+            </TabsContent>
+          )}
 
           <TabsContent value="metadata" className="mt-4">
             <div className="archive-card rounded-md p-6 space-y-6">
