@@ -89,6 +89,9 @@ const SearchPage = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={t("search.placeholder")}
                 className="pl-10"
+                type="search"
+                enterKeyHint="search"
+                autoComplete="off"
               />
             </div>
             <Button type="submit">{t("search.btn")}</Button>
@@ -115,18 +118,18 @@ const SearchPage = () => {
                 </p>
 
                 <Tabs defaultValue="all">
-                  <TabsList className="mb-6">
-                    <TabsTrigger value="all">
-                      {t("search.tab_all")} <Badge variant="secondary" className="ml-2">{totalCount}</Badge>
+                  <TabsList className="mb-6 flex w-full overflow-x-auto no-scrollbar gap-0">
+                    <TabsTrigger value="all" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
+                      {t("search.tab_all")} <Badge variant="secondary" className="ms-1.5">{totalCount}</Badge>
                     </TabsTrigger>
-                    <TabsTrigger value="laws">
-                      {t("search.tab_laws")} <Badge variant="secondary" className="ml-2">{lawsCount}</Badge>
+                    <TabsTrigger value="laws" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
+                      {t("search.tab_laws")} <Badge variant="secondary" className="ms-1.5">{lawsCount}</Badge>
                     </TabsTrigger>
-                    <TabsTrigger value="judgments">
-                      {t("search.tab_judgments")} <Badge variant="secondary" className="ml-2">{judgmentsCount}</Badge>
+                    <TabsTrigger value="judgments" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
+                      {t("search.tab_judgments")} <Badge variant="secondary" className="ms-1.5">{judgmentsCount}</Badge>
                     </TabsTrigger>
-                    <TabsTrigger value="notices">
-                      {t("search.tab_notices")} <Badge variant="secondary" className="ml-2">{noticesCount}</Badge>
+                    <TabsTrigger value="notices" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
+                      {t("search.tab_notices")} <Badge variant="secondary" className="ms-1.5">{noticesCount}</Badge>
                     </TabsTrigger>
                   </TabsList>
 
@@ -312,7 +315,7 @@ const ResultCard = ({ href, icon, type, typeColor, title, meta, summary, date, s
           )}
         </div>
         <Link to={href} className="shrink-0 mt-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-11 w-11">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </Link>
