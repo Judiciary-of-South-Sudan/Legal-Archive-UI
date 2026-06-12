@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
-import PdfViewer from '@/components/PdfViewer';
+const PdfViewer = React.lazy(() => import('@/components/PdfViewer'));
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -92,7 +92,7 @@ const NoticeDetail: React.FC = () => {
   }
 
   const pdfUrl = resolveFileUrl(notice.pdfUrl);
-  const defaultTab = pdfUrl ? 'pdf' : 'metadata';
+  const defaultTab = pdfUrl ? 'pdf' : notice.fullText ? 'text' : 'metadata';
 
   const statusColor =
     notice.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
@@ -103,12 +103,12 @@ const NoticeDetail: React.FC = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-6 space-y-4 max-w-5xl">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <nav className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t('common.home')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <Link to="/notices" className="hover:text-primary">{t('nav.notices')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground truncate max-w-[40ch]">{notice.title}</span>
+          <span className="text-foreground truncate max-w-[16ch] sm:max-w-[40ch]">{notice.title}</span>
         </nav>
 
         <div className="archive-card rounded-md p-6">
@@ -187,12 +187,17 @@ const NoticeDetail: React.FC = () => {
         <Tabs defaultValue={defaultTab}>
           <TabsList>
             <TabsTrigger value="pdf">{t('common.tab_pdf')}</TabsTrigger>
+            {notice.fullText && (
+              <TabsTrigger value="text">{t('common.tab_text', { defaultValue: 'Text' })}</TabsTrigger>
+            )}
             <TabsTrigger value="metadata">{t('common.tab_metadata')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="pdf" className="mt-4">
             {pdfUrl ? (
-              <PdfViewer url={pdfUrl} />
+              <Suspense fallback={<div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
+                <PdfViewer url={pdfUrl} />
+              </Suspense>
             ) : (
               <div className="archive-card rounded-md py-16 text-center">
                 <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
@@ -200,6 +205,14 @@ const NoticeDetail: React.FC = () => {
               </div>
             )}
           </TabsContent>
+
+          {notice.fullText && (
+            <TabsContent value="text" className="mt-4">
+              <div className="archive-card rounded-md p-6">
+                <div className="text-sm leading-8 text-foreground whitespace-pre-wrap">{notice.fullText}</div>
+              </div>
+            </TabsContent>
+          )}
 
           <TabsContent value="metadata" className="mt-4">
             <div className="archive-card rounded-md p-6 space-y-6">
