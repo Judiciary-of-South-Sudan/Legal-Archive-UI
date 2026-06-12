@@ -4,15 +4,16 @@ import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookmarkCheck, Loader2, BookOpen, Gavel, FileText, Trash2, ChevronRight } from 'lucide-react';
+import { BookmarkCheck, Loader2, BookOpen, Gavel, FileText, ScrollText, Trash2, ChevronRight } from 'lucide-react';
 import { useGetBookmarks, useToggleBookmark } from '@/hooks/useBookmarks';
 import { Bookmark } from '@/types/api';
 import { useTranslation } from 'react-i18next';
 
 const TYPE_META: Record<string, { icon: React.ReactNode; href: (id: string) => string; color: string; labelKey: string }> = {
-  LAW:      { icon: <BookOpen className="h-4 w-4" />, href: id => `/laws/${id}`,      color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',     labelKey: 'library.type_law' },
-  JUDGMENT: { icon: <Gavel className="h-4 w-4" />,    href: id => `/judgments/${id}`, color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100', labelKey: 'library.type_judgment' },
-  NOTICE:   { icon: <FileText className="h-4 w-4" />, href: id => `/notices/${id}`,   color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100', labelKey: 'library.type_notice' },
+  LAW:      { icon: <BookOpen className="h-4 w-4" />,   href: id => `/laws/${id}`,      color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',       labelKey: 'library.type_law' },
+  JUDGMENT: { icon: <Gavel className="h-4 w-4" />,      href: id => `/judgments/${id}`, color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100', labelKey: 'library.type_judgment' },
+  NOTICE:   { icon: <FileText className="h-4 w-4" />,   href: id => `/notices/${id}`,   color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100', labelKey: 'library.type_notice' },
+  DECREE:   { icon: <ScrollText className="h-4 w-4" />, href: id => `/decrees/${id}`,   color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100', labelKey: 'library.type_decree' },
 };
 
 const BookmarkCard = ({ bookmark }: { bookmark: Bookmark }) => {
@@ -39,14 +40,14 @@ const BookmarkCard = ({ bookmark }: { bookmark: Bookmark }) => {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link to={meta.href(bookmark.documentId)}>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-11 w-11">
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </Link>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+              className="h-11 w-11 text-muted-foreground hover:text-destructive"
               disabled={isPending}
               onClick={() => toggle({ documentId: bookmark.documentId, documentType: bookmark.documentType, title: bookmark.title })}
             >
@@ -67,6 +68,7 @@ const Library = () => {
   const laws = byType('LAW');
   const judgments = byType('JUDGMENT');
   const notices = byType('NOTICE');
+  const decrees = byType('DECREE');
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,6 +128,14 @@ const Library = () => {
                   <FileText className="h-4 w-4" /> {t("library.section_notices")} <Badge variant="secondary">{notices.length}</Badge>
                 </h2>
                 <div className="space-y-2">{notices.map(b => <BookmarkCard key={b.id} bookmark={b} />)}</div>
+              </section>
+            )}
+            {decrees.length > 0 && (
+              <section>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <ScrollText className="h-4 w-4" /> {t("library.section_decrees", { defaultValue: 'Decrees' })} <Badge variant="secondary">{decrees.length}</Badge>
+                </h2>
+                <div className="space-y-2">{decrees.map(b => <BookmarkCard key={b.id} bookmark={b} />)}</div>
               </section>
             )}
           </div>
