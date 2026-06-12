@@ -219,6 +219,7 @@ const Header = () => {
               <NavLink
                 key={item.href}
                 to={item.href}
+                onClick={() => setIsMenuOpen(false)}
                 className={({ isActive }) =>
                   `rounded-md px-3 py-3 text-sm font-semibold transition-colors ${
                     isActive
@@ -230,6 +231,53 @@ const Header = () => {
                 {item.name}
               </NavLink>
             ))}
+
+            {/* Auth links — mobile only */}
+            <div className="mt-2 flex flex-col gap-1 border-t border-border pt-2 md:hidden">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-semibold text-foreground hover:bg-secondary hover:text-primary"
+                  >
+                    <User className="h-4 w-4" /> {t("header.my_profile")}
+                  </Link>
+                  <Link
+                    to="/library"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-semibold text-foreground hover:bg-secondary hover:text-primary"
+                  >
+                    <BookmarkCheck className="h-4 w-4" /> {t("header.my_library")}
+                  </Link>
+                  {(isEditor() || isAdmin()) && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-semibold text-foreground hover:bg-secondary hover:text-primary"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      {isAdmin() ? t("header.admin_dashboard") : t("header.dashboard")}
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                    className="flex w-full items-center gap-2 rounded-md px-3 py-3 text-start text-sm font-semibold text-foreground hover:bg-secondary hover:text-primary"
+                  >
+                    <LogOut className="h-4 w-4" /> {t("header.logout")}
+                  </button>
+                </>
+              ) : (
+                <div className="flex gap-2 px-1 pt-1">
+                  <Button variant="outline" className="flex-1 h-11" asChild>
+                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>{t("header.login")}</Link>
+                  </Button>
+                  <Button className="flex-1 h-11" asChild>
+                    <Link to="/register" onClick={() => setIsMenuOpen(false)}>{t("header.register")}</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
 
