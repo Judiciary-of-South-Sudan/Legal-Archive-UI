@@ -78,6 +78,8 @@ const Judgments = () => {
           <CardContent className="space-y-3">
             <div className="flex gap-2">
               <Input
+                type="search"
+                enterKeyHint="search"
                 placeholder={t("judgments.search_placeholder")}
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
@@ -177,12 +179,12 @@ const Judgments = () => {
                   </div>
                   <div className="flex items-center gap-1 shrink-0 pt-0.5">
                     <Link to={`/judgments/${judgment.id}`}>
-                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">{t("judgments.view")}</Button>
+                      <Button size="sm" variant="ghost" className="h-10 px-3 text-xs sm:h-7 sm:px-2">{t("judgments.view")}</Button>
                     </Link>
                     {judgment.pdfUrl && (
-                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" asChild>
+                      <Button size="sm" variant="ghost" className="h-10 px-3 text-xs sm:h-7 sm:px-2" asChild>
                         <a href={resolveFileUrl(judgment.pdfUrl)} target="_blank" rel="noreferrer">
-                          <Download className="h-3 w-3 mr-1" /> PDF
+                          <Download className="h-3 w-3 me-1" /> PDF
                         </a>
                       </Button>
                     )}
