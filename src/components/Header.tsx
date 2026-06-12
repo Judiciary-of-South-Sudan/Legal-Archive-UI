@@ -220,7 +220,7 @@ const Header = () => {
                 key={item.href}
                 to={item.href}
                 className={({ isActive }) =>
-                  `rounded-md px-3 py-2 text-sm font-semibold transition-colors ${
+                  `rounded-md px-3 py-3 text-sm font-semibold transition-colors ${
                     isActive
                       ? "bg-secondary text-primary"
                       : "text-foreground hover:bg-secondary hover:text-primary"
@@ -234,13 +234,20 @@ const Header = () => {
         </nav>
 
         <form onSubmit={handleSearch} className={`${isMenuOpen ? "block" : "hidden"} pb-4 lg:hidden`}>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              ref={mobileSearchRef}
-              placeholder={t("header.search_placeholder")}
-              className="h-10 rounded-md bg-background pl-10"
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                ref={mobileSearchRef}
+                type="search"
+                enterKeyHint="search"
+                placeholder={t("header.search_placeholder")}
+                className="h-10 rounded-md bg-background ps-10"
+              />
+            </div>
+            <Button type="submit" size="icon" className="h-10 w-10 shrink-0">
+              <Search className="h-4 w-4" />
+            </Button>
           </div>
         </form>
       </div>
