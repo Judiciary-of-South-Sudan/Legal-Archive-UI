@@ -95,6 +95,8 @@ const Hero = () => {
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t("hero.search_placeholder")}
                     className="h-12 rounded-md border-border bg-background pl-12 text-base"
+                    type="search"
+                    enterKeyHint="search"
                   />
                 </div>
                 <Button type="submit" size="lg" className="h-12 px-6">
@@ -109,7 +111,7 @@ const Hero = () => {
                     key={item.value}
                     type="button"
                     onClick={() => setScope(item.value)}
-                    className={`rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
+                    className={`rounded-md border px-3 py-2.5 text-sm font-medium transition-colors ${
                       scope === item.value
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary"
@@ -127,7 +129,7 @@ const Hero = () => {
                 <button
                   key={term.value}
                   type="button"
-                  className="rounded-sm text-primary underline-offset-4 hover:underline"
+                  className="rounded-sm px-2 py-2 text-primary underline-offset-4 hover:underline"
                   onClick={() => navigate(`/search?q=${encodeURIComponent(term.value)}`)}
                 >
                   {term.label}
