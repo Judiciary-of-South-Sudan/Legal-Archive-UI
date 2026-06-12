@@ -85,26 +85,41 @@ const Decrees = () => {
           <p className="mt-1 text-muted-foreground">{t('decrees.page_subtitle')}</p>
         </div>
 
-        <div className="mb-4 flex gap-3 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              className="pl-9"
-              placeholder={t('decrees.search_placeholder')}
-              value={searchInput}
-              onChange={e => setSearchInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-            />
+        <div className="mb-4 space-y-2 sm:space-y-0">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                enterKeyHint="search"
+                className="ps-9"
+                placeholder={t('decrees.search_placeholder')}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+            <Button size="sm" onClick={handleSearch}>{t('header.search')}</Button>
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              className="hidden sm:inline-flex"
+              onClick={() => setShowFilters(v => !v)}
+            >
+              <SlidersHorizontal className="h-4 w-4 me-1" />
+              {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
+            </Button>
           </div>
-          <Button size="sm" onClick={handleSearch}>{t('header.search')}</Button>
-          <Button
-            variant={showFilters ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowFilters(v => !v)}
-          >
-            <SlidersHorizontal className="h-4 w-4 mr-1" />
-            {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
-          </Button>
+          <div className="flex justify-end sm:hidden">
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFilters(v => !v)}
+            >
+              <SlidersHorizontal className="h-4 w-4 me-1" />
+              {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
+            </Button>
+          </div>
         </div>
 
         {showFilters && (
