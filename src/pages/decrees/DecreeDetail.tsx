@@ -31,6 +31,7 @@ const DecreeDetail: React.FC = () => {
   const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
 
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
@@ -140,12 +141,28 @@ const DecreeDetail: React.FC = () => {
             )}
           </div>
 
-          {decree.subject && (
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">{decree.subject}</p>
-          )}
-
-          {decree.summary && (
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{decree.summary}</p>
+          {(decree.subject || decree.summary) && (
+            <div className="mt-4 border-t border-border pt-4 space-y-2">
+              {decree.subject && (
+                <p className="text-sm text-muted-foreground leading-relaxed">{decree.subject}</p>
+              )}
+              {decree.summary && (
+                <>
+                  <p className={`text-sm text-muted-foreground leading-relaxed ${!summaryExpanded ? 'line-clamp-3' : ''}`}>
+                    {decree.summary}
+                  </p>
+                  {decree.summary.length > 180 && (
+                    <button
+                      type="button"
+                      onClick={() => setSummaryExpanded(v => !v)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      {summaryExpanded ? t('common.show_less', { defaultValue: 'Show less' }) : t('common.show_more', { defaultValue: 'Show more' })}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">

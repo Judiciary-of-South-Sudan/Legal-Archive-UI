@@ -20,7 +20,9 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const pagesAreaRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(900);
+  const [containerWidth, setContainerWidth] = useState(() =>
+    typeof window !== 'undefined' ? Math.min(window.innerWidth - 32, 1200) : 300
+  );
   const thumbnailRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
