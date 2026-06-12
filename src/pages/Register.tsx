@@ -92,6 +92,7 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
+                  autoComplete="username"
                 />
               </div>
 
@@ -106,6 +107,7 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
+                  autoComplete="email"
                 />
               </div>
 
@@ -162,11 +164,12 @@ const Register: React.FC = () => {
                     required
                     disabled={isLoading}
                     minLength={8}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute end-1 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700"
                     disabled={isLoading}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -186,11 +189,12 @@ const Register: React.FC = () => {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
+                    autoComplete="new-password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute end-1 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700"
                     disabled={isLoading}
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
