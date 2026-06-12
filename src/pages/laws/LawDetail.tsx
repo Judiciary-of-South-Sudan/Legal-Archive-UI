@@ -23,6 +23,7 @@ const LawDetail: React.FC = () => {
   const { isAdmin, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const { mutate: trackDownload } = useIncrementLawDownload();
@@ -145,7 +146,20 @@ const LawDetail: React.FC = () => {
           </div>
 
           {law.summary && (
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed border-t border-border pt-4">{law.summary}</p>
+            <div className="mt-4 border-t border-border pt-4">
+              <p className={`text-sm text-muted-foreground leading-relaxed ${!summaryExpanded ? 'line-clamp-3' : ''}`}>
+                {law.summary}
+              </p>
+              {law.summary.length > 180 && (
+                <button
+                  type="button"
+                  onClick={() => setSummaryExpanded(v => !v)}
+                  className="mt-1 text-xs text-primary hover:underline"
+                >
+                  {summaryExpanded ? t('common.show_less', { defaultValue: 'Show less' }) : t('common.show_more', { defaultValue: 'Show more' })}
+                </button>
+              )}
+            </div>
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
