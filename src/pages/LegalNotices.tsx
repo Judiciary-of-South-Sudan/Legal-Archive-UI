@@ -74,7 +74,7 @@ const LegalNotices = () => {
         </div>
 
         <Tabs defaultValue="notices" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
             <TabsTrigger value="notices">{t("notices.tab_all")}</TabsTrigger>
             <TabsTrigger value="types">{t("notices.tab_types")}</TabsTrigger>
             <TabsTrigger value="gazette">{t("notices.tab_gazette")}</TabsTrigger>
@@ -177,12 +177,12 @@ const LegalNotices = () => {
                       </div>
                       <div className="flex items-center gap-1 shrink-0 pt-0.5">
                         <Link to={`/notices/${notice.id}`}>
-                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">{t("notices.view")}</Button>
+                          <Button size="sm" variant="ghost" className="h-10 px-3 text-xs sm:h-7 sm:px-2">{t("notices.view")}</Button>
                         </Link>
                         {notice.pdfUrl && (
-                          <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" asChild>
+                          <Button size="sm" variant="ghost" className="h-10 px-3 text-xs sm:h-7 sm:px-2" asChild>
                             <a href={resolveFileUrl(notice.pdfUrl)} target="_blank" rel="noreferrer">
-                              <Download className="h-3 w-3 mr-1" /> PDF
+                              <Download className="h-3 w-3 me-1" /> PDF
                             </a>
                           </Button>
                         )}
