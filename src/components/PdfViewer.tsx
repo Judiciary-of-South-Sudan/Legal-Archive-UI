@@ -75,7 +75,7 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
           className="flex flex-1 overflow-hidden w-full"
         >
           {showThumbnails && numPages > 0 && (
-            <div className="w-36 shrink-0 overflow-y-auto bg-gray-100 border-r flex flex-col items-center py-3 gap-3">
+            <div className="hidden md:flex w-36 shrink-0 overflow-y-auto bg-gray-100 border-r flex-col items-center py-3 gap-3">
               {Array.from({ length: numPages }, (_, i) => {
                 const n = i + 1;
                 return (
@@ -119,7 +119,7 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
     >
       {/* Sticky sidebar */}
       {showThumbnails && numPages > 0 && (
-        <div className="sticky top-0 h-screen w-40 shrink-0 overflow-y-auto bg-gray-50 border-r border-gray-200 flex flex-col items-center pt-4 pb-4 gap-2">
+        <div className="hidden md:flex sticky top-0 h-screen w-40 shrink-0 overflow-y-auto bg-gray-50 border-r border-gray-200 flex-col items-center pt-4 pb-4 gap-2">
           {Array.from({ length: numPages }, (_, i) => {
             const n = i + 1;
             return (
