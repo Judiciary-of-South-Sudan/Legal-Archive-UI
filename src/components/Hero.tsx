@@ -89,12 +89,12 @@ const Hero = () => {
             <form onSubmit={handleSearch} className="mt-8 max-w-4xl rounded-md border border-border bg-card p-3 shadow-sm">
               <div className="flex flex-col gap-3 md:flex-row">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t("hero.search_placeholder")}
-                    className="h-12 rounded-md border-border bg-background pl-12 text-base"
+                    className="h-12 rounded-md border-border bg-background ps-12 text-base"
                     type="search"
                     enterKeyHint="search"
                   />
