@@ -81,45 +81,33 @@ const Decrees = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground">{t('decrees.page_title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground md:text-3xl">{t('decrees.page_title')}</h1>
           <p className="mt-1 text-muted-foreground">{t('decrees.page_subtitle')}</p>
         </div>
 
-        <div className="mb-4 space-y-2 sm:space-y-0">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
-                enterKeyHint="search"
-                className="ps-9"
-                placeholder={t('decrees.search_placeholder')}
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
-            <Button size="sm" onClick={handleSearch}>{t('header.search')}</Button>
-            <Button
-              variant={showFilters ? 'default' : 'outline'}
-              size="sm"
-              className="hidden sm:inline-flex"
-              onClick={() => setShowFilters(v => !v)}
-            >
-              <SlidersHorizontal className="h-4 w-4 me-1" />
-              {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
-            </Button>
+        <div className="mb-4 flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              enterKeyHint="search"
+              className="ps-9"
+              placeholder={t('decrees.search_placeholder')}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            />
           </div>
-          <div className="flex justify-end sm:hidden">
-            <Button
-              variant={showFilters ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setShowFilters(v => !v)}
-            >
-              <SlidersHorizontal className="h-4 w-4 me-1" />
-              {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
-            </Button>
-          </div>
+          <Button size="sm" onClick={handleSearch}>{t('header.search')}</Button>
+          <Button
+            variant={showFilters ? 'default' : 'outline'}
+            size="sm"
+            className="shrink-0"
+            onClick={() => setShowFilters(v => !v)}
+          >
+            <SlidersHorizontal className="h-4 w-4 me-1" />
+            {t('decrees.filters')} {hasFilters ? `(${[filterType, filterYear].filter(Boolean).length})` : ''}
+          </Button>
         </div>
 
         {showFilters && (
@@ -143,7 +131,7 @@ const Decrees = () => {
               </div>
               {hasFilters && (
                 <Button variant="ghost" size="sm" className="mt-2 text-muted-foreground" onClick={clearFilters}>
-                  <X className="h-3 w-3 mr-1" /> {t('decrees.clear_filters')}
+                  <X className="h-3 w-3 me-1" /> {t('decrees.clear_filters')}
                 </Button>
               )}
             </CardContent>
@@ -159,7 +147,7 @@ const Decrees = () => {
         {activeQuery.isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2">{t('decrees.loading')}</span>
+            <span className="ms-2">{t('decrees.loading')}</span>
           </div>
         ) : (
           <>
