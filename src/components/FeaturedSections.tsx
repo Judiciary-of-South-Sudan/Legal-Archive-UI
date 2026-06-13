@@ -1,10 +1,11 @@
-import { BookOpen, Calendar, ChevronRight, FileText, Gavel, Loader2 } from "lucide-react";
+import { BookOpen, Calendar, ChevronRight, FileText, Gavel, Loader2, ScrollText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useGetLaws, useGetRecentLaws } from "@/hooks/useLaws";
 import { useGetJudgments, useGetRecentJudgments } from "@/hooks/useJudgments";
 import { useGetNotices } from "@/hooks/useNotices";
+import { useGetDecrees, useGetRecentDecrees } from "@/hooks/useDecrees";
 import { useTranslation } from "react-i18next";
 
 const StatBlock = ({
@@ -33,9 +34,11 @@ const FeaturedSections = () => {
   const { data: recentJudgments, isLoading: judgementsLoading } = useGetRecentJudgments(5);
   const { data: recentLaws, isLoading: lawsLoading } = useGetRecentLaws(5);
   const { data: recentNotices, isLoading: noticesLoading } = useGetNotices({ page: 0, size: 5, sort: "createdAt,desc" });
+  const { data: recentDecrees, isLoading: decreesLoading } = useGetRecentDecrees(5);
   const { data: lawStats } = useGetLaws({ page: 0, size: 1 });
   const { data: judgmentStats } = useGetJudgments({ page: 0, size: 1 });
   const { data: noticeStats } = useGetNotices({ page: 0, size: 1 });
+  const { data: decreeStats } = useGetDecrees({ page: 0, size: 1 });
 
   return (
     <section className="bg-background py-12">
@@ -55,13 +58,14 @@ const FeaturedSections = () => {
           </Button>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatBlock label={t("featured.laws_label")} value={lawStats?.totalElements} href="/laws" />
           <StatBlock label={t("featured.judgments_label")} value={judgmentStats?.totalElements} href="/judgments" />
           <StatBlock label={t("featured.notices_label")} value={noticeStats?.totalElements} href="/notices" />
+          <StatBlock label={t("featured.decrees_label")} value={decreeStats?.totalElements} href="/decrees" />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
           <div className="archive-card rounded-md">
             <div className="flex items-center justify-between border-b border-border p-4">
               <h3 className="flex items-center gap-2 font-semibold">
@@ -170,6 +174,45 @@ const FeaturedSections = () => {
                 </div>
               ) : (
                 <EmptyState label={t("featured.no_notices")} />
+              )}
+            </div>
+          </div>
+
+          <div className="archive-card rounded-md">
+            <div className="flex items-center justify-between border-b border-border p-4">
+              <h3 className="flex items-center gap-2 font-semibold">
+                <ScrollText className="h-5 w-5 text-primary" />
+                {t("featured.recent_decrees")}
+              </h3>
+              <Link to="/decrees" className="text-sm font-semibold text-primary hover:underline">
+                {t("featured.view_all")}
+              </Link>
+            </div>
+            <div className="p-4">
+              {decreesLoading ? (
+                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : recentDecrees && recentDecrees.length > 0 ? (
+                <div className="divide-y divide-border">
+                  {recentDecrees.map((decree) => (
+                    <Link key={decree.id} to={`/decrees/${decree.id}`} className="block py-3 first:pt-0 last:pb-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <h4 className="text-sm font-semibold leading-6 text-foreground hover:text-primary">{decree.title}</h4>
+                        {decree.decreeType && <Badge variant="outline" className="shrink-0 text-xs">{decree.decreeType}</Badge>}
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                        {decree.decreeDate && (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(decree.decreeDate).toLocaleDateString()}
+                          </span>
+                        )}
+                        {decree.decreeNumber && <span>{decree.decreeNumber}</span>}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState label={t("featured.no_decrees")} />
               )}
             </div>
           </div>
