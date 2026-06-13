@@ -3,6 +3,8 @@ import { decreeService, DecreeFilterParams } from '@/services/decreeService';
 import { CreateDecreeRequest } from '@/types/api';
 import { toast } from 'sonner';
 
+interface SearchParams { query: string; page: number; size: number; }
+
 export const decreeKeys = {
   all: ['decrees'] as const,
   lists: () => [...decreeKeys.all, 'list'] as const,
@@ -15,6 +17,13 @@ export const decreeKeys = {
 
 export const useGetDecrees = (params?: DecreeFilterParams) =>
   useQuery({ queryKey: decreeKeys.list(params), queryFn: () => decreeService.getAllDecrees(params) });
+
+export const useSearchDecrees = (params: SearchParams) =>
+  useQuery({
+    queryKey: [...decreeKeys.all, 'search', params],
+    queryFn: () => decreeService.searchDecrees(params.query, params.page, params.size),
+    enabled: !!params.query,
+  });
 
 export const useGetDecreeById = (id: string) =>
   useQuery({ queryKey: decreeKeys.detail(id), queryFn: () => decreeService.getDecreeById(id), enabled: !!id });
