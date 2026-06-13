@@ -3,6 +3,7 @@ import { Document, Page, Thumbnail, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // CDN worker — avoids the new URL() Vite trick that fails on mobile Safari
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -17,6 +18,8 @@ type Props = {
 };
 
 const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = true }) => {
+  const { i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const pagesAreaRef = useRef<HTMLDivElement>(null);
@@ -74,7 +77,7 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
           aria-label="Previous page"
           className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-muted disabled:opacity-40"
         >
-          <ChevronLeft className="h-4 w-4" />
+          {isRtl ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
         <span className="min-w-[3.5rem] text-center text-xs font-medium tabular-nums">
           {pageNumber} / {numPages}
@@ -85,7 +88,7 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
           aria-label="Next page"
           className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-muted disabled:opacity-40"
         >
-          <ChevronRight className="h-4 w-4" />
+          {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
       </div>
     </div>
