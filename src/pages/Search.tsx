@@ -83,12 +83,12 @@ const SearchPage = () => {
           <h1 className="text-2xl font-bold mb-4">{t("search.page_title")}</h1>
           <form onSubmit={handleSearch} className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={t("search.placeholder")}
-                className="pl-10"
+                className="ps-10"
                 type="search"
                 enterKeyHint="search"
                 autoComplete="off"
@@ -107,7 +107,7 @@ const SearchPage = () => {
           <>
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-primary mr-3" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary me-3" />
                 <span className="text-muted-foreground">{t("search.loading")}</span>
               </div>
             ) : (
