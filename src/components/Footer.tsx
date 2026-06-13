@@ -17,9 +17,10 @@ const Footer = () => {
     { name: t("footer.supreme_court"), href: "/judgments/supreme-court" },
     { name: t("footer.court_of_appeal"), href: "/judgments/court-of-appeal" },
     { name: t("footer.high_court"), href: "/judgments/high-court" },
+    { name: t("footer.county_court"), href: "/judgments/county-court" },
     { name: t("footer.constitution"), href: "/laws/constitution" },
     { name: t("footer.acts"), href: "/laws/acts" },
-    { name: t("footer.notices"), href: "/notices" },
+    { name: t("footer.decrees"), href: "/decrees" },
   ];
 
   return (
