@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
+import ListCardSkeleton from "@/components/ListCardSkeleton";
 import { Download, Eye, FileText, Calendar, ChevronRight, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -168,10 +169,7 @@ const Laws = () => {
             )}
 
             {activeQuery.isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ms-2">{t("laws.loading")}</span>
-              </div>
+              <ListCardSkeleton />
             ) : (
               <>
                 {totalElements > 0 && (
