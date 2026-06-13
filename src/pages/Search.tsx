@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, BookOpen, Gavel, FileText, Calendar, Loader2, ChevronRight } from "lucide-react";
+import { Search, BookOpen, Gavel, FileText, Calendar, Loader2, ChevronRight, ScrollText } from "lucide-react";
 import { useSearchLaws } from "@/hooks/useLaws";
 import { useSearchJudgments } from "@/hooks/useJudgments";
 import { useSearchNotices } from "@/hooks/useNotices";
+import { useSearchDecrees } from "@/hooks/useDecrees";
 import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 20;
@@ -34,6 +35,7 @@ const SearchPage = () => {
   const [lawsPage, setLawsPage] = useState(0);
   const [judgmentsPage, setJudgmentsPage] = useState(0);
   const [noticesPage, setNoticesPage] = useState(0);
+  const [decreesPage, setDecreesPage] = useState(0);
 
   const query = searchParams.get("q") || "";
   const lastRecordedQuery = useRef("");
@@ -43,6 +45,7 @@ const SearchPage = () => {
     setLawsPage(0);
     setJudgmentsPage(0);
     setNoticesPage(0);
+    setDecreesPage(0);
   }, [query]);
 
   useEffect(() => {
@@ -62,17 +65,20 @@ const SearchPage = () => {
   const lawsResult = useSearchLaws({ query, page: lawsPage, size: PAGE_SIZE });
   const judgmentsResult = useSearchJudgments({ query, page: judgmentsPage, size: PAGE_SIZE });
   const noticesResult = useSearchNotices({ query, page: noticesPage, size: PAGE_SIZE });
+  const decreesResult = useSearchDecrees({ query, page: decreesPage, size: PAGE_SIZE });
 
   const lawsCount = lawsResult.data?.totalElements ?? 0;
   const judgmentsCount = judgmentsResult.data?.totalElements ?? 0;
   const noticesCount = noticesResult.data?.totalElements ?? 0;
-  const totalCount = lawsCount + judgmentsCount + noticesCount;
+  const decreesCount = decreesResult.data?.totalElements ?? 0;
+  const totalCount = lawsCount + judgmentsCount + noticesCount + decreesCount;
 
   const lawsTotalPages = lawsResult.data?.totalPages ?? 1;
   const judgmentsTotalPages = judgmentsResult.data?.totalPages ?? 1;
   const noticesTotalPages = noticesResult.data?.totalPages ?? 1;
+  const decreesTotalPages = decreesResult.data?.totalPages ?? 1;
 
-  const isLoading = lawsResult.isLoading || judgmentsResult.isLoading || noticesResult.isLoading;
+  const isLoading = lawsResult.isLoading || judgmentsResult.isLoading || noticesResult.isLoading || decreesResult.isLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,6 +137,9 @@ const SearchPage = () => {
                     <TabsTrigger value="notices" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
                       {t("search.tab_notices")} <Badge variant="secondary" className="ms-1.5">{noticesCount}</Badge>
                     </TabsTrigger>
+                    <TabsTrigger value="decrees" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
+                      {t("search.tab_decrees")} <Badge variant="secondary" className="ms-1.5">{decreesCount}</Badge>
+                    </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="all" className="space-y-3">
@@ -183,7 +192,22 @@ const SearchPage = () => {
                       />
                     ))}
 
-                    {(lawsCount > 5 || judgmentsCount > 5 || noticesCount > 5) && (
+                    {decreesResult.data?.content.slice(0, 5).map((d) => (
+                      <ResultCard
+                        key={d.id}
+                        href={`/decrees/${d.id}`}
+                        icon={<ScrollText className="h-4 w-4" />}
+                        type={t("search.type_decree")}
+                        typeColor="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100"
+                        title={d.title}
+                        meta={[d.decreeType, d.year?.toString()].filter(Boolean) as string[]}
+                        summary={d.subject}
+                        date={d.decreeDate}
+                        subTitle={d.decreeNumber}
+                      />
+                    ))}
+
+                    {(lawsCount > 5 || judgmentsCount > 5 || noticesCount > 5 || decreesCount > 5) && (
                       <p className="text-sm text-muted-foreground text-center pt-2">
                         {t("search.top_5_hint")}
                       </p>
@@ -263,6 +287,32 @@ const SearchPage = () => {
                           />
                         ))}
                         <Pagination page={noticesPage} totalPages={noticesTotalPages} onPrev={() => setNoticesPage(p => p - 1)} onNext={() => setNoticesPage(p => p + 1)} />
+                      </>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="decrees" className="space-y-3">
+                    {decreesResult.isLoading ? (
+                      <Loading />
+                    ) : decreesResult.data?.content.length === 0 ? (
+                      <Empty message={t("search.no_decrees", { query })} />
+                    ) : (
+                      <>
+                        {decreesResult.data?.content.map((d) => (
+                          <ResultCard
+                            key={d.id}
+                            href={`/decrees/${d.id}`}
+                            icon={<ScrollText className="h-4 w-4" />}
+                            type={t("search.type_decree")}
+                            typeColor="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100"
+                            title={d.title}
+                            meta={[d.decreeType, d.year?.toString(), d.issuedBy].filter(Boolean) as string[]}
+                            summary={d.subject}
+                            date={d.decreeDate}
+                            subTitle={d.decreeNumber}
+                          />
+                        ))}
+                        <Pagination page={decreesPage} totalPages={decreesTotalPages} onPrev={() => setDecreesPage(p => p - 1)} onNext={() => setDecreesPage(p => p + 1)} />
                       </>
                     )}
                   </TabsContent>
