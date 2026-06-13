@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ListCardSkeleton from '@/components/ListCardSkeleton';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -145,10 +146,7 @@ const Decrees = () => {
         )}
 
         {activeQuery.isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ms-2">{t('decrees.loading')}</span>
-          </div>
+          <ListCardSkeleton />
         ) : (
           <>
             {totalElements > 0 && (
