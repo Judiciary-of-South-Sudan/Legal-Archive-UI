@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
+import ListCardSkeleton from "@/components/ListCardSkeleton";
 import { Download, Calendar, Gavel, Loader2, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,10 +138,7 @@ const Judgments = () => {
         )}
 
         {activeQuery.isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ms-2">{t("judgments.loading")}</span>
-          </div>
+          <ListCardSkeleton />
         ) : (
           <>
             {totalElements > 0 && (
