@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Document, Page, Thumbnail, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import { Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 
 // CDN worker — avoids the new URL() Vite trick that fails on mobile Safari
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -65,9 +65,36 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
     pageRefs.current[clamped]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [numPages]);
 
+  const floatingNav = numPages > 1 ? (
+    <div className="fixed bottom-4 inset-x-0 z-20 flex justify-center pointer-events-none md:hidden">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-border bg-background/90 px-2 py-1.5 shadow-lg backdrop-blur-sm">
+        <button
+          onClick={() => goToPage(pageNumber - 1)}
+          disabled={pageNumber <= 1}
+          aria-label="Previous page"
+          className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-muted disabled:opacity-40"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+        <span className="min-w-[3.5rem] text-center text-xs font-medium tabular-nums">
+          {pageNumber} / {numPages}
+        </span>
+        <button
+          onClick={() => goToPage(pageNumber + 1)}
+          disabled={pageNumber >= numPages}
+          aria-label="Next page"
+          className="flex h-7 w-7 items-center justify-center rounded-full transition-colors hover:bg-muted disabled:opacity-40"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   // fullHeight mode: fixed container with its own scroll (used on the /document page)
   if (fullHeight) {
     return (
+      <>
       <div className="flex h-full overflow-hidden">
         <Document
           file={url}
@@ -107,11 +134,14 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
           </div>
         </Document>
       </div>
+      {floatingNav}
+      </>
     );
   }
 
   // Default mode: pages flow naturally with the page, sticky thumbnail sidebar
   return (
+    <>
     <Document
       file={url}
       onLoadSuccess={({ numPages: n }) => { setNumPages(n); setPageNumber(1); }}
@@ -157,6 +187,8 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
         <div className="h-8" />
       </div>
     </Document>
+    {floatingNav}
+    </>
   );
 };
 
