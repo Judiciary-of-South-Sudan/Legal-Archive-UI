@@ -324,9 +324,12 @@
     "no_laws": "لا توجد قوانين لـ \"{{query}}\".",
     "no_judgments": "لا توجد أحكام لـ \"{{query}}\".",
     "no_notices": "لا توجد إشعارات لـ \"{{query}}\".",
+    "no_decrees": "لا توجد مراسيم لـ \"{{query}}\".",
+    "tab_decrees": "المراسيم",
     "type_law": "قانون",
     "type_judgment": "حكم",
-    "type_notice": "إشعار"
+    "type_notice": "إشعار",
+    "type_decree": "مرسوم"
   },
   "library": {
     "title": "مكتبتي",
