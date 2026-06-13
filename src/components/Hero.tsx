@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, BookOpen, FileText, Gavel, Landmark, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpen, FileText, Gavel, Landmark, ScrollText, Search, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
@@ -51,6 +51,12 @@ const Hero = () => {
       title: t("hero.entrance_agreements_title"),
       description: t("hero.entrance_agreements_desc"),
       href: "/search?q=peace%20agreement",
+    },
+    {
+      icon: <ScrollText className="h-5 w-5" />,
+      title: t("hero.entrance_decrees_title"),
+      description: t("hero.entrance_decrees_desc"),
+      href: "/decrees",
     },
   ];
 
