@@ -70,7 +70,7 @@ const Judgments = () => {
             <CardTitle className="flex items-center justify-between text-base">
               <span className="flex items-center gap-2"><Gavel className="h-4 w-4" /> {t("judgments.search_title")}</span>
               <Button variant={showFilters ? "default" : "outline"} size="sm" onClick={() => setShowFilters(v => !v)}>
-                <SlidersHorizontal className="h-4 w-4 mr-1" />
+                <SlidersHorizontal className="h-4 w-4 me-1" />
                 {t("judgments.filters")} {hasFilters && !submittedSearch ? `(${activeFilterCount})` : ""}
               </Button>
             </CardTitle>
@@ -122,7 +122,7 @@ const Judgments = () => {
 
                 {hasFilters && (
                   <Button variant="ghost" size="sm" className="text-muted-foreground col-span-full w-fit" onClick={clearFilters}>
-                    <X className="h-3 w-3 mr-1" /> {t("judgments.clear_filters")}
+                    <X className="h-3 w-3 me-1" /> {t("judgments.clear_filters")}
                   </Button>
                 )}
               </div>
@@ -139,7 +139,7 @@ const Judgments = () => {
         {activeQuery.isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2">{t("judgments.loading")}</span>
+            <span className="ms-2">{t("judgments.loading")}</span>
           </div>
         ) : (
           <>
