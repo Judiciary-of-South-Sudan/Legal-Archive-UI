@@ -207,6 +207,11 @@ const Header = () => {
             <Button variant="ghost" size="icon" onClick={() => setDark((d) => !d)} aria-label="Toggle dark mode">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
+            {!isAuthenticated && (
+              <Button variant="outline" size="sm" className="h-9 px-3" asChild>
+                <Link to="/login">{t("header.login")}</Link>
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen((open) => !open)} aria-label="Toggle menu">
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
