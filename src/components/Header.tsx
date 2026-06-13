@@ -10,6 +10,8 @@ import {
   Settings,
   Sun,
   User,
+  Wifi,
+  WifiOff,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBandwidth } from "@/contexts/BandwidthContext";
 import { useTranslation } from "react-i18next";
 import apiClient from "@/lib/apiClient";
 import {
@@ -32,6 +35,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   const { isAuthenticated, user, logout, isAdmin, isEditor } = useAuth();
+  const { lowBandwidth, toggle: toggleBandwidth } = useBandwidth();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
@@ -149,6 +153,9 @@ const Header = () => {
             <Button variant="ghost" size="sm" onClick={() => setDark((d) => !d)} aria-label="Toggle dark mode">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
+            <Button variant="ghost" size="sm" onClick={toggleBandwidth} aria-label="Toggle bandwidth mode" title={lowBandwidth ? 'Low bandwidth mode on' : 'Low bandwidth mode off'}>
+              {lowBandwidth ? <WifiOff className="h-4 w-4 text-amber-500" /> : <Wifi className="h-4 w-4" />}
+            </Button>
 
             {isAuthenticated ? (
               <DropdownMenu>
@@ -206,6 +213,9 @@ const Header = () => {
             </Button>
             <Button variant="ghost" size="icon" onClick={() => setDark((d) => !d)} aria-label="Toggle dark mode">
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={toggleBandwidth} aria-label="Toggle bandwidth mode">
+              {lowBandwidth ? <WifiOff className="h-4 w-4 text-amber-500" /> : <Wifi className="h-4 w-4" />}
             </Button>
             {!isAuthenticated && (
               <Button variant="outline" size="sm" className="h-9 px-3" asChild>
