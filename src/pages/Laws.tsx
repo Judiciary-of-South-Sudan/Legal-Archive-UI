@@ -218,7 +218,7 @@ const Laws = () => {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-between pt-4">
+                  <div className="flex flex-col gap-2 pt-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="text-sm text-muted-foreground">
                       {t("common.showing")} {page * size + 1}–{Math.min((page + 1) * size, totalElements)} {t("common.of")} {totalElements}
                     </div>
