@@ -272,7 +272,7 @@ const AdminDashboard: React.FC = () => {
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 me-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -284,7 +284,7 @@ const AdminDashboard: React.FC = () => {
               <TabsTrigger value="review" className="relative">
                 Unpublished
                 {reviewQueue.length > 0 && (
-                  <span className="ml-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                  <span className="ms-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
                     {reviewQueue.length}
                   </span>
                 )}
@@ -587,7 +587,7 @@ const AdminDashboard: React.FC = () => {
                               onClick={() => setVerifyItem(item)}
                               className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
-                              <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
+                              <ShieldCheck className="h-3.5 w-3.5 me-1.5" />
                               {isLoading ? 'Saving…' : 'Review'}
                             </Button>
                           </div>
@@ -670,7 +670,7 @@ const AdminDashboard: React.FC = () => {
                       <div className="space-y-2">
                         {analytics.topSearchTerms.map((s, i) => (
                           <div key={s.term} className="flex items-center gap-3">
-                            <span className="text-xs text-muted-foreground w-5 text-right font-mono">{i + 1}</span>
+                            <span className="text-xs text-muted-foreground w-5 text-end font-mono">{i + 1}</span>
                             <div className="flex-1 bg-muted rounded-full h-5 overflow-hidden">
                               <div
                                 className="h-full bg-primary rounded-full transition-all"
@@ -678,7 +678,7 @@ const AdminDashboard: React.FC = () => {
                               />
                             </div>
                             <span className="text-sm font-medium min-w-[120px] truncate">{s.term}</span>
-                            <span className="text-xs text-muted-foreground w-8 text-right">{s.count}</span>
+                            <span className="text-xs text-muted-foreground w-8 text-end">{s.count}</span>
                           </div>
                         ))}
                       </div>
@@ -694,19 +694,19 @@ const AdminDashboard: React.FC = () => {
                       <table className="w-full text-sm">
                         <thead className="bg-muted/50">
                           <tr>
-                            <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Collection</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Views</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">Downloads</th>
-                            <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">D/L Rate</th>
+                            <th className="text-start px-4 py-2.5 font-medium text-muted-foreground">Collection</th>
+                            <th className="text-end px-4 py-2.5 font-medium text-muted-foreground">Views</th>
+                            <th className="text-end px-4 py-2.5 font-medium text-muted-foreground">Downloads</th>
+                            <th className="text-end px-4 py-2.5 font-medium text-muted-foreground">D/L Rate</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y">
                           {analytics.byType.map(r => (
                             <tr key={r.type} className="hover:bg-muted/30 transition-colors">
                               <td className="px-4 py-2.5 font-medium">{r.type}</td>
-                              <td className="px-4 py-2.5 text-right">{r.views.toLocaleString()}</td>
-                              <td className="px-4 py-2.5 text-right">{r.downloads.toLocaleString()}</td>
-                              <td className="px-4 py-2.5 text-right text-muted-foreground">
+                              <td className="px-4 py-2.5 text-end">{r.views.toLocaleString()}</td>
+                              <td className="px-4 py-2.5 text-end">{r.downloads.toLocaleString()}</td>
+                              <td className="px-4 py-2.5 text-end text-muted-foreground">
                                 {r.views > 0 ? `${Math.round((r.downloads / r.views) * 100)}%` : '—'}
                               </td>
                             </tr>
