@@ -103,6 +103,8 @@
     "constitution": "Constitution",
     "acts": "Acts & Statutes",
     "notices": "Legal Notices",
+    "decrees": "Republican Decrees",
+    "county_court": "County Court",
     "copyright": "© {{year}} Republic of South Sudan. All rights reserved."
   },
   "laws": {
