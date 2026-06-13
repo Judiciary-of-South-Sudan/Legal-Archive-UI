@@ -6,10 +6,11 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Download, Calendar, BookOpen, Pencil, Loader2, Copy, Check, Bookmark, BookmarkCheck, ChevronRight, Printer } from 'lucide-react';
-import { useGetLawById, useIncrementLawView, useIncrementLawDownload } from '@/hooks/useLaws';
+import { FileText, Download, Calendar, BookOpen, Pencil, Loader2, Copy, Check, Bookmark, BookmarkCheck, ChevronRight, Printer, Send } from 'lucide-react';
+import { useGetLawById, useIncrementLawView, useIncrementLawDownload, lawKeys } from '@/hooks/useLaws';
 import { resolveFileUrl } from '@/lib/apiClient';
 import apiClient from '@/lib/apiClient';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
@@ -29,6 +30,22 @@ const LawDetail: React.FC = () => {
   const { mutate: trackDownload } = useIncrementLawDownload();
   const [relatedLawTitles, setRelatedLawTitles] = useState<{ id: string; title: string }[]>([]);
   const [citedBy, setCitedBy] = useState<{ judgments: any[]; notices: any[] } | null>(null);
+  const [submitPending, setSubmitPending] = useState(false);
+  const queryClient = useQueryClient();
+
+  const handleSubmitForReview = async () => {
+    if (!id) return;
+    setSubmitPending(true);
+    try {
+      await apiClient.put(`/laws/${id}/submit`);
+      toast.success('Submitted for review');
+      queryClient.invalidateQueries({ queryKey: lawKeys.detail(id) });
+    } catch {
+      toast.error('Failed to submit for review');
+    } finally {
+      setSubmitPending(false);
+    }
+  };
 
   useEffect(() => {
     if (!id || !law) return;
@@ -188,6 +205,12 @@ const LawDetail: React.FC = () => {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1.5" /> {t('common.print')}
             </Button>
+            {(isAdmin() || isEditor()) && law.verificationStatus === 'DRAFT' && (
+              <Button variant="outline" size="sm" onClick={handleSubmitForReview} disabled={submitPending}>
+                {submitPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Send className="h-4 w-4 mr-1.5" />}
+                {t('common.submit_for_review', { defaultValue: 'Submit for Review' })}
+              </Button>
+            )}
             {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-law/${id}`}>
                 <Button variant="outline" size="sm">
