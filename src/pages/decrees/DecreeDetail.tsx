@@ -183,7 +183,7 @@ const DecreeDetail: React.FC = () => {
 
           <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
             {pdfUrl && (
-              <Button variant="outline" size="sm" asChild>
+              <Button variant="outline" size="sm" className="h-11 sm:h-9" asChild>
                 <a href={pdfUrl} target="_blank" rel="noreferrer" download onClick={() => trackDownload(id!)}>
                   <Download className="h-4 w-4 me-1.5" /> {t('laws.download_pdf')}
                 </a>
@@ -193,6 +193,7 @@ const DecreeDetail: React.FC = () => {
               <Button
                 variant={bookmarked ? 'default' : 'outline'}
                 size="sm"
+                className="h-11 sm:h-9"
                 onClick={() => toggleBookmark({ documentId: id!, documentType: 'DECREE', title: decree.title })}
                 disabled={bookmarkPending}
               >
@@ -200,28 +201,28 @@ const DecreeDetail: React.FC = () => {
                 {bookmarked ? t('common.bookmarked') : t('common.bookmark')}
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={copyCitation}>
+            <Button variant="outline" size="sm" className="h-11 sm:h-9" onClick={copyCitation}>
               {citationCopied ? <Check className="h-4 w-4 me-1.5" /> : <Copy className="h-4 w-4 me-1.5" />}
               {citationCopied ? t('common.citation_copied') : t('common.copy_citation')}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Button variant="outline" size="sm" className="h-11 sm:h-9" onClick={() => window.print()}>
               <Printer className="h-4 w-4 me-1.5" /> {t('common.print')}
             </Button>
             {(isAdmin() || isEditor()) && decree.verificationStatus === 'DRAFT' && (
-              <Button variant="outline" size="sm" onClick={handleSubmitForReview} disabled={submitPending}>
+              <Button variant="outline" size="sm" className="h-11 sm:h-9" onClick={handleSubmitForReview} disabled={submitPending}>
                 {submitPending ? <Loader2 className="h-4 w-4 me-1.5 animate-spin" /> : <Send className="h-4 w-4 me-1.5" />}
                 {t('common.submit_for_review', { defaultValue: 'Submit for Review' })}
               </Button>
             )}
             {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-decree/${id}`}>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="h-11 sm:h-9">
                   <Pencil className="h-4 w-4 me-1.5" /> {t('common.edit')}
                 </Button>
               </Link>
             )}
             <Link to="/decrees">
-              <Button variant="ghost" size="sm">{t('decrees.back')}</Button>
+              <Button variant="ghost" size="sm" className="h-11 sm:h-9">{t('decrees.back')}</Button>
             </Link>
           </div>
         </div>
