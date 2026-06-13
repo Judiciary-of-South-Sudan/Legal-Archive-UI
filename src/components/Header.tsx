@@ -131,11 +131,11 @@ const Header = () => {
 
           <form onSubmit={handleSearch} className="hidden w-full max-w-md items-center gap-2 lg:flex">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
                 placeholder={t("header.search_placeholder")}
-                className="h-10 rounded-md border-border bg-background pl-10"
+                className="h-10 rounded-md border-border bg-background ps-10"
               />
             </div>
             <Button type="submit" size="sm">{t("header.search")}</Button>
@@ -165,17 +165,17 @@ const Header = () => {
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/profile"><Settings className="mr-2 h-4 w-4" /> {t('header.my_profile')}</Link>
+                    <Link to="/profile"><Settings className="me-2 h-4 w-4" /> {t('header.my_profile')}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/library"><BookmarkCheck className="mr-2 h-4 w-4" /> {t("header.my_library")}</Link>
+                    <Link to="/library"><BookmarkCheck className="me-2 h-4 w-4" /> {t("header.my_library")}</Link>
                   </DropdownMenuItem>
                   {(isEditor() || isAdmin()) && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard">
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          <LayoutDashboard className="me-2 h-4 w-4" />
                           {isAdmin() ? t("header.admin_dashboard") : t("header.dashboard")}
                         </Link>
                       </DropdownMenuItem>
@@ -183,7 +183,7 @@ const Header = () => {
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="me-2 h-4 w-4" />
                     {t("header.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
