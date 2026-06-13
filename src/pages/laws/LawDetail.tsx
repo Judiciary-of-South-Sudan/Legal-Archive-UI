@@ -20,7 +20,7 @@ const LawDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { data: law, isLoading, error } = useGetLawById(id || '');
   const { mutate: incrementView } = useIncrementLawView();
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { isAdmin, isEditor, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
   const [summaryExpanded, setSummaryExpanded] = useState(false);
@@ -188,7 +188,7 @@ const LawDetail: React.FC = () => {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1.5" /> {t('common.print')}
             </Button>
-            {isAdmin() && (
+            {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-law/${id}`}>
                 <Button variant="outline" size="sm">
                   <Pencil className="h-4 w-4 mr-1.5" /> {t('common.edit')}
