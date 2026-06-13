@@ -116,18 +116,18 @@ const LegalNotices = () => {
               <Card>
                 <CardContent className="pt-4 pb-3">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <Select value={filters.type ?? ""} onValueChange={v => setFilter("type", v)}>
+                    <Select value={filters.type ?? "all"} onValueChange={v => setFilter("type", v === "all" ? undefined : v)}>
                       <SelectTrigger><SelectValue placeholder={t("notices.all_types")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("notices.all_types")}</SelectItem>
+                        <SelectItem value="all">{t("notices.all_types")}</SelectItem>
                         {NOTICE_TYPES.map(nt => <SelectItem key={nt} value={nt}>{nt}</SelectItem>)}
                       </SelectContent>
                     </Select>
 
-                    <Select value={filters.status ?? ""} onValueChange={v => setFilter("status", v)}>
+                    <Select value={filters.status ?? "all"} onValueChange={v => setFilter("status", v === "all" ? undefined : v)}>
                       <SelectTrigger><SelectValue placeholder={t("notices.all_statuses")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("notices.all_statuses")}</SelectItem>
+                        <SelectItem value="all">{t("notices.all_statuses")}</SelectItem>
                         {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
