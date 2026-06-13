@@ -13,6 +13,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useBandwidth } from '@/contexts/BandwidthContext';
+import LowBandwidthBanner from '@/components/LowBandwidthBanner';
 
 const typeColor: Record<string, string> = {
   APPOINTMENT: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
@@ -25,6 +27,7 @@ const typeColor: Record<string, string> = {
 
 const DecreeDetail: React.FC = () => {
   const { t } = useTranslation();
+  const { lowBandwidth } = useBandwidth();
   const { id } = useParams<{ id: string }>();
   const { data: decree, isLoading, error } = useGetDecreeById(id || '');
   const { mutate: incrementView } = useIncrementDecreeView();
@@ -105,13 +108,14 @@ const DecreeDetail: React.FC = () => {
   }
 
   const pdfUrl = resolveFileUrl(decree.pdfUrl);
-  const defaultTab = pdfUrl ? 'pdf' : decree.fullText ? 'text' : 'metadata';
+  const defaultTab = pdfUrl && !lowBandwidth ? 'pdf' : decree.fullText ? 'text' : 'metadata';
   const typeClass = decree.decreeType ? (typeColor[decree.decreeType] ?? 'bg-secondary text-secondary-foreground') : '';
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-6 space-y-4 max-w-5xl">
+        <LowBandwidthBanner />
         <nav className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t('common.home')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
