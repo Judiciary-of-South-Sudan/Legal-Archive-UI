@@ -79,7 +79,7 @@ const DecreeDetail: React.FC = () => {
         <Header />
         <main className="container mx-auto px-4 py-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">{t('decrees.loading_detail')}</span>
+          <span className="ms-2">{t('decrees.loading_detail')}</span>
         </main>
         <Footer />
       </div>
