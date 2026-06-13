@@ -138,13 +138,13 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 flex items-center gap-1.5">
             <FileText className="h-3.5 w-3.5" /> Audit Trail
           </p>
-          <ScrollArea className="h-48 pr-2">
+          <ScrollArea className="h-48 pe-2">
             {historyLoading ? (
               <p className="text-sm text-muted-foreground">Loading history…</p>
             ) : history.length === 0 ? (
               <p className="text-sm text-muted-foreground">No audit entries yet.</p>
             ) : (
-              <ol className="relative border-l border-border ml-2 space-y-4">
+              <ol className="relative border-s border-border ms-2 space-y-4">
                 {history.map(entry => {
                   const cfg = ACTION_CFG[entry.action] ?? { label: entry.action, cls: 'bg-gray-100 text-gray-700' };
                   // Parse comment out of details like "DRAFT → PUBLISHED | Great content"
@@ -153,8 +153,8 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                   const entryComment = parts.slice(1).join(' | ') || null;
 
                   return (
-                    <li key={entry.id} className="ml-4">
-                      <span className="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border bg-background border-border" />
+                    <li key={entry.id} className="ms-4">
+                      <span className="absolute -start-1.5 mt-1 h-3 w-3 rounded-full border bg-background border-border" />
                       <div className="flex items-start gap-2 flex-wrap">
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.cls}`}>
                           {cfg.label}
@@ -205,7 +205,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('UNDER_REVIEW')}
                 className="text-blue-600 border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/40"
               >
-                <Clock className="h-3.5 w-3.5 mr-1.5" />
+                <Clock className="h-3.5 w-3.5 me-1.5" />
                 {submitting ? 'Submitting…' : 'Submit for Review'}
               </Button>
             )}
@@ -215,7 +215,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('PUBLISHED')}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                <CheckCircle2 className="h-3.5 w-3.5 me-1.5" />
                 {submitting ? 'Publishing…' : 'Publish Directly'}
               </Button>
             )}
@@ -228,7 +228,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('DRAFT')}
                 className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
               >
-                <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                <RotateCcw className="h-3.5 w-3.5 me-1.5" />
                 {submitting ? 'Saving…' : 'Return to Draft'}
               </Button>
             )}
@@ -238,7 +238,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('PUBLISHED')}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
+                <CheckCircle2 className="h-3.5 w-3.5 me-1.5" />
                 {submitting ? 'Publishing…' : 'Approve & Publish'}
               </Button>
             )}
@@ -251,7 +251,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('DRAFT')}
                 className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
               >
-                <XCircle className="h-3.5 w-3.5 mr-1.5" /> Unpublish
+                <XCircle className="h-3.5 w-3.5 me-1.5" /> Unpublish
               </Button>
             )}
           </div>
