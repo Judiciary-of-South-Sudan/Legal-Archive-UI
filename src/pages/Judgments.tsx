@@ -96,26 +96,26 @@ const Judgments = () => {
 
             {showFilters && !submittedSearch && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-1">
-                <Select value={filters.courtLevel ?? ""} onValueChange={v => setFilter("courtLevel", v)}>
+                <Select value={filters.courtLevel ?? "all"} onValueChange={v => setFilter("courtLevel", v === "all" ? undefined : v)}>
                   <SelectTrigger><SelectValue placeholder={t("judgments.all_courts")} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t("judgments.all_courts")}</SelectItem>
+                    <SelectItem value="all">{t("judgments.all_courts")}</SelectItem>
                     {COURT_LEVELS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
 
-                <Select value={filters.caseType ?? ""} onValueChange={v => setFilter("caseType", v)}>
+                <Select value={filters.caseType ?? "all"} onValueChange={v => setFilter("caseType", v === "all" ? undefined : v)}>
                   <SelectTrigger><SelectValue placeholder={t("judgments.all_case_types")} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t("judgments.all_case_types")}</SelectItem>
+                    <SelectItem value="all">{t("judgments.all_case_types")}</SelectItem>
                     {CASE_TYPES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
 
-                <Select value={filters.status ?? ""} onValueChange={v => setFilter("status", v)}>
+                <Select value={filters.status ?? "all"} onValueChange={v => setFilter("status", v === "all" ? undefined : v)}>
                   <SelectTrigger><SelectValue placeholder={t("judgments.all_statuses")} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t("judgments.all_statuses")}</SelectItem>
+                    <SelectItem value="all">{t("judgments.all_statuses")}</SelectItem>
                     {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                   </SelectContent>
                 </Select>
