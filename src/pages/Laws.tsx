@@ -112,41 +112,41 @@ const Laws = () => {
               <Card>
                 <CardContent className="pt-4 pb-3">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Select value={filters.type ?? ""} onValueChange={v => setFilter("type", v)}>
+                    <Select value={filters.type ?? "all"} onValueChange={v => setFilter("type", v === "all" ? undefined : v)}>
                       <SelectTrigger><SelectValue placeholder={t("laws.all_types")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("laws.all_types")}</SelectItem>
+                        <SelectItem value="all">{t("laws.all_types")}</SelectItem>
                         {(types ?? ["Act", "Constitution", "Regulation", "Statutory Instrument"]).map(tp => (
                           <SelectItem key={tp} value={tp}>{tp}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
 
-                    <Select value={filters.status ?? ""} onValueChange={v => setFilter("status", v)}>
+                    <Select value={filters.status ?? "all"} onValueChange={v => setFilter("status", v === "all" ? undefined : v)}>
                       <SelectTrigger><SelectValue placeholder={t("laws.all_statuses")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("laws.all_statuses")}</SelectItem>
+                        <SelectItem value="all">{t("laws.all_statuses")}</SelectItem>
                         {STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                       </SelectContent>
                     </Select>
 
                     <Select
-                      value={filters.year?.toString() ?? ""}
-                      onValueChange={v => setFilter("year", v ? parseInt(v) : undefined)}
+                      value={filters.year?.toString() ?? "all"}
+                      onValueChange={v => setFilter("year", v === "all" ? undefined : parseInt(v))}
                     >
                       <SelectTrigger><SelectValue placeholder={t("laws.all_years")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("laws.all_years")}</SelectItem>
+                        <SelectItem value="all">{t("laws.all_years")}</SelectItem>
                         {(years ?? []).map(y => (
                           <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
 
-                    <Select value={filters.category ?? ""} onValueChange={v => setFilter("category", v)}>
+                    <Select value={filters.category ?? "all"} onValueChange={v => setFilter("category", v === "all" ? undefined : v)}>
                       <SelectTrigger><SelectValue placeholder={t("laws.all_categories")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">{t("laws.all_categories")}</SelectItem>
+                        <SelectItem value="all">{t("laws.all_categories")}</SelectItem>
                         {(categories ?? []).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                       </SelectContent>
                     </Select>
