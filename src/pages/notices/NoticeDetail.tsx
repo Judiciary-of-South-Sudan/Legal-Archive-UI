@@ -21,7 +21,7 @@ const NoticeDetail: React.FC = () => {
   const { data: notice, isLoading, error } = useGetNoticeById(id || '');
   const { mutate: incrementView } = useIncrementNoticeView();
   const { mutate: trackDownload } = useIncrementNoticeDownload();
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { isAdmin, isEditor, isAuthenticated } = useAuth();
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
   const [summaryExpanded, setSummaryExpanded] = useState(false);
@@ -185,7 +185,7 @@ const NoticeDetail: React.FC = () => {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1.5" /> {t('common.print')}
             </Button>
-            {isAdmin() && (
+            {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-notice/${id}`}>
                 <Button variant="outline" size="sm">
                   <Pencil className="h-4 w-4 mr-1.5" /> {t('common.edit')}
