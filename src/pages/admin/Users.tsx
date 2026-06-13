@@ -151,7 +151,7 @@ const AdminUsers: React.FC = () => {
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 me-2 ${loading ? 'animate-spin' : ''}`} />
             {t('admin.users.refresh')}
           </Button>
         </div>
@@ -170,11 +170,11 @@ const AdminUsers: React.FC = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_user')}</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_role')}</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_status')}</th>
-                      <th className="text-left py-3 pr-4 font-medium text-muted-foreground">{t('admin.users.col_joined')}</th>
-                      <th className="text-right py-3 font-medium text-muted-foreground">{t('admin.users.col_actions')}</th>
+                      <th className="text-start py-3 pe-4 font-medium text-muted-foreground">{t('admin.users.col_user')}</th>
+                      <th className="text-start py-3 pe-4 font-medium text-muted-foreground">{t('admin.users.col_role')}</th>
+                      <th className="text-start py-3 pe-4 font-medium text-muted-foreground">{t('admin.users.col_status')}</th>
+                      <th className="text-start py-3 pe-4 font-medium text-muted-foreground">{t('admin.users.col_joined')}</th>
+                      <th className="text-end py-3 font-medium text-muted-foreground">{t('admin.users.col_actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,14 +183,14 @@ const AdminUsers: React.FC = () => {
                       const isPending = pendingRoleChange[user.id] !== undefined;
                       return (
                         <tr key={user.id} className="border-b last:border-0 hover:bg-muted/40">
-                          <td className="py-3 pr-4">
+                          <td className="py-3 pe-4">
                             <div className="font-medium">{user.fullName || user.username}</div>
                             <div className="text-xs text-muted-foreground">{user.email}</div>
                             {user.organization && (
                               <div className="text-xs text-muted-foreground">{user.organization}</div>
                             )}
                           </td>
-                          <td className="py-3 pr-4">
+                          <td className="py-3 pe-4">
                             <Select
                               value={pendingRoleChange[user.id] ?? role}
                               onValueChange={(val) => handleRoleChange(user.id, val)}
@@ -208,7 +208,7 @@ const AdminUsers: React.FC = () => {
                               </SelectContent>
                             </Select>
                           </td>
-                          <td className="py-3 pr-4">
+                          <td className="py-3 pe-4">
                             <Badge variant={user.enabled ? 'default' : 'secondary'}>
                               {user.enabled ? t('admin.users.status_active') : t('admin.users.status_disabled')}
                             </Badge>
@@ -218,7 +218,7 @@ const AdminUsers: React.FC = () => {
                               ? format(new Date(user.createdAt), 'dd MMM yyyy')
                               : '—'}
                           </td>
-                          <td className="py-3 text-right">
+                          <td className="py-3 text-end">
                             <div className="flex items-center justify-end gap-2">
                               <Button
                                 variant="ghost"
