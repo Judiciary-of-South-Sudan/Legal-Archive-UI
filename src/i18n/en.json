@@ -324,9 +324,12 @@
     "no_laws": "No laws found for \"{{query}}\".",
     "no_judgments": "No judgments found for \"{{query}}\".",
     "no_notices": "No notices found for \"{{query}}\".",
+    "no_decrees": "No decrees found for \"{{query}}\".",
+    "tab_decrees": "Decrees",
     "type_law": "Law",
     "type_judgment": "Judgment",
-    "type_notice": "Notice"
+    "type_notice": "Notice",
+    "type_decree": "Decree"
   },
   "library": {
     "title": "My Library",
