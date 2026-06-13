@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
-import { Download, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
+import { Download, Calendar, FileText, Bell, Archive, Star, Loader2, ChevronRight, Search, SlidersHorizontal, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -134,7 +134,7 @@ const LegalNotices = () => {
                   </div>
                   {hasFilters && (
                     <Button variant="ghost" size="sm" className="mt-2 text-muted-foreground" onClick={clearFilters}>
-                      <X className="h-3 w-3 mr-1" /> {t("notices.clear_filters")}
+                      <X className="h-3 w-3 me-1" /> {t("notices.clear_filters")}
                     </Button>
                   )}
                 </CardContent>
@@ -150,7 +150,7 @@ const LegalNotices = () => {
             {activeQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">{t("notices.loading")}</span>
+                <span className="ms-2">{t("notices.loading")}</span>
               </div>
             ) : (
               <>
@@ -239,7 +239,7 @@ const LegalNotices = () => {
                         setFilter("type", type.typeFilter);
                         setShowFilters(true);
                       }}>
-                        {t("notices.view_notices")} <ChevronRight className="h-4 w-4 ml-1" />
+                        {t("notices.view_notices")} <ChevronRight className="h-4 w-4 ms-1" />
                       </Button>
                     </CardContent>
                   </Card>
@@ -281,7 +281,7 @@ const LegalNotices = () => {
                         </p>
                       </div>
                       <Link to={`/notices/${notice.id}`}>
-                        <Button variant="outline" size="sm"><Eye className="h-4 w-4 mr-1" />{t("notices.view")}</Button>
+                        <Button variant="outline" size="sm"><Eye className="h-4 w-4 me-1" />{t("notices.view")}</Button>
                       </Link>
                     </div>
                   ))}
