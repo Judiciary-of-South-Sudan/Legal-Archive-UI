@@ -6,10 +6,11 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, FileText, Download, Building2, Loader2, Pencil, Bookmark, BookmarkCheck, ChevronRight, Copy, Check, Printer } from 'lucide-react';
-import { useGetNoticeById, useIncrementNoticeView, useIncrementNoticeDownload } from '@/hooks/useNotices';
+import { Calendar, FileText, Download, Building2, Loader2, Pencil, Bookmark, BookmarkCheck, ChevronRight, Copy, Check, Printer, Send } from 'lucide-react';
+import { useGetNoticeById, useIncrementNoticeView, useIncrementNoticeDownload, noticeKeys } from '@/hooks/useNotices';
 import { resolveFileUrl } from '@/lib/apiClient';
 import apiClient from '@/lib/apiClient';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
@@ -25,6 +26,8 @@ const NoticeDetail: React.FC = () => {
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
   const [summaryExpanded, setSummaryExpanded] = useState(false);
+  const [submitPending, setSubmitPending] = useState(false);
+  const queryClient = useQueryClient();
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const [lawTitles, setLawTitles] = useState<Record<string, string>>({});
@@ -47,6 +50,20 @@ const NoticeDetail: React.FC = () => {
       incrementView(id);
     }
   }, [id]);
+
+  const handleSubmitForReview = async () => {
+    if (!id) return;
+    setSubmitPending(true);
+    try {
+      await apiClient.put(`/legal-notices/${id}/submit`);
+      toast.success('Submitted for review');
+      queryClient.invalidateQueries({ queryKey: noticeKeys.detail(id) });
+    } catch {
+      toast.error('Failed to submit for review');
+    } finally {
+      setSubmitPending(false);
+    }
+  };
 
   const copyCitation = () => {
     if (!notice) return;
@@ -185,6 +202,12 @@ const NoticeDetail: React.FC = () => {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1.5" /> {t('common.print')}
             </Button>
+            {(isAdmin() || isEditor()) && notice.verificationStatus === 'DRAFT' && (
+              <Button variant="outline" size="sm" onClick={handleSubmitForReview} disabled={submitPending}>
+                {submitPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Send className="h-4 w-4 mr-1.5" />}
+                {t('common.submit_for_review', { defaultValue: 'Submit for Review' })}
+              </Button>
+            )}
             {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-notice/${id}`}>
                 <Button variant="outline" size="sm">
