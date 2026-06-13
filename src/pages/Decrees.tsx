@@ -126,17 +126,17 @@ const Decrees = () => {
           <Card className="mb-4">
             <CardContent className="pt-4 pb-3">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Select value={filterType} onValueChange={v => { setPage(0); setFilterType(v); }}>
+                <Select value={filterType || "all"} onValueChange={v => { setPage(0); setFilterType(v === "all" ? "" : v); }}>
                   <SelectTrigger><SelectValue placeholder={t('decrees.all_types')} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t('decrees.all_types')}</SelectItem>
+                    <SelectItem value="all">{t('decrees.all_types')}</SelectItem>
                     {DECREE_TYPES.map(tp => <SelectItem key={tp} value={tp}>{tp}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <Select value={filterYear} onValueChange={v => { setPage(0); setFilterYear(v); }}>
+                <Select value={filterYear || "all"} onValueChange={v => { setPage(0); setFilterYear(v === "all" ? "" : v); }}>
                   <SelectTrigger><SelectValue placeholder={t('decrees.all_years')} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">{t('decrees.all_years')}</SelectItem>
+                    <SelectItem value="all">{t('decrees.all_years')}</SelectItem>
                     {(years ?? []).map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                   </SelectContent>
                 </Select>
