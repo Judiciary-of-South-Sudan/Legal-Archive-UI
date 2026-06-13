@@ -60,9 +60,9 @@ const Judgments = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">{t("judgments.page_title")}</h1>
-          <p className="text-muted-foreground">{t("judgments.page_subtitle")}</p>
+        <div className="mb-4 md:mb-8">
+          <h1 className="text-2xl font-bold text-foreground mb-1 md:text-3xl md:mb-4">{t("judgments.page_title")}</h1>
+          <p className="text-muted-foreground text-sm md:text-base">{t("judgments.page_subtitle")}</p>
         </div>
 
         <Card className="mb-6">
