@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
-import { Download, Eye, FileText, Calendar, ChevronRight, Loader2, SlidersHorizontal, X } from "lucide-react";
+import { Download, Eye, FileText, Calendar, ChevronRight, Loader2, Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import SearchBar from "@/components/SearchBar";
 import DocStatusDropdown from "@/components/DocStatusDropdown";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -30,17 +30,23 @@ const Laws = () => {
   const { user } = useAuth();
   const isAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false;
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Omit<LawFilterParams, "page" | "size" | "sort">>({});
   const size = 10;
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const hasFilters = Object.values(filters).some(Boolean);
 
   const listParams: LawFilterParams = { page, size, sort: "year,desc", ...filters };
   const listQuery = useGetLaws(listParams);
-  const searchQueryResult = useSearchLaws({ query: searchQuery, page, size, sort: "year,desc" });
-  const activeQuery = searchQuery ? searchQueryResult : listQuery;
+  const searchQueryResult = useSearchLaws({ query: debouncedSearch, page, size, sort: "year,desc" });
+  const activeQuery = debouncedSearch ? searchQueryResult : listQuery;
 
   const { data: categories } = useGetLawCategories();
   const { data: types } = useGetLawTypes();
@@ -64,35 +70,41 @@ const Laws = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">{t("laws.page_title")}</h1>
-          <p className="text-muted-foreground">{t("laws.page_subtitle")}</p>
+        <div className="mb-4 md:mb-8">
+          <h1 className="text-2xl font-bold text-foreground mb-1 md:text-3xl md:mb-4">{t("laws.page_title")}</h1>
+          <p className="text-muted-foreground text-sm md:text-base">{t("laws.page_subtitle")}</p>
         </div>
 
         <Tabs defaultValue="browse" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+          <div className="overflow-x-auto pb-0.5">
+          <TabsList className="grid min-w-max grid-cols-4 sm:w-full">
             <TabsTrigger value="browse">{t("laws.tab_browse")}</TabsTrigger>
             <TabsTrigger value="constitution">{t("laws.tab_constitution")}</TabsTrigger>
             <TabsTrigger value="categories">{t("laws.tab_categories")}</TabsTrigger>
             <TabsTrigger value="recent">{t("laws.tab_recent")}</TabsTrigger>
           </TabsList>
+          </div>
 
           <TabsContent value="browse" className="space-y-4">
-            <div className="flex gap-3 items-start">
-              <div className="flex-1">
-                <SearchBar
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={searchQuery}
+                  onChange={e => { setPage(0); setSearchQuery(e.target.value); }}
                   placeholder={t("laws.search_placeholder")}
-                  onSearch={(query) => { setPage(0); setSearchQuery(query || ""); }}
+                  className="ps-9"
+                  type="search"
                 />
               </div>
               <Button
                 variant={showFilters ? "default" : "outline"}
                 size="sm"
-                className="mt-1 shrink-0"
+                className="shrink-0"
                 onClick={() => setShowFilters(v => !v)}
               >
-                <SlidersHorizontal className="h-4 w-4 mr-1" />
-                {t("laws.filters")} {hasFilters && !searchQuery ? `(${activeFilterCount})` : ""}
+                <SlidersHorizontal className="h-4 w-4 me-1.5" />
+                {t("laws.filters")}{hasFilters && !searchQuery ? ` (${activeFilterCount})` : ""}
               </Button>
             </div>
 
