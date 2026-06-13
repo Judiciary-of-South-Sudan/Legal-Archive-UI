@@ -201,14 +201,14 @@ const Judgments = () => {
             </div>
 
             {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-8">
+              <div className="flex flex-col gap-2 mt-8 sm:flex-row sm:items-center sm:justify-between">
                 <div className="text-sm text-muted-foreground">
                   {t("common.showing")} {page * size + 1}–{Math.min((page + 1) * size, totalElements)} {t("common.of")} {totalElements}
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>{t("common.previous")}</Button>
-                  <span className="flex items-center px-4">{t("common.page")} {page + 1} {t("common.of")} {totalPages}</span>
-                  <Button variant="outline" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>{t("common.next")}</Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page <= 0}>{t("common.previous")}</Button>
+                  <span className="text-sm">{t("common.page")} {page + 1} {t("common.of")} {totalPages}</span>
+                  <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>{t("common.next")}</Button>
                 </div>
               </div>
             )}
