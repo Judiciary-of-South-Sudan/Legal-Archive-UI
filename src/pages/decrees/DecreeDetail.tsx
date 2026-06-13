@@ -5,9 +5,10 @@ const PdfViewer = React.lazy(() => import('@/components/PdfViewer'));
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Download, Pencil, FileText, Loader2, Copy, Check, Bookmark, BookmarkCheck, ChevronRight, Printer, Users, ScrollText } from 'lucide-react';
-import { useGetDecreeById, useIncrementDecreeView, useIncrementDecreeDownload } from '@/hooks/useDecrees';
-import { resolveFileUrl } from '@/lib/apiClient';
+import { Calendar, Download, Pencil, FileText, Loader2, Copy, Check, Bookmark, BookmarkCheck, ChevronRight, Printer, Users, ScrollText, Send } from 'lucide-react';
+import { useGetDecreeById, useIncrementDecreeView, useIncrementDecreeDownload, decreeKeys } from '@/hooks/useDecrees';
+import apiClient, { resolveFileUrl } from '@/lib/apiClient';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsBookmarked, useToggleBookmark } from '@/hooks/useBookmarks';
 import { toast } from 'sonner';
@@ -32,7 +33,8 @@ const DecreeDetail: React.FC = () => {
   const countedViewForId = useRef<string | null>(null);
   const [citationCopied, setCitationCopied] = useState(false);
   const [summaryExpanded, setSummaryExpanded] = useState(false);
-
+  const [submitPending, setSubmitPending] = useState(false);
+  const queryClient = useQueryClient();
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
 
@@ -43,6 +45,20 @@ const DecreeDetail: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const handleSubmitForReview = async () => {
+    if (!id) return;
+    setSubmitPending(true);
+    try {
+      await apiClient.put(`/decrees/${id}/submit`);
+      toast.success('Submitted for review');
+      queryClient.invalidateQueries({ queryKey: decreeKeys.detail(id) });
+    } catch {
+      toast.error('Failed to submit for review');
+    } finally {
+      setSubmitPending(false);
+    }
+  };
 
   const copyCitation = () => {
     if (!decree) return;
@@ -191,6 +207,12 @@ const DecreeDetail: React.FC = () => {
             <Button variant="outline" size="sm" onClick={() => window.print()}>
               <Printer className="h-4 w-4 mr-1.5" /> {t('common.print')}
             </Button>
+            {(isAdmin() || isEditor()) && decree.verificationStatus === 'DRAFT' && (
+              <Button variant="outline" size="sm" onClick={handleSubmitForReview} disabled={submitPending}>
+                {submitPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Send className="h-4 w-4 mr-1.5" />}
+                {t('common.submit_for_review', { defaultValue: 'Submit for Review' })}
+              </Button>
+            )}
             {(isAdmin() || isEditor()) && (
               <Link to={`/admin/edit-decree/${id}`}>
                 <Button variant="outline" size="sm">
