@@ -99,6 +99,7 @@ const LegalNotices = () => {
                   placeholder={t("notices.search_placeholder")}
                   className="ps-9"
                   type="search"
+                  enterKeyHint="search"
                 />
               </div>
               <Button
