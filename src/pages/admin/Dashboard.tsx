@@ -278,7 +278,7 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className={`grid w-full max-w-xl ${isAdmin() ? 'grid-cols-4' : 'grid-cols-2'}`}>
+          <TabsList className={`grid min-w-max sm:w-full sm:max-w-xl ${isAdmin() ? 'grid-cols-4' : 'grid-cols-2'}`}>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             {isAdmin() && (
               <TabsTrigger value="review" className="relative">
