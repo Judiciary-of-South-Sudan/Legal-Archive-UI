@@ -153,7 +153,7 @@ const Laws = () => {
                   </div>
                   {hasFilters && (
                     <Button variant="ghost" size="sm" className="mt-2 text-muted-foreground" onClick={clearFilters}>
-                      <X className="h-3 w-3 mr-1" /> {t("laws.clear_filters")}
+                      <X className="h-3 w-3 me-1" /> {t("laws.clear_filters")}
                     </Button>
                   )}
                 </CardContent>
@@ -169,7 +169,7 @@ const Laws = () => {
             {activeQuery.isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2">{t("laws.loading")}</span>
+                <span className="ms-2">{t("laws.loading")}</span>
               </div>
             ) : (
               <>
@@ -255,12 +255,12 @@ const Laws = () => {
                     <p className="text-muted-foreground mb-4">{law.summary}</p>
                     <div className="flex gap-2">
                       <Link to={`/laws/${law.id}`}>
-                        <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
+                        <Button size="sm" variant="outline"><Eye className="h-4 w-4 me-1" /> {t("laws.view")}</Button>
                       </Link>
                       {law.pdfUrl && (
                         <Button size="sm" variant="default" asChild>
                           <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                            <Download className="h-4 w-4 mr-1" /> {t("laws.download_pdf")}
+                            <Download className="h-4 w-4 me-1" /> {t("laws.download_pdf")}
                           </a>
                         </Button>
                       )}
@@ -286,7 +286,7 @@ const Laws = () => {
                       setFilter("category", category);
                       setShowFilters(true);
                     }}>
-                      {t("laws.view_laws")} <ChevronRight className="h-4 w-4 ml-1" />
+                      {t("laws.view_laws")} <ChevronRight className="h-4 w-4 ms-1" />
                     </Button>
                   </CardContent>
                 </Card>
@@ -315,14 +315,14 @@ const Laws = () => {
                             : ""}
                         </p>
                       </div>
-                      <div className="flex gap-2 ml-4">
+                      <div className="flex gap-2 ms-4">
                         <Link to={`/laws/${law.id}`}>
-                          <Button size="sm" variant="outline"><Eye className="h-4 w-4 mr-1" /> {t("laws.view")}</Button>
+                          <Button size="sm" variant="outline"><Eye className="h-4 w-4 me-1" /> {t("laws.view")}</Button>
                         </Link>
                         {law.pdfUrl && (
                           <Button size="sm" variant="outline" asChild>
                             <a href={resolveFileUrl(law.pdfUrl)} target="_blank" rel="noreferrer">
-                              <Download className="h-4 w-4 mr-1" /> {t("laws.pdf")}
+                              <Download className="h-4 w-4 me-1" /> {t("laws.pdf")}
                             </a>
                           </Button>
                         )}
