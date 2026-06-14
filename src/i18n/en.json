@@ -632,7 +632,15 @@
       "tags_field": "Tags (comma-separated)",
       "status_pending": "Pending",
       "status_approved": "Approved",
-      "status_rejected": "Rejected"
+      "status_rejected": "Rejected",
+      "type_decree": "Decree",
+      "decree_details": "Decree Details",
+      "decree_number": "Decree Number",
+      "decree_date": "Decree Date",
+      "decree_type": "Decree Type",
+      "issued_by": "Issued By",
+      "subject_field": "Subject",
+      "personnel_hint": "Personnel (comma-separated)"
     }
   },
   "searchbar": {
