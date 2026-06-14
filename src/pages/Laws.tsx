@@ -173,7 +173,7 @@ const Laws = () => {
             ) : (
               <>
                 {totalElements > 0 && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
                     {totalElements} {totalElements !== 1 ? t("laws.found_plural") : t("laws.found_singular")}
                   </p>
                 )}
