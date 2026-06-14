@@ -632,7 +632,15 @@
       "tags_field": "العلامات (مفصولة بفاصلة)",
       "status_pending": "بانتظار المراجعة",
       "status_approved": "تمت الموافقة",
-      "status_rejected": "مرفوض"
+      "status_rejected": "مرفوض",
+      "type_decree": "مرسوم",
+      "decree_details": "تفاصيل المرسوم",
+      "decree_number": "رقم المرسوم",
+      "decree_date": "تاريخ المرسوم",
+      "decree_type": "نوع المرسوم",
+      "issued_by": "صادر عن",
+      "subject_field": "الموضوع",
+      "personnel_hint": "الأفراد (مفصولون بفاصلة)"
     }
   },
   "searchbar": {
