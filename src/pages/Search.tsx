@@ -17,13 +17,16 @@ import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 20;
 
-const Pagination = ({ page, totalPages, onPrev, onNext }: { page: number; totalPages: number; onPrev: () => void; onNext: () => void }) => {
+const Pagination = ({ page, totalPages, onPrev, onNext, prevLabel, nextLabel, pageLabel, ofLabel }: {
+  page: number; totalPages: number; onPrev: () => void; onNext: () => void;
+  prevLabel: string; nextLabel: string; pageLabel: string; ofLabel: string;
+}) => {
   if (totalPages <= 1) return null;
   return (
     <div className="flex items-center justify-center gap-3 pt-4">
-      <Button variant="outline" size="sm" onClick={onPrev} disabled={page === 0}>Previous</Button>
-      <span className="text-sm text-muted-foreground">Page {page + 1} of {totalPages}</span>
-      <Button variant="outline" size="sm" onClick={onNext} disabled={page >= totalPages - 1}>Next</Button>
+      <Button variant="outline" size="sm" onClick={onPrev} disabled={page === 0}>{prevLabel}</Button>
+      <span className="text-sm text-muted-foreground">{pageLabel} {page + 1} {ofLabel} {totalPages}</span>
+      <Button variant="outline" size="sm" onClick={onNext} disabled={page >= totalPages - 1}>{nextLabel}</Button>
     </div>
   );
 };
@@ -234,7 +237,7 @@ const SearchPage = () => {
                             date={law.enactmentDate}
                           />
                         ))}
-                        <Pagination page={lawsPage} totalPages={lawsTotalPages} onPrev={() => setLawsPage(p => p - 1)} onNext={() => setLawsPage(p => p + 1)} />
+                        <Pagination page={lawsPage} totalPages={lawsTotalPages} onPrev={() => setLawsPage(p => p - 1)} onNext={() => setLawsPage(p => p + 1)} prevLabel={t('common.previous')} nextLabel={t('common.next')} pageLabel={t('common.page')} ofLabel={t('common.of')} />
                       </>
                     )}
                   </TabsContent>
