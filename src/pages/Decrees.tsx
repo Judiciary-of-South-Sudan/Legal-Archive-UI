@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Loader2, SlidersHorizontal, X, FileText, Calendar, Search, Users } from 'lucide-react';
+import { SlidersHorizontal, X, FileText, Calendar, Search, Users } from 'lucide-react';
 import { useGetDecrees, useGetDecreeYears } from '@/hooks/useDecrees';
 import { decreeService } from '@/services/decreeService';
 import { useQuery } from '@tanstack/react-query';
@@ -150,7 +150,7 @@ const Decrees = () => {
         ) : (
           <>
             {totalElements > 0 && (
-              <p className="mb-3 text-sm text-muted-foreground">
+              <p className="mb-3 text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
                 {totalElements} {totalElements !== 1 ? t('decrees.found_plural') : t('decrees.found_singular')}
               </p>
             )}
