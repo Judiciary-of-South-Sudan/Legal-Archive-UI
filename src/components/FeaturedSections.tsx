@@ -78,7 +78,14 @@ const FeaturedSections = () => {
             </div>
             <div className="p-4">
               {lawsLoading ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-5 w-12 animate-pulse rounded bg-muted" />
+                    </div>
+                  ))}
+                </div>
               ) : recentLaws && recentLaws.length > 0 ? (
                 <div className="divide-y divide-border">
                   {recentLaws.map((law) => (
@@ -112,7 +119,14 @@ const FeaturedSections = () => {
             </div>
             <div className="p-4">
               {judgementsLoading ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-5 w-16 animate-pulse rounded bg-muted" />
+                    </div>
+                  ))}
+                </div>
               ) : recentJudgments && recentJudgments.length > 0 ? (
                 <div className="divide-y divide-border">
                   {recentJudgments.map((judgment) => (
@@ -151,7 +165,14 @@ const FeaturedSections = () => {
             </div>
             <div className="p-4">
               {noticesLoading ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-5 w-12 animate-pulse rounded bg-muted" />
+                    </div>
+                  ))}
+                </div>
               ) : recentNotices && recentNotices.content.length > 0 ? (
                 <div className="divide-y divide-border">
                   {recentNotices.content.map((notice) => (
@@ -190,7 +211,14 @@ const FeaturedSections = () => {
             </div>
             <div className="p-4">
               {decreesLoading ? (
-                <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+                <div className="divide-y divide-border">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+                    </div>
+                  ))}
+                </div>
               ) : recentDecrees && recentDecrees.length > 0 ? (
                 <div className="divide-y divide-border">
                   {recentDecrees.map((decree) => (
