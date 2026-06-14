@@ -23,16 +23,18 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const pagesAreaRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(() =>
-    typeof window !== 'undefined' ? Math.min(window.innerWidth - 32, 1200) : 300
-  );
+  const [containerWidth, setContainerWidth] = useState(0);
   const thumbnailRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-  // Track the width of the pages area for responsive page sizing
+  // Track the width of the pages area for responsive page sizing.
+  // Read the element's actual width on mount rather than window.innerWidth,
+  // which over-estimates when the viewer is rendered inside a constrained container.
   useEffect(() => {
     const el = pagesAreaRef.current;
     if (!el) return;
+    const initial = el.getBoundingClientRect().width;
+    setContainerWidth(initial || (typeof window !== 'undefined' ? window.innerWidth - 32 : 300));
     const observer = new ResizeObserver(([entry]) => {
       setContainerWidth(entry.contentRect.width);
     });
