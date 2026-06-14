@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { resolveFileUrl } from "@/lib/apiClient";
 import ListCardSkeleton from "@/components/ListCardSkeleton";
-import { Download, Calendar, Gavel, Loader2, SlidersHorizontal, X } from "lucide-react";
+import { Download, Calendar, Gavel, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -142,7 +142,7 @@ const Judgments = () => {
         ) : (
           <>
             {totalElements > 0 && (
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-4" aria-live="polite" aria-atomic="true">
                 {totalElements} {totalElements !== 1 ? t("judgments.found_plural") : t("judgments.found_singular")}
               </p>
             )}
