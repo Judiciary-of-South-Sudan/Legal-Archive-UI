@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 interface State {
@@ -36,12 +37,13 @@ class PageErrorBoundary extends React.Component<Props, State> {
           {this.state.message && (
             <p className="max-w-sm text-sm text-muted-foreground">{this.state.message}</p>
           )}
-          <Button
-            variant="outline"
-            onClick={onBack ?? (() => { window.location.href = backHref; })}
-          >
-            {backLabel}
-          </Button>
+          {onBack ? (
+            <Button variant="outline" onClick={onBack}>{backLabel}</Button>
+          ) : (
+            <Button variant="outline" asChild>
+              <Link to={backHref}>{backLabel}</Link>
+            </Button>
+          )}
         </div>
       );
     }
