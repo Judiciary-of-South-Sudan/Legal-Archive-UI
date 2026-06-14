@@ -6,7 +6,14 @@ import { useTranslation } from 'react-i18next';
 const LowBandwidthBanner: React.FC = () => {
   const { lowBandwidth, toggle } = useBandwidth();
   const { t } = useTranslation();
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem('bwBannerDismissed') === 'true'
+  );
+
+  const handleDismiss = () => {
+    localStorage.setItem('bwBannerDismissed', 'true');
+    setDismissed(true);
+  };
 
   if (!lowBandwidth || dismissed) return null;
 
@@ -20,7 +27,7 @@ const LowBandwidthBanner: React.FC = () => {
       >
         {t('common.disable_low_bandwidth', { defaultValue: 'Disable' })}
       </button>
-      <button onClick={() => setDismissed(true)} aria-label="Dismiss" className="ms-1 text-amber-600 hover:text-amber-900 dark:text-amber-400">
+      <button onClick={handleDismiss} aria-label="Dismiss" className="ms-1 text-amber-600 hover:text-amber-900 dark:text-amber-400">
         <X className="h-3.5 w-3.5" />
       </button>
     </div>
