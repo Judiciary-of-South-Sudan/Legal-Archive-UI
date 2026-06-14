@@ -154,7 +154,7 @@ const LegalNotices = () => {
             ) : (
               <>
                 {totalElements > 0 && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground" aria-live="polite" aria-atomic="true">
                     {totalElements} {totalElements !== 1 ? t("notices.found_plural") : t("notices.found_singular")}
                   </p>
                 )}
