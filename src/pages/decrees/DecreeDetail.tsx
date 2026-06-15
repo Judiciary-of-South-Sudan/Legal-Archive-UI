@@ -288,6 +288,17 @@ const DecreeDetail: React.FC = () => {
                     <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{decree.frbrUri}</dd>
                   </div>
                 )}
+                {(decree.sourceProvenance || decree.sourceUrl) && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">Source</dt>
+                    {decree.sourceProvenance && <dd className="text-sm font-medium text-foreground mt-0.5">{decree.sourceProvenance}</dd>}
+                    {decree.sourceUrl && (
+                      <dd className="mt-1">
+                        <a href={decree.sourceUrl} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">{decree.sourceUrl}</a>
+                      </dd>
+                    )}
+                  </div>
+                )}
               </div>
 
               {decree.personnel && decree.personnel.length > 0 && (
