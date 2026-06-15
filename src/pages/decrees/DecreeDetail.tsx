@@ -53,7 +53,7 @@ const DecreeDetail: React.FC = () => {
     if (!id) return;
     setSubmitPending(true);
     try {
-      await apiClient.put(`/decrees/${id}/submit`);
+      await apiClient.put(`/editor/decrees/${id}/submit`);
       toast.success('Submitted for review');
       queryClient.invalidateQueries({ queryKey: decreeKeys.detail(id) });
     } catch {
