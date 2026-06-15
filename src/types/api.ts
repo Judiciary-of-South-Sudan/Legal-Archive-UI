@@ -97,6 +97,7 @@ export interface Law {
   sourceProvenance?: string;
   relatedLaws?: string[];
   amendments?: string[];
+  amendmentIds?: string[];
   repealedBy?: string;
   repealDate?: string;
   language?: string;
@@ -137,6 +138,7 @@ export interface CreateLawRequest {
   sourceProvenance?: string;
   relatedLaws?: string[];
   amendments?: string[];
+  amendmentIds?: string[];
   repealedBy?: string;
   repealDate?: string;
   language?: string;
