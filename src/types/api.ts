@@ -161,6 +161,9 @@ export interface RepublicanDecree {
   frbrUri?: string;
   tags?: string[];
   language?: string;
+  gazetteVolume?: string;
+  gazetteIssue?: string;
+  gazetteDate?: string;
   sourceUrl?: string;
   sourceProvenance?: string;
   verificationStatus?: string;
@@ -188,6 +191,9 @@ export interface CreateDecreeRequest {
   frbrUri?: string;
   tags?: string[];
   language?: string;
+  gazetteVolume?: string;
+  gazetteIssue?: string;
+  gazetteDate?: string;
   sourceUrl?: string;
   sourceProvenance?: string;
   verificationStatus?: string;
@@ -274,7 +280,9 @@ export interface LegalNotice {
   issuingAuthority: string;
   ministry?: string;
   department?: string;
+  gazetteVolume?: string;
   gazetteIssue?: string;
+  gazetteDate?: string;
   effectiveDate?: string;
   expiryDate?: string;
   summary?: string;
@@ -307,7 +315,9 @@ export interface CreateLegalNoticeRequest {
   issuingAuthority: string;
   ministry?: string;
   department?: string;
+  gazetteVolume?: string;
   gazetteIssue?: string;
+  gazetteDate?: string;
   effectiveDate?: string;
   expiryDate?: string;
   summary?: string;
