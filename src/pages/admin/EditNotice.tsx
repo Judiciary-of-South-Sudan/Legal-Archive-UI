@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, FileWarning } from 'lucide-react';
 import { useGetNoticeById, useUpdateNotice } from '@/hooks/useNotices';
+import { CitationSearch } from '@/components/CitationSearch';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateLegalNoticeRequest, LegalNotice } from '@/types/api';
 import { toast } from 'sonner';
@@ -29,8 +30,8 @@ interface EditNoticeForm {
   effectiveDate?: string;
   summary?: string;
   tags?: string;
-  relatedLaws?: string;
-  amendsLaws?: string;
+  relatedLaws?: string[];
+  amendsLaws?: string[];
   status?: string;
   jurisdiction?: string;
   language?: string;
@@ -65,8 +66,8 @@ const EditNotice: React.FC = () => {
         effectiveDate: notice.effectiveDate ? notice.effectiveDate.split('T')[0] : '',
         summary: notice.summary || '',
         tags: (notice.tags || []).join(', '),
-        relatedLaws: (notice.relatedLaws || []).join(', '),
-        amendsLaws: (notice.amendsLaws || []).join(', '),
+        relatedLaws: notice.relatedLaws || [],
+        amendsLaws: notice.amendsLaws || [],
         status: notice.status || 'Active',
         jurisdiction: notice.jurisdiction || 'South Sudan',
         language: notice.language || 'English',
@@ -107,8 +108,8 @@ const EditNotice: React.FC = () => {
         effectiveDate: formData.effectiveDate || undefined,
         summary: formData.summary || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        amendsLaws: formData.amendsLaws ? formData.amendsLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws?.length ? formData.relatedLaws : undefined,
+        amendsLaws: formData.amendsLaws?.length ? formData.amendsLaws : undefined,
         status: formData.status || undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
@@ -250,13 +251,22 @@ const EditNotice: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
-                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.related_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.relatedLaws ?? []}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, relatedLaws: ids } : prev)}
+                  />
                 </div>
 
                 <div>
-                  <Label htmlFor="amendsLaws">{t('admin.form.amends_laws')}</Label>
-                  <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.amends_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.amendsLaws ?? []}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, amendsLaws: ids } : prev)}
+                    placeholder="Search for laws amended by this notice…"
+                  />
                 </div>
 
                 <div className="md:col-span-2">
