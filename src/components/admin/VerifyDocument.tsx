@@ -8,9 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
-  CheckCircle2, XCircle, RotateCcw, Clock, User, FileText,
+  CheckCircle2, XCircle, RotateCcw, Clock, User, FileText, Trash2,
 } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,8 @@ interface Props {
   item: ReviewItem | null;
   onClose: () => void;
   onAction: (item: ReviewItem, newStatus: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT', comment: string) => Promise<void>;
+  /** Called when the user clicks Delete — parent owns the confirm dialog */
+  onDeleteRequest?: (item: ReviewItem) => void;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -72,7 +75,8 @@ const fmtDate = (iso: string) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
+const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction, onDeleteRequest }) => {
+  const { isAdmin } = useAuth();
   const [comment, setComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -192,10 +196,26 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
           />
         </div>
 
-        <DialogFooter className="px-6 pb-6 flex-row justify-between gap-2">
-          <Button variant="ghost" onClick={onClose} disabled={submitting}>
-            Cancel
-          </Button>
+        <DialogFooter className="px-6 pb-6 flex-col gap-3 sm:flex-row sm:justify-between">
+          {/* Left: Cancel + Delete */}
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={onClose} disabled={submitting}>
+              Cancel
+            </Button>
+            {isAdmin() && onDeleteRequest && (
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={submitting}
+                onClick={() => onDeleteRequest(item)}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+              >
+                <Trash2 className="h-3.5 w-3.5 me-1" /> Delete
+              </Button>
+            )}
+          </div>
+
+          {/* Right: workflow actions */}
           <div className="flex gap-2">
             {/* DRAFT → submit for review or publish directly */}
             {isDraft && (
@@ -220,7 +240,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
               </Button>
             )}
 
-            {/* UNDER_REVIEW → return to draft or approve */}
+            {/* UNDER_REVIEW → decline (return to draft) or approve */}
             {isUnderReview && (
               <Button
                 variant="outline"
@@ -228,8 +248,8 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('DRAFT')}
                 className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
               >
-                <RotateCcw className="h-3.5 w-3.5 me-1.5" />
-                {submitting ? 'Saving…' : 'Return to Draft'}
+                <XCircle className="h-3.5 w-3.5 me-1.5" />
+                {submitting ? 'Declining…' : 'Decline'}
               </Button>
             )}
             {isUnderReview && (
@@ -251,7 +271,7 @@ const VerifyDocument: React.FC<Props> = ({ item, onClose, onAction }) => {
                 onClick={() => handleAction('DRAFT')}
                 className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/40"
               >
-                <XCircle className="h-3.5 w-3.5 me-1.5" /> Unpublish
+                <RotateCcw className="h-3.5 w-3.5 me-1.5" /> Unpublish
               </Button>
             )}
           </div>
