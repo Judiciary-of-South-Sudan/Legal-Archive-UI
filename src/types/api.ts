@@ -96,6 +96,8 @@ export interface Law {
   sourceUrl?: string;
   relatedLaws?: string[];
   amendments?: string[];
+  repealedBy?: string;
+  repealDate?: string;
   language?: string;
   verificationStatus?: string;
   createdBy?: string;
@@ -133,6 +135,8 @@ export interface CreateLawRequest {
   sourceUrl?: string;
   relatedLaws?: string[];
   amendments?: string[];
+  repealedBy?: string;
+  repealDate?: string;
   language?: string;
   verificationStatus?: string;
 }
