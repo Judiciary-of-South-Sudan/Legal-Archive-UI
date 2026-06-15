@@ -269,7 +269,9 @@ const NoticeDetail: React.FC = () => {
                     { label: t('notices.ministry'), value: notice.ministry },
                     { label: t('notices.department'), value: notice.department },
                     { label: t('judgments.jurisdiction'), value: notice.jurisdiction },
+                    { label: t('laws.gazette_volume'), value: notice.gazetteVolume },
                     { label: t('notices.gazette_issue'), value: notice.gazetteIssue },
+                    { label: t('laws.gazette_date'), value: notice.gazetteDate },
                   ].filter(r => r.value).map(({ label, value }) => (
                     <div key={label}>
                       <dt className="text-muted-foreground">{label}</dt>
