@@ -1,9 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { decreeService, DecreeFilterParams } from '@/services/decreeService';
-import { CreateDecreeRequest } from '@/types/api';
+import { CreateDecreeRequest, SearchParams } from '@/types/api';
 import { toast } from 'sonner';
-
-interface SearchParams { query: string; page: number; size: number; }
 
 export const decreeKeys = {
   all: ['decrees'] as const,
@@ -21,7 +19,7 @@ export const useGetDecrees = (params?: DecreeFilterParams) =>
 export const useSearchDecrees = (params: SearchParams) =>
   useQuery({
     queryKey: [...decreeKeys.all, 'search', params],
-    queryFn: () => decreeService.searchDecrees(params.query, params.page, params.size),
+    queryFn: () => decreeService.searchDecrees(params),
     enabled: !!params.query,
   });
 
