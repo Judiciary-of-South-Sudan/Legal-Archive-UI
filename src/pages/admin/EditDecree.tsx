@@ -33,6 +33,9 @@ interface EditDecreeForm {
   verificationStatus: string;
   sourceUrl: string;
   sourceProvenance: string;
+  gazetteVolume: string;
+  gazetteIssue: string;
+  gazetteDate: string;
 }
 
 const EditDecree: React.FC = () => {
@@ -64,6 +67,9 @@ const EditDecree: React.FC = () => {
         verificationStatus: decree.verificationStatus || 'DRAFT',
         sourceUrl: decree.sourceUrl || '',
         sourceProvenance: decree.sourceProvenance || '',
+        gazetteVolume: decree.gazetteVolume || '',
+        gazetteIssue: decree.gazetteIssue || '',
+        gazetteDate: decree.gazetteDate || '',
       });
       setPersonnel(decree.personnel?.length ? decree.personnel : ['']);
     }
@@ -120,6 +126,9 @@ const EditDecree: React.FC = () => {
         verificationStatus: formData.verificationStatus,
         sourceUrl: formData.sourceUrl || undefined,
         sourceProvenance: formData.sourceProvenance || undefined,
+        gazetteVolume: formData.gazetteVolume || undefined,
+        gazetteIssue: formData.gazetteIssue || undefined,
+        gazetteDate: formData.gazetteDate || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -254,6 +263,21 @@ const EditDecree: React.FC = () => {
                 <div className="space-y-1.5">
                   <Label htmlFor="tags">{t('decrees.tags_label')}</Label>
                   <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} placeholder={t('decrees.tags_hint')} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="gazetteVolume">{t('laws.gazette_volume')}</Label>
+                  <Input id="gazetteVolume" name="gazetteVolume" value={formData.gazetteVolume} onChange={handleInputChange} placeholder="e.g. Vol. XV" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="gazetteIssue">{t('laws.gazette_issue')}</Label>
+                  <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange} placeholder="e.g. No. 23" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="gazetteDate">{t('laws.gazette_date')}</Label>
+                  <Input id="gazetteDate" name="gazetteDate" type="date" value={formData.gazetteDate} onChange={handleInputChange} />
                 </div>
               </div>
 
