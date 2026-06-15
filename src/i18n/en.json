@@ -699,7 +699,10 @@
     "tab_pdf": "PDF",
     "tab_metadata": "Metadata",
     "download_pdf_link": "Download the PDF",
-    "fulltext_pdf_suffix": "to read the full text."
+    "fulltext_pdf_suffix": "to read the full text.",
+    "show_less": "Show less",
+    "show_more": "Show more",
+    "submit_for_review": "Submit for review"
   },
   "profile": {
     "loading_error": "Could not load profile",
