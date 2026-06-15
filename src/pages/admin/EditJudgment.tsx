@@ -12,6 +12,7 @@ import { Loader2, Upload, Gavel } from 'lucide-react';
 import { useGetJudgmentById, useUpdateJudgment } from '@/hooks/useJudgments';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateJudgmentRequest, Judgment } from '@/types/api';
+import { CitationSearch } from '@/components/CitationSearch';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 
@@ -29,8 +30,8 @@ interface EditJudgmentForm {
   summary: string;
   tags: string;
   fullText: string;
-  citedLaws: string;
-  citedCases: string;
+  citedLaws: string[];
+  citedCases: string[];
   jurisdiction: string;
   language: string;
   sourceUrl: string;
@@ -64,8 +65,8 @@ const EditJudgment: React.FC = () => {
         summary: judgment.summary || '',
         tags: (judgment.tags || []).join(', '),
         fullText: judgment.fullText || '',
-        citedLaws: (judgment.citedLaws || []).join(', '),
-        citedCases: (judgment.citedCases || []).join(', '),
+        citedLaws: judgment.citedLaws || [],
+        citedCases: judgment.citedCases || [],
         jurisdiction: judgment.jurisdiction || 'South Sudan',
         language: judgment.language || 'English',
         sourceUrl: judgment.sourceUrl || '',
@@ -104,8 +105,8 @@ const EditJudgment: React.FC = () => {
         summary: formData.summary || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         fullText: formData.fullText || undefined,
-        citedLaws: formData.citedLaws ? formData.citedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        citedCases: formData.citedCases ? formData.citedCases.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        citedLaws: formData.citedLaws.length ? formData.citedLaws : undefined,
+        citedCases: formData.citedCases.length ? formData.citedCases : undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
         sourceUrl: formData.sourceUrl || undefined,
@@ -269,13 +270,21 @@ const EditJudgment: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="citedLaws">{t('admin.form.cited_laws')}</Label>
-                  <Input id="citedLaws" name="citedLaws" value={formData.citedLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.cited_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.citedLaws}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, citedLaws: ids } : prev)}
+                  />
                 </div>
 
                 <div>
-                  <Label htmlFor="citedCases">{t('admin.form.cited_cases')}</Label>
-                  <Input id="citedCases" name="citedCases" value={formData.citedCases} onChange={handleInputChange} />
+                  <Label>{t('admin.form.cited_cases')}</Label>
+                  <CitationSearch
+                    type="judgment"
+                    value={formData.citedCases}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, citedCases: ids } : prev)}
+                  />
                 </div>
 
                 <div className="md:col-span-2">
