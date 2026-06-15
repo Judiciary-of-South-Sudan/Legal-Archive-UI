@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, BookOpen, Gavel, FileText, Calendar, Loader2, ChevronRight, ScrollText } from "lucide-react";
+import { Search, BookOpen, Gavel, FileText, Calendar, Loader2, ChevronRight, ScrollText, SlidersHorizontal, X } from "lucide-react";
 import { useSearchLaws } from "@/hooks/useLaws";
 import { useSearchJudgments } from "@/hooks/useJudgments";
 import { useSearchNotices } from "@/hooks/useNotices";
@@ -39,16 +39,31 @@ const SearchPage = () => {
   const [judgmentsPage, setJudgmentsPage] = useState(0);
   const [noticesPage, setNoticesPage] = useState(0);
   const [decreesPage, setDecreesPage] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [fromYear, setFromYear] = useState<number | undefined>();
+  const [toYear, setToYear] = useState<number | undefined>();
+  const [sort, setSort] = useState("relevance");
 
   const query = searchParams.get("q") || "";
   const lastRecordedQuery = useRef("");
 
-  useEffect(() => {
-    setInputValue(query);
+  const resetPages = () => {
     setLawsPage(0);
     setJudgmentsPage(0);
     setNoticesPage(0);
     setDecreesPage(0);
+  };
+
+  const clearFilters = () => {
+    setFromYear(undefined);
+    setToYear(undefined);
+    setSort("relevance");
+    resetPages();
+  };
+
+  useEffect(() => {
+    setInputValue(query);
+    resetPages();
   }, [query]);
 
   useEffect(() => {
@@ -65,10 +80,12 @@ const SearchPage = () => {
     }
   };
 
-  const lawsResult = useSearchLaws({ query, page: lawsPage, size: PAGE_SIZE });
-  const judgmentsResult = useSearchJudgments({ query, page: judgmentsPage, size: PAGE_SIZE });
-  const noticesResult = useSearchNotices({ query, page: noticesPage, size: PAGE_SIZE });
-  const decreesResult = useSearchDecrees({ query, page: decreesPage, size: PAGE_SIZE });
+  const lawsResult = useSearchLaws({ query, page: lawsPage, size: PAGE_SIZE, fromYear, toYear, sort });
+  const judgmentsResult = useSearchJudgments({ query, page: judgmentsPage, size: PAGE_SIZE, fromYear, toYear, sort });
+  const noticesResult = useSearchNotices({ query, page: noticesPage, size: PAGE_SIZE, fromYear, toYear, sort });
+  const decreesResult = useSearchDecrees({ query, page: decreesPage, size: PAGE_SIZE, fromYear, toYear, sort });
+
+  const activeFilterCount = [fromYear, toYear].filter(Boolean).length + (sort !== "relevance" ? 1 : 0);
 
   const lawsCount = lawsResult.data?.totalElements ?? 0;
   const judgmentsCount = judgmentsResult.data?.totalElements ?? 0;
@@ -104,7 +121,75 @@ const SearchPage = () => {
               />
             </div>
             <Button type="submit">{t("search.btn")}</Button>
+            <Button
+              type="button"
+              variant={filtersOpen || activeFilterCount > 0 ? "secondary" : "outline"}
+              size="icon"
+              onClick={() => setFiltersOpen((o) => !o)}
+              aria-label={t("searchbar.filters")}
+              className="relative shrink-0"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -end-1.5 h-4 w-4 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-medium">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
           </form>
+
+          {filtersOpen && (
+            <div className="mt-3 flex flex-wrap items-end gap-3 rounded-lg border bg-muted/30 p-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">{t("search.from_year")}</label>
+                <Input
+                  type="number"
+                  min={1900}
+                  max={2099}
+                  value={fromYear ?? ""}
+                  onChange={(e) => {
+                    setFromYear(e.target.value ? Number(e.target.value) : undefined);
+                    resetPages();
+                  }}
+                  className="w-24 h-8 text-sm"
+                  placeholder="1900"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">{t("search.to_year")}</label>
+                <Input
+                  type="number"
+                  min={1900}
+                  max={2099}
+                  value={toYear ?? ""}
+                  onChange={(e) => {
+                    setToYear(e.target.value ? Number(e.target.value) : undefined);
+                    resetPages();
+                  }}
+                  className="w-24 h-8 text-sm"
+                  placeholder="2099"
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-muted-foreground">{t("search.sort")}</label>
+                <select
+                  value={sort}
+                  onChange={(e) => { setSort(e.target.value); resetPages(); }}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="relevance">{t("search.sort_relevance")}</option>
+                  <option value="newest">{t("search.sort_newest")}</option>
+                  <option value="oldest">{t("search.sort_oldest")}</option>
+                </select>
+              </div>
+              {activeFilterCount > 0 && (
+                <Button type="button" variant="ghost" size="sm" onClick={clearFilters} className="h-8 gap-1">
+                  <X className="h-3 w-3" />
+                  {t("searchbar.clear_all")}
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {!query ? (
