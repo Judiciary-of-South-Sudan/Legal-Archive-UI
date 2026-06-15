@@ -28,7 +28,9 @@ const AdminUploadNotice: React.FC = () => {
     issuingAuthority: '',
     ministry: '',
     department: '',
+    gazetteVolume: '',
     gazetteIssue: '',
+    gazetteDate: '',
     effectiveDate: '',
     summary: '',
     tags: '',
@@ -67,7 +69,9 @@ const AdminUploadNotice: React.FC = () => {
         issuingAuthority: formData.issuingAuthority,
         ministry: formData.ministry || undefined,
         department: formData.department || undefined,
+        gazetteVolume: formData.gazetteVolume || undefined,
         gazetteIssue: formData.gazetteIssue || undefined,
+        gazetteDate: formData.gazetteDate || undefined,
         effectiveDate: formData.effectiveDate || undefined,
         summary: formData.summary || undefined,
         fullText: formData.fullText || undefined,
@@ -159,8 +163,18 @@ const AdminUploadNotice: React.FC = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="gazetteVolume">{t('laws.gazette_volume')}</Label>
+                  <Input id="gazetteVolume" name="gazetteVolume" value={formData.gazetteVolume} onChange={handleInputChange} placeholder="e.g. Vol. XV" />
+                </div>
+
+                <div>
                   <Label htmlFor="gazetteIssue">{t('admin.form.gazette_issue')}</Label>
                   <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteDate">{t('laws.gazette_date')}</Label>
+                  <Input id="gazetteDate" name="gazetteDate" type="date" value={formData.gazetteDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
