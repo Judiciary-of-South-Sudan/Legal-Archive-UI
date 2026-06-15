@@ -23,7 +23,9 @@ interface EditNoticeForm {
   issuingAuthority?: string;
   ministry?: string;
   department?: string;
+  gazetteVolume?: string;
   gazetteIssue?: string;
+  gazetteDate?: string;
   effectiveDate?: string;
   summary?: string;
   tags?: string;
@@ -57,7 +59,9 @@ const EditNotice: React.FC = () => {
         issuingAuthority: notice.issuingAuthority || '',
         ministry: notice.ministry || '',
         department: notice.department || '',
+        gazetteVolume: notice.gazetteVolume || '',
         gazetteIssue: notice.gazetteIssue || '',
+        gazetteDate: notice.gazetteDate || '',
         effectiveDate: notice.effectiveDate ? notice.effectiveDate.split('T')[0] : '',
         summary: notice.summary || '',
         tags: (notice.tags || []).join(', '),
@@ -97,7 +101,9 @@ const EditNotice: React.FC = () => {
         issuingAuthority: formData.issuingAuthority,
         ministry: formData.ministry || undefined,
         department: formData.department || undefined,
+        gazetteVolume: formData.gazetteVolume || undefined,
         gazetteIssue: formData.gazetteIssue || undefined,
+        gazetteDate: formData.gazetteDate || undefined,
         effectiveDate: formData.effectiveDate || undefined,
         summary: formData.summary || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
@@ -207,8 +213,18 @@ const EditNotice: React.FC = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="gazetteVolume">{t('laws.gazette_volume')}</Label>
+                  <Input id="gazetteVolume" name="gazetteVolume" value={formData.gazetteVolume} onChange={handleInputChange} placeholder="e.g. Vol. XV" />
+                </div>
+
+                <div>
                   <Label htmlFor="gazetteIssue">{t('admin.form.gazette_issue')}</Label>
                   <Input id="gazetteIssue" name="gazetteIssue" value={formData.gazetteIssue} onChange={handleInputChange} />
+                </div>
+
+                <div>
+                  <Label htmlFor="gazetteDate">{t('laws.gazette_date')}</Label>
+                  <Input id="gazetteDate" name="gazetteDate" type="date" value={formData.gazetteDate} onChange={handleInputChange} />
                 </div>
 
                 <div>
