@@ -699,7 +699,10 @@
     "tab_pdf": "PDF",
     "tab_metadata": "البيانات الوصفية",
     "download_pdf_link": "تنزيل ملف PDF",
-    "fulltext_pdf_suffix": "لقراءة النص الكامل."
+    "fulltext_pdf_suffix": "لقراءة النص الكامل.",
+    "show_less": "عرض أقل",
+    "show_more": "عرض المزيد",
+    "submit_for_review": "إرسال للمراجعة"
   },
   "profile": {
     "loading_error": "تعذّر تحميل الملف الشخصي",
