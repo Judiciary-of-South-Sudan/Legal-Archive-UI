@@ -66,14 +66,15 @@ const LawDetail: React.FC = () => {
 
   useEffect(() => {
     if (!law?.amendmentIds?.length) return;
-    Promise.allSettled(law.amendmentIds.map((lid: string) => apiClient.get(`/laws/${lid}`))).then(results => {
+    apiClient.get(`/laws/batch?ids=${law.amendmentIds.join(',')}`).then(res => {
+      const laws: any[] = res.data?.data ?? [];
       setAmendmentLawTitles(
-        results.map((r, i) => ({
-          id: law.amendmentIds![i],
-          title: r.status === 'fulfilled' ? (r.value.data?.data?.title ?? law.amendmentIds![i]) : law.amendmentIds![i],
+        law.amendmentIds!.map(lid => ({
+          id: lid,
+          title: laws.find((l: any) => l.id === lid)?.title ?? lid,
         }))
       );
-    });
+    }).catch(() => {});
   }, [law?.amendmentIds?.join(',')]);
 
   const copyCitation = () => {
