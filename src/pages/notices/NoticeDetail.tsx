@@ -283,6 +283,17 @@ const NoticeDetail: React.FC = () => {
                     <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{notice.frbrUri}</dd>
                   </div>
                 )}
+                {(notice.sourceProvenance || notice.sourceUrl) && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">Source</dt>
+                    {notice.sourceProvenance && <dd className="text-sm font-medium text-foreground mt-0.5">{notice.sourceProvenance}</dd>}
+                    {notice.sourceUrl && (
+                      <dd className="mt-1">
+                        <a href={notice.sourceUrl} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">{notice.sourceUrl}</a>
+                      </dd>
+                    )}
+                  </div>
+                )}
               </div>
 
               {notice.tags && notice.tags.length > 0 && (
