@@ -58,7 +58,7 @@ const NoticeDetail: React.FC = () => {
     if (!id) return;
     setSubmitPending(true);
     try {
-      await apiClient.put(`/legal-notices/${id}/submit`);
+      await apiClient.put(`/editor/notices/${id}/submit`);
       toast.success('Submitted for review');
       queryClient.invalidateQueries({ queryKey: noticeKeys.detail(id) });
     } catch {
