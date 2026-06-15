@@ -171,8 +171,10 @@ const Judgments = () => {
                         : verificationBadge(judgment.verificationStatus)
                       }
                     </div>
-                    {judgment.parties && (
-                      <p className="mt-1 text-xs text-muted-foreground line-clamp-1">{judgment.parties}</p>
+                    {(judgment.summary || judgment.parties) && (
+                      <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                        {judgment.summary || judgment.parties}
+                      </p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0 pt-0.5">
