@@ -274,6 +274,9 @@ const DecreeDetail: React.FC = () => {
                     { label: t('decrees.subject'), value: decree.subject },
                     { label: t('decrees.year'), value: decree.year },
                     { label: t('decrees.language'), value: decree.language },
+                    { label: t('laws.gazette_volume'), value: decree.gazetteVolume },
+                    { label: t('laws.gazette_issue'), value: decree.gazetteIssue },
+                    { label: t('laws.gazette_date'), value: decree.gazetteDate },
                     { label: t('common.status'), value: decree.verificationStatus },
                   ].filter(r => r.value).map(({ label, value }) => (
                     <div key={label}>
