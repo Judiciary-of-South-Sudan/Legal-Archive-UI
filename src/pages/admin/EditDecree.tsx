@@ -31,6 +31,8 @@ interface EditDecreeForm {
   language: string;
   fullText: string;
   verificationStatus: string;
+  sourceUrl: string;
+  sourceProvenance: string;
 }
 
 const EditDecree: React.FC = () => {
@@ -60,6 +62,8 @@ const EditDecree: React.FC = () => {
         language: decree.language || 'English',
         fullText: decree.fullText || '',
         verificationStatus: decree.verificationStatus || 'DRAFT',
+        sourceUrl: decree.sourceUrl || '',
+        sourceProvenance: decree.sourceProvenance || '',
       });
       setPersonnel(decree.personnel?.length ? decree.personnel : ['']);
     }
@@ -114,6 +118,8 @@ const EditDecree: React.FC = () => {
         fullText: formData.fullText || undefined,
         pdfUrl: pdfUrl || undefined,
         verificationStatus: formData.verificationStatus,
+        sourceUrl: formData.sourceUrl || undefined,
+        sourceProvenance: formData.sourceProvenance || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -249,6 +255,18 @@ const EditDecree: React.FC = () => {
                   <Label htmlFor="tags">{t('decrees.tags_label')}</Label>
                   <Input id="tags" name="tags" value={formData.tags} onChange={handleInputChange} placeholder={t('decrees.tags_hint')} />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="sourceUrl">Source URL</Label>
+                <Input id="sourceUrl" name="sourceUrl" type="url" value={formData.sourceUrl} onChange={handleInputChange}
+                  placeholder="https://presidency.gov.ss/..." />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="sourceProvenance">Source Provenance</Label>
+                <Input id="sourceProvenance" name="sourceProvenance" value={formData.sourceProvenance} onChange={handleInputChange}
+                  placeholder="e.g. Office of the President, Official Gazette No. 12, 2023" />
               </div>
 
               <div className="space-y-1.5">
