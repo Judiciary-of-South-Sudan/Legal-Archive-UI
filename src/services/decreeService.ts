@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { ApiResponse, PaginatedResponse, RepublicanDecree, CreateDecreeRequest } from '@/types/api';
+import { ApiResponse, PaginatedResponse, RepublicanDecree, CreateDecreeRequest, SearchParams } from '@/types/api';
 
 export interface DecreeFilterParams {
   page?: number;
@@ -22,8 +22,8 @@ export const decreeService = {
     const response = await apiClient.get<ApiResponse<RepublicanDecree[]>>('/decrees/recent', { params: { limit } });
     return response.data.data!;
   },
-  async searchDecrees(query: string, page = 0, size = 20): Promise<PaginatedResponse<RepublicanDecree>> {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<RepublicanDecree>>>('/decrees/search', { params: { query, page, size } });
+  async searchDecrees(params: SearchParams): Promise<PaginatedResponse<RepublicanDecree>> {
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<RepublicanDecree>>>('/decrees/search', { params });
     return response.data.data!;
   },
   async getAllYears(): Promise<number[]> {
