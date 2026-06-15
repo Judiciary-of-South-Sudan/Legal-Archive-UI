@@ -36,6 +36,8 @@ interface EditLawForm {
   amendments: string;
   repealedBy: string;
   repealDate: string;
+  sourceUrl: string;
+  sourceProvenance: string;
 }
 
 const EditLaw: React.FC = () => {
@@ -72,6 +74,8 @@ const EditLaw: React.FC = () => {
         amendments: (law.amendments || []).join(', '),
         repealedBy: law.repealedBy || '',
         repealDate: law.repealDate ? law.repealDate.split('T')[0] : '',
+        sourceUrl: law.sourceUrl || '',
+        sourceProvenance: law.sourceProvenance || '',
       });
     }
   }, [law]);
@@ -113,6 +117,8 @@ const EditLaw: React.FC = () => {
         amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         repealedBy: formData.repealedBy || undefined,
         repealDate: formData.repealDate || undefined,
+        sourceUrl: formData.sourceUrl || undefined,
+        sourceProvenance: formData.sourceProvenance || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -293,6 +299,18 @@ const EditLaw: React.FC = () => {
                 <div>
                   <Label htmlFor="amendments">{t('admin.form.amendments')}</Label>
                   <Input id="amendments" name="amendments" value={formData.amendments} onChange={handleInputChange} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceUrl">Source URL</Label>
+                  <Input id="sourceUrl" name="sourceUrl" type="url" value={formData.sourceUrl} onChange={handleInputChange}
+                    placeholder="https://gazette.gov.ss/..." />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceProvenance">Source Provenance</Label>
+                  <Input id="sourceProvenance" name="sourceProvenance" value={formData.sourceProvenance} onChange={handleInputChange}
+                    placeholder="e.g. Official Gazette of South Sudan, Vol. XV No. 23, 12 March 2019" />
                 </div>
 
                 <div className="md:col-span-2">
