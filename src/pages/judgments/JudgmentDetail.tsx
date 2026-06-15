@@ -71,7 +71,7 @@ const JudgmentDetail: React.FC = () => {
     if (!id) return;
     setSubmitPending(true);
     try {
-      await apiClient.put(`/judgments/${id}/submit`);
+      await apiClient.put(`/editor/judgments/${id}/submit`);
       toast.success('Submitted for review');
       queryClient.invalidateQueries({ queryKey: judgmentKeys.detail(id) });
     } catch {
