@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -38,7 +38,6 @@ const UploadDecree: React.FC = () => {
   const [personnel, setPersonnel] = useState<string[]>(['']);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const submitActionRef = useRef<'DRAFT' | 'UNDER_REVIEW'>('DRAFT');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -57,8 +56,7 @@ const UploadDecree: React.FC = () => {
   const updatePersonnelEntry = (idx: number, value: string) =>
     setPersonnel(prev => prev.map((v, i) => (i === idx ? value : v)));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (status: 'DRAFT' | 'UNDER_REVIEW') => {
     setIsUploading(true);
     try {
       let pdfUrl = '';
@@ -85,7 +83,7 @@ const UploadDecree: React.FC = () => {
         language: formData.language,
         fullText: formData.fullText || undefined,
         pdfUrl: pdfUrl || undefined,
-        verificationStatus: submitActionRef.current,
+        verificationStatus: status,
       });
 
       navigate(created?.id ? `/decrees/${created.id}` : '/admin/dashboard');
@@ -107,7 +105,7 @@ const UploadDecree: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={e => e.preventDefault()} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="decreeNumber">{t('decrees.decree_number')}</Label>
@@ -208,17 +206,17 @@ const UploadDecree: React.FC = () => {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <Button type="submit" disabled={isUploading || createDecreeMutation.isPending}
-                  onClick={() => { submitActionRef.current = 'DRAFT'; }}>
-                  {(isUploading || createDecreeMutation.isPending) && submitActionRef.current === 'DRAFT' ? (
+                <Button type="button" disabled={isUploading || createDecreeMutation.isPending}
+                  onClick={() => handleSave('DRAFT')}>
+                  {(isUploading || createDecreeMutation.isPending) ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('common.saving')}</>
                   ) : (
                     <><Upload className="h-4 w-4 mr-2" />Save as Draft</>
                   )}
                 </Button>
-                <Button type="submit" variant="secondary" disabled={isUploading || createDecreeMutation.isPending}
-                  onClick={() => { submitActionRef.current = 'UNDER_REVIEW'; }}>
-                  {(isUploading || createDecreeMutation.isPending) && submitActionRef.current === 'UNDER_REVIEW' ? (
+                <Button type="button" variant="secondary" disabled={isUploading || createDecreeMutation.isPending}
+                  onClick={() => handleSave('UNDER_REVIEW')}>
+                  {(isUploading || createDecreeMutation.isPending) ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t('common.saving')}</>
                   ) : (
                     <>Submit for Review</>
