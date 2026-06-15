@@ -127,6 +127,22 @@ const LawDetail: React.FC = () => {
       <Header />
       <main className="container mx-auto px-4 py-6 space-y-4 max-w-5xl">
         <LowBandwidthBanner />
+
+        {law.status === 'Repealed' && (
+          <div className="rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive dark:border-destructive/30 dark:bg-destructive/20">
+            <strong>This law has been repealed.</strong>
+            {law.repealDate && (
+              <span> Effective: {new Date(law.repealDate).toLocaleDateString()}.</span>
+            )}
+            {law.repealedBy && (
+              <span> Repealed by: <Link to={`/laws/${law.repealedBy}`} className="underline hover:no-underline">view repealing instrument</Link>.</span>
+            )}
+            {!law.repealedBy && !law.repealDate && (
+              <span> It may no longer be in force. Consult the official gazette for current status.</span>
+            )}
+          </div>
+        )}
+
         <nav className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">{t('common.home')}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
