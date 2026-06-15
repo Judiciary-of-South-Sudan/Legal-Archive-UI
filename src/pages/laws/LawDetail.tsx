@@ -305,6 +305,17 @@ const LawDetail: React.FC = () => {
                     <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{law.frbrUri}</dd>
                   </div>
                 )}
+                {(law.sourceProvenance || law.sourceUrl) && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">Source</dt>
+                    {law.sourceProvenance && <dd className="text-sm font-medium text-foreground mt-0.5">{law.sourceProvenance}</dd>}
+                    {law.sourceUrl && (
+                      <dd className="mt-1">
+                        <a href={law.sourceUrl} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">{law.sourceUrl}</a>
+                      </dd>
+                    )}
+                  </div>
+                )}
               </div>
 
               {law.tags && law.tags.length > 0 && (
