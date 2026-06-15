@@ -317,6 +317,12 @@ const JudgmentDetail: React.FC = () => {
                     <dd className="text-sm font-medium text-foreground mt-0.5">{judgment.judges.join(', ')}</dd>
                   </div>
                 )}
+                {judgment.coram && (
+                  <div className="mt-3">
+                    <dt className="text-sm text-muted-foreground">Coram</dt>
+                    <dd className="text-sm font-medium text-foreground mt-0.5">{judgment.coram}</dd>
+                  </div>
+                )}
                 {judgment.frbrUri && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <dt className="text-sm text-muted-foreground">{t('judgments.frbr_uri')}</dt>
@@ -335,6 +341,24 @@ const JudgmentDetail: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {judgment.headnotes && (
+                <div className="border-t border-border pt-5">
+                  <h3 className="archive-section-label mb-3">Headnotes</h3>
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{judgment.headnotes}</p>
+                </div>
+              )}
+
+              {judgment.legalPrinciples && judgment.legalPrinciples.length > 0 && (
+                <div className="border-t border-border pt-5">
+                  <h3 className="archive-section-label mb-3">Legal Principles</h3>
+                  <ul className="list-disc list-inside space-y-1">
+                    {judgment.legalPrinciples.map((p, i) => (
+                      <li key={i} className="text-sm text-foreground">{p}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {judgment.tags && judgment.tags.length > 0 && (
                 <div className="border-t border-border pt-5">
