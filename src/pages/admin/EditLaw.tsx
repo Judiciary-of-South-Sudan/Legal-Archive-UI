@@ -34,6 +34,7 @@ interface EditLawForm {
   fullText: string;
   relatedLaws: string;
   amendments: string;
+  amendmentIds: string;
   repealedBy: string;
   repealDate: string;
   sourceUrl: string;
@@ -72,6 +73,7 @@ const EditLaw: React.FC = () => {
         fullText: law.fullText || '',
         relatedLaws: (law.relatedLaws || []).join(', '),
         amendments: (law.amendments || []).join(', '),
+        amendmentIds: (law.amendmentIds || []).join(', '),
         repealedBy: law.repealedBy || '',
         repealDate: law.repealDate ? law.repealDate.split('T')[0] : '',
         sourceUrl: law.sourceUrl || '',
@@ -115,6 +117,7 @@ const EditLaw: React.FC = () => {
         fullText: formData.fullText || undefined,
         relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendmentIds: formData.amendmentIds ? formData.amendmentIds.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         repealedBy: formData.repealedBy || undefined,
         repealDate: formData.repealDate || undefined,
         sourceUrl: formData.sourceUrl || undefined,
@@ -297,8 +300,15 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="amendments">{t('admin.form.amendments')}</Label>
-                  <Input id="amendments" name="amendments" value={formData.amendments} onChange={handleInputChange} />
+                  <Label htmlFor="amendmentIds">Amending Law IDs (comma-separated)</Label>
+                  <Input id="amendmentIds" name="amendmentIds" value={formData.amendmentIds} onChange={handleInputChange}
+                    placeholder="MongoDB IDs of laws that amend this law" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="amendments">Amendment Notes (legacy text)</Label>
+                  <Input id="amendments" name="amendments" value={formData.amendments} onChange={handleInputChange}
+                    placeholder="e.g. Amended by Act No. 3, 2018" />
                 </div>
 
                 <div className="md:col-span-2">
