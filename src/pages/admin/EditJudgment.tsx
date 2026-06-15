@@ -30,6 +30,9 @@ interface EditJudgmentForm {
   summary: string;
   tags: string;
   fullText: string;
+  coram: string;
+  headnotes: string;
+  legalPrinciples: string;
   citedLaws: string[];
   citedCases: string[];
   jurisdiction: string;
@@ -65,6 +68,9 @@ const EditJudgment: React.FC = () => {
         summary: judgment.summary || '',
         tags: (judgment.tags || []).join(', '),
         fullText: judgment.fullText || '',
+        coram: judgment.coram || '',
+        headnotes: judgment.headnotes || '',
+        legalPrinciples: (judgment.legalPrinciples || []).join(', '),
         citedLaws: judgment.citedLaws || [],
         citedCases: judgment.citedCases || [],
         jurisdiction: judgment.jurisdiction || 'South Sudan',
@@ -105,6 +111,9 @@ const EditJudgment: React.FC = () => {
         summary: formData.summary || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         fullText: formData.fullText || undefined,
+        coram: formData.coram || undefined,
+        headnotes: formData.headnotes || undefined,
+        legalPrinciples: formData.legalPrinciples ? formData.legalPrinciples.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         citedLaws: formData.citedLaws.length ? formData.citedLaws : undefined,
         citedCases: formData.citedCases.length ? formData.citedCases : undefined,
         jurisdiction: formData.jurisdiction || undefined,
@@ -267,6 +276,24 @@ const EditJudgment: React.FC = () => {
                 <div className="md:col-span-2">
                   <Label htmlFor="fullText">{t('admin.form.full_text')}</Label>
                   <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="coram">Coram</Label>
+                  <Input id="coram" name="coram" value={formData.coram} onChange={handleInputChange}
+                    placeholder="e.g., Justice Majok, Justice Deng" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="headnotes">Headnotes</Label>
+                  <Textarea id="headnotes" name="headnotes" value={formData.headnotes} onChange={handleInputChange} rows={3}
+                    placeholder="Key legal points from this judgment…" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="legalPrinciples">Legal Principles (comma-separated)</Label>
+                  <Input id="legalPrinciples" name="legalPrinciples" value={formData.legalPrinciples} onChange={handleInputChange}
+                    placeholder="e.g., Presumption of innocence, Right to fair trial" />
                 </div>
 
                 <div>
