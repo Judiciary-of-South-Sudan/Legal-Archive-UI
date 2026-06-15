@@ -32,6 +32,8 @@ interface EditNoticeForm {
   status?: string;
   jurisdiction?: string;
   language?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
 }
 
 const EditNotice: React.FC = () => {
@@ -64,6 +66,8 @@ const EditNotice: React.FC = () => {
         status: notice.status || 'Active',
         jurisdiction: notice.jurisdiction || 'South Sudan',
         language: notice.language || 'English',
+        sourceUrl: notice.sourceUrl || '',
+        sourceProvenance: notice.sourceProvenance || '',
       });
     }
   }, [notice]);
@@ -102,6 +106,8 @@ const EditNotice: React.FC = () => {
         status: formData.status || undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
+        sourceUrl: formData.sourceUrl || undefined,
+        sourceProvenance: formData.sourceProvenance || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -235,6 +241,18 @@ const EditNotice: React.FC = () => {
                 <div>
                   <Label htmlFor="amendsLaws">{t('admin.form.amends_laws')}</Label>
                   <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceUrl">Source URL</Label>
+                  <Input id="sourceUrl" name="sourceUrl" type="url" value={formData.sourceUrl} onChange={handleInputChange}
+                    placeholder="https://gazette.gov.ss/..." />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceProvenance">Source Provenance</Label>
+                  <Input id="sourceProvenance" name="sourceProvenance" value={formData.sourceProvenance} onChange={handleInputChange}
+                    placeholder="e.g. Official Gazette of South Sudan, Vol. XV No. 23, 12 March 2019" />
                 </div>
 
                 <div className="md:col-span-2">
