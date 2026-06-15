@@ -319,6 +319,17 @@ const JudgmentDetail: React.FC = () => {
                     <dd className="mt-0.5 font-mono text-xs text-foreground break-all">{judgment.frbrUri}</dd>
                   </div>
                 )}
+                {(judgment.sourceProvenance || judgment.sourceUrl) && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <dt className="text-sm text-muted-foreground">Source</dt>
+                    {judgment.sourceProvenance && <dd className="text-sm font-medium text-foreground mt-0.5">{judgment.sourceProvenance}</dd>}
+                    {judgment.sourceUrl && (
+                      <dd className="mt-1">
+                        <a href={judgment.sourceUrl} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline break-all">{judgment.sourceUrl}</a>
+                      </dd>
+                    )}
+                  </div>
+                )}
               </div>
 
               {judgment.tags && judgment.tags.length > 0 && (
