@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, FileWarning } from 'lucide-react';
 import { useCreateNotice } from '@/hooks/useNotices';
+import { CitationSearch } from '@/components/CitationSearch';
 import { toast } from 'sonner';
 import { noticeService } from '@/services/noticeService';
 import { CreateLegalNoticeRequest, LegalNotice } from '@/types/api';
@@ -35,8 +36,8 @@ const AdminUploadNotice: React.FC = () => {
     summary: '',
     tags: '',
     fullText: '',
-    relatedLaws: '',
-    amendsLaws: '',
+    relatedLaws: [] as string[],
+    amendsLaws: [] as string[],
     jurisdiction: 'South Sudan',
     language: 'English',
     status: 'Active',
@@ -76,8 +77,8 @@ const AdminUploadNotice: React.FC = () => {
         summary: formData.summary || undefined,
         fullText: formData.fullText || undefined,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        amendsLaws: formData.amendsLaws ? formData.amendsLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws.length ? formData.relatedLaws : undefined,
+        amendsLaws: formData.amendsLaws.length ? formData.amendsLaws : undefined,
         jurisdiction: formData.jurisdiction,
         language: formData.language,
         status: formData.status || undefined,
@@ -198,13 +199,22 @@ const AdminUploadNotice: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
-                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.related_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.relatedLaws}
+                    onChange={ids => setFormData(prev => ({ ...prev, relatedLaws: ids }))}
+                  />
                 </div>
 
                 <div>
-                  <Label htmlFor="amendsLaws">{t('admin.form.amends_laws')}</Label>
-                  <Input id="amendsLaws" name="amendsLaws" value={formData.amendsLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.amends_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.amendsLaws}
+                    onChange={ids => setFormData(prev => ({ ...prev, amendsLaws: ids }))}
+                    placeholder="Search for laws amended by this notice…"
+                  />
                 </div>
 
                 <div className="md:col-span-2">
