@@ -33,6 +33,8 @@ interface EditJudgmentForm {
   citedCases: string;
   jurisdiction: string;
   language: string;
+  sourceUrl: string;
+  sourceProvenance: string;
 }
 
 const EditJudgment: React.FC = () => {
@@ -66,6 +68,8 @@ const EditJudgment: React.FC = () => {
         citedCases: (judgment.citedCases || []).join(', '),
         jurisdiction: judgment.jurisdiction || 'South Sudan',
         language: judgment.language || 'English',
+        sourceUrl: judgment.sourceUrl || '',
+        sourceProvenance: judgment.sourceProvenance || '',
       });
     }
   }, [judgment]);
@@ -104,6 +108,8 @@ const EditJudgment: React.FC = () => {
         citedCases: formData.citedCases ? formData.citedCases.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         jurisdiction: formData.jurisdiction || undefined,
         language: formData.language || undefined,
+        sourceUrl: formData.sourceUrl || undefined,
+        sourceProvenance: formData.sourceProvenance || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -270,6 +276,18 @@ const EditJudgment: React.FC = () => {
                 <div>
                   <Label htmlFor="citedCases">{t('admin.form.cited_cases')}</Label>
                   <Input id="citedCases" name="citedCases" value={formData.citedCases} onChange={handleInputChange} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceUrl">Source URL</Label>
+                  <Input id="sourceUrl" name="sourceUrl" type="url" value={formData.sourceUrl} onChange={handleInputChange}
+                    placeholder="https://judiciary.gov.ss/..." />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="sourceProvenance">Source Provenance</Label>
+                  <Input id="sourceProvenance" name="sourceProvenance" value={formData.sourceProvenance} onChange={handleInputChange}
+                    placeholder="e.g. Supreme Court Records, File No. HC/2021/04" />
                 </div>
 
                 <div className="md:col-span-2">
