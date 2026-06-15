@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, FileText } from 'lucide-react';
 import { useCreateLaw } from '@/hooks/useLaws';
+import { CitationSearch } from '@/components/CitationSearch';
 import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, Law } from '@/types/api';
@@ -37,7 +38,7 @@ const AdminUploadLaw: React.FC = () => {
     tags: '',
     language: 'English',
     fullText: '',
-    relatedLaws: '',
+    relatedLaws: [] as string[],
     amendments: '',
   });
 
@@ -65,7 +66,7 @@ const AdminUploadLaw: React.FC = () => {
       const lawData = {
         ...formData,
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws.length ? formData.relatedLaws : undefined,
         amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         year: Number(formData.year),
         fullText: formData.fullText || undefined,
@@ -226,8 +227,12 @@ const AdminUploadLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
-                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.related_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.relatedLaws}
+                    onChange={ids => setFormData(prev => ({ ...prev, relatedLaws: ids }))}
+                  />
                 </div>
 
                 <div>
