@@ -225,6 +225,8 @@ export interface Judgment {
   verdict?: string;
   summary?: string;
   fullText?: string;
+  coram?: string;
+  headnotes?: string;
   legalPrinciples?: string[];
   citedCases?: string[];
   citedLaws?: string[];
@@ -257,6 +259,8 @@ export interface CreateJudgmentRequest {
   verdict?: string;
   summary?: string;
   fullText?: string;
+  coram?: string;
+  headnotes?: string;
   legalPrinciples?: string[];
   citedCases?: string[];
   citedLaws?: string[];
