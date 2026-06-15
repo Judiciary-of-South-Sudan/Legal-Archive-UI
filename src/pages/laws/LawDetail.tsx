@@ -32,6 +32,7 @@ const LawDetail: React.FC = () => {
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const { mutate: trackDownload } = useIncrementLawDownload();
   const [relatedLawTitles, setRelatedLawTitles] = useState<{ id: string; title: string }[]>([]);
+  const [amendmentLawTitles, setAmendmentLawTitles] = useState<{ id: string; title: string }[]>([]);
   const [citedBy, setCitedBy] = useState<{ judgments: any[]; notices: any[] } | null>(null);
   const [submitPending, setSubmitPending] = useState(false);
   const queryClient = useQueryClient();
@@ -62,6 +63,18 @@ const LawDetail: React.FC = () => {
       setCitedBy(citedByData as { judgments: any[]; notices: any[] });
     }).catch(() => {});
   }, [id, law?.id]);
+
+  useEffect(() => {
+    if (!law?.amendmentIds?.length) return;
+    Promise.allSettled(law.amendmentIds.map((lid: string) => apiClient.get(`/laws/${lid}`))).then(results => {
+      setAmendmentLawTitles(
+        results.map((r, i) => ({
+          id: law.amendmentIds![i],
+          title: r.status === 'fulfilled' ? (r.value.data?.data?.title ?? law.amendmentIds![i]) : law.amendmentIds![i],
+        }))
+      );
+    });
+  }, [law?.amendmentIds?.join(',')]);
 
   const copyCitation = () => {
     if (!law) return;
@@ -342,9 +355,25 @@ const LawDetail: React.FC = () => {
                 </div>
               )}
 
-              {law.amendments && law.amendments.length > 0 && (
+              {law.amendmentIds && law.amendmentIds.length > 0 && (
                 <div className="border-t border-border pt-5">
                   <h3 className="archive-section-label mb-3">{t('laws.amendments_label')}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {(amendmentLawTitles.length > 0
+                      ? amendmentLawTitles
+                      : law.amendmentIds.map(lid => ({ id: lid, title: lid }))
+                    ).map(({ id: lawId, title }) => (
+                      <Link key={lawId} to={`/laws/${lawId}`}>
+                        <Badge variant="outline" className="cursor-pointer hover:bg-muted">{title}</Badge>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {law.amendments && law.amendments.length > 0 && (
+                <div className="border-t border-border pt-5">
+                  <h3 className="archive-section-label mb-3">Amendment Notes</h3>
                   <div className="flex flex-wrap gap-2">
                     {law.amendments.map((a, i) => (
                       <span key={i} className="rounded-md border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground">{a}</span>
