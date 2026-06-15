@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import VerifyDocument from '@/components/admin/VerifyDocument';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,7 +13,7 @@ import {
   FileText, Gavel, FileWarning, Users, BarChart3, TrendingUp,
   UserCog, Eye, Download, Search, ClipboardList, RefreshCw, CheckCircle2,
   Clock, AlertTriangle, Scale, BookOpen, Layers, ShieldCheck,
-  XCircle, ChevronRight,
+  XCircle, ChevronRight, PenLine, Send, Trash2,
 } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
@@ -61,6 +62,17 @@ interface ReviewItem {
   year: number;
   verificationStatus: 'DRAFT' | 'UNDER_REVIEW' | 'PUBLISHED';
   createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface DraftItem {
+  id: string;
+  documentType: 'Law' | 'Judgment' | 'Notice' | 'Decree';
+  collection: 'laws' | 'judgments' | 'notices' | 'decrees';
+  title: string;
+  subType: string;
+  year: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -186,6 +198,29 @@ const AdminDashboard: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: myDrafts = [], isLoading: myDraftsLoading, refetch: refetchMyDrafts } = useQuery<DraftItem[]>({
+    queryKey: ['editor', 'myDrafts'],
+    queryFn: () => apiClient.get('/editor/my-drafts').then(r => r.data.data ?? []),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const [submitLoading, setSubmitLoading] = useState<Record<string, boolean>>({});
+
+  const handleSubmitForReview = async (item: DraftItem) => {
+    setSubmitLoading(prev => ({ ...prev, [item.id]: true }));
+    try {
+      await apiClient.put(`/editor/${item.collection}/${item.id}/submit`);
+      queryClient.setQueryData<DraftItem[]>(['editor', 'myDrafts'], prev =>
+        (prev ?? []).filter(d => d.id !== item.id)
+      );
+      toast.success(`"${item.title}" submitted for review`);
+    } catch {
+      toast.error('Could not submit for review');
+    } finally {
+      setSubmitLoading(prev => ({ ...prev, [item.id]: false }));
+    }
+  };
+
   const loading = statsLoading || reviewQueueLoading;
 
   const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT', comment = '') => {
@@ -224,9 +259,44 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const COLLECTION_API_PATH: Record<string, string> = {
+    laws: 'laws',
+    judgments: 'judgments',
+    notices: 'legal-notices',
+    decrees: 'decrees',
+  };
+
+  type DeleteTarget = { id: string; collection: string; title: string };
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const requestDelete = (item: DeleteTarget) => setDeleteTarget(item);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      const path = COLLECTION_API_PATH[deleteTarget.collection];
+      await apiClient.delete(`/${path}/${deleteTarget.id}`);
+      queryClient.setQueryData<ReviewItem[]>(['admin', 'reviewQueue'], prev =>
+        (prev ?? []).filter(r => r.id !== deleteTarget.id)
+      );
+      queryClient.setQueryData<DraftItem[]>(['editor', 'myDrafts'], prev =>
+        (prev ?? []).filter(d => d.id !== deleteTarget.id)
+      );
+      toast.success(`"${deleteTarget.title}" deleted`);
+      setDeleteTarget(null);
+      setVerifyItem(null);
+    } catch {
+      toast.error('Could not delete document');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([refetchStats(), refetchActivity(), refetchAnalytics(), refetchAudit(), refetchReviewQueue()]);
+    await Promise.all([refetchStats(), refetchActivity(), refetchAnalytics(), refetchAudit(), refetchReviewQueue(), refetchMyDrafts()]);
     setRefreshing(false);
     toast.success('Dashboard refreshed');
   };
@@ -278,11 +348,11 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className={`grid min-w-max sm:w-full sm:max-w-xl ${isAdmin() ? 'grid-cols-4' : 'grid-cols-2'}`}>
+          <TabsList className={`grid min-w-max sm:w-full sm:max-w-2xl ${isAdmin() ? 'grid-cols-5' : 'grid-cols-3'}`}>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             {isAdmin() && (
               <TabsTrigger value="review" className="relative">
-                Unpublished
+                In Review
                 {reviewQueue.length > 0 && (
                   <span className="ms-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
                     {reviewQueue.length}
@@ -290,6 +360,14 @@ const AdminDashboard: React.FC = () => {
                 )}
               </TabsTrigger>
             )}
+            <TabsTrigger value="drafts" className="relative">
+              My Drafts
+              {myDrafts.length > 0 && (
+                <span className="ms-1.5 inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold bg-slate-400 text-white">
+                  {myDrafts.length}
+                </span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             {isAdmin() && <TabsTrigger value="audit">Audit Log</TabsTrigger>}
           </TabsList>
@@ -388,7 +466,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-3">
                       <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" />
-                        {(stats?.underReviewLaws ?? 0) + (stats?.underReviewJudgments ?? 0) + (stats?.underReviewNotices ?? 0)} documents under review — see Unpublished tab
+                        {(stats?.underReviewLaws ?? 0) + (stats?.underReviewJudgments ?? 0) + (stats?.underReviewNotices ?? 0)} documents awaiting review — see In Review tab
                       </p>
                     </div>
                   )}
@@ -485,24 +563,24 @@ const AdminDashboard: React.FC = () => {
             </Card>
           </TabsContent>
 
-          {/* ──────────────── UNPUBLISHED TAB ──────────────── */}
+          {/* ──────────────── IN REVIEW TAB ──────────────── */}
           <TabsContent value="review" className="space-y-4">
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4 text-amber-500" /> Unpublished Documents
+                      <ShieldCheck className="h-4 w-4 text-amber-500" /> Documents In Review
                     </CardTitle>
                     <CardDescription>
                       {reviewQueue.length === 0
-                        ? 'All documents are published'
-                        : `${reviewQueue.length} document${reviewQueue.length > 1 ? 's' : ''} not yet visible to the public`}
+                        ? 'No documents awaiting review'
+                        : `${reviewQueue.length} document${reviewQueue.length > 1 ? 's' : ''} submitted for review — approve, decline, or delete`}
                     </CardDescription>
                   </div>
                   {reviewQueue.length > 0 && (
                     <span className="text-sm font-semibold text-amber-600 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-3 py-1 rounded-full">
-                      {reviewQueue.length} unpublished
+                      {reviewQueue.length} awaiting review
                     </span>
                   )}
                 </div>
@@ -513,9 +591,9 @@ const AdminDashboard: React.FC = () => {
                     <div className="p-4 rounded-full bg-green-50 dark:bg-green-950/40">
                       <CheckCircle2 className="h-8 w-8 text-green-500" />
                     </div>
-                    <p className="text-sm font-medium">All clear — everything is published</p>
+                    <p className="text-sm font-medium">Nothing to review</p>
                     <p className="text-xs text-muted-foreground">
-                      Draft and under-review documents appear here so you can publish or reject them.
+                      Documents submitted for review by editors appear here. Declined documents return to the editor's drafts.
                     </p>
                   </div>
                 ) : (
@@ -590,6 +668,157 @@ const AdminDashboard: React.FC = () => {
                               <ShieldCheck className="h-3.5 w-3.5 me-1.5" />
                               {isLoading ? 'Saving…' : 'Review'}
                             </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={isLoading}
+                              onClick={() => requestDelete(item)}
+                              className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                              aria-label="Delete document"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ──────────────── MY DRAFTS TAB ──────────────── */}
+          <TabsContent value="drafts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <PenLine className="h-4 w-4 text-slate-500" /> My Drafts
+                    </CardTitle>
+                    <CardDescription>
+                      {myDraftsLoading
+                        ? 'Loading…'
+                        : myDrafts.length === 0
+                          ? 'You have no saved drafts'
+                          : `${myDrafts.length} draft${myDrafts.length > 1 ? 's' : ''} saved — not yet visible to the public`}
+                    </CardDescription>
+                  </div>
+                  {myDrafts.length > 0 && (
+                    <span className="text-sm font-semibold text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full">
+                      {myDrafts.length} draft{myDrafts.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {myDraftsLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" />
+                    ))}
+                  </div>
+                ) : myDrafts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+                    <div className="p-4 rounded-full bg-slate-50 dark:bg-slate-900/40">
+                      <PenLine className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="text-sm font-medium">No drafts yet</p>
+                    <p className="text-xs text-muted-foreground">
+                      When you upload a document and save it as a draft, it will appear here.
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center mt-1">
+                      {[
+                        { to: '/admin/upload-law',      label: 'Upload Law' },
+                        { to: '/admin/upload-judgment',  label: 'Upload Judgment' },
+                        { to: '/admin/upload-notice',    label: 'Upload Notice' },
+                        { to: '/admin/upload-decree',    label: 'Upload Decree' },
+                      ].map(({ to, label }) => (
+                        <Link key={to} to={to}>
+                          <Button variant="outline" size="sm">{label}</Button>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myDrafts.map(item => {
+                      const typeColor = {
+                        Law:      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300',
+                        Judgment: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300',
+                        Notice:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300',
+                        Decree:   'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300',
+                      }[item.documentType];
+                      const typeIcon = {
+                        Law:      <FileText className="h-4 w-4" />,
+                        Judgment: <Gavel className="h-4 w-4" />,
+                        Notice:   <FileWarning className="h-4 w-4" />,
+                        Decree:   <Scale className="h-4 w-4" />,
+                      }[item.documentType];
+                      const editLink = {
+                        Law:      `/admin/edit-law/${item.id}`,
+                        Judgment: `/admin/edit-judgment/${item.id}`,
+                        Notice:   `/admin/edit-notice/${item.id}`,
+                        Decree:   `/admin/edit-decree/${item.id}`,
+                      }[item.documentType];
+                      const isSubmitting = submitLoading[item.id];
+
+                      return (
+                        <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border p-4 hover:bg-muted/20 transition-colors">
+                          {/* Type badge */}
+                          <div className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border self-start sm:self-center shrink-0 ${typeColor}`}>
+                            {typeIcon} {item.documentType}
+                          </div>
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold leading-snug truncate" title={item.title}>
+                              {item.title}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                              {item.subType && (
+                                <span className="text-xs text-muted-foreground">{item.subType}</span>
+                              )}
+                              {item.year > 0 && (
+                                <span className="text-xs text-muted-foreground">{item.year}</span>
+                              )}
+                              {item.updatedAt && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Clock className="h-3 w-3" /> Last edited {fmtDate(item.updatedAt)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Link to={editLink}>
+                              <Button variant="outline" size="sm">
+                                <PenLine className="h-3.5 w-3.5 me-1.5" /> Edit
+                              </Button>
+                            </Link>
+                            <Button
+                              size="sm"
+                              disabled={isSubmitting}
+                              onClick={() => handleSubmitForReview(item)}
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                            >
+                              <Send className="h-3.5 w-3.5 me-1.5" />
+                              {isSubmitting ? 'Submitting…' : 'Submit for Review'}
+                            </Button>
+                            {isAdmin() && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={isSubmitting}
+                                onClick={() => requestDelete(item)}
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                                aria-label="Delete draft"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                       );
@@ -806,6 +1035,17 @@ const AdminDashboard: React.FC = () => {
         item={verifyItem}
         onClose={() => setVerifyItem(null)}
         onAction={handleReviewAction}
+        onDeleteRequest={requestDelete}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={`Delete "${deleteTarget?.title ?? 'this document'}"?`}
+        description="This action cannot be undone. The document and any associated PDF will be permanently removed from the archive."
+        confirmLabel="Delete document"
+        isLoading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={() => { if (!isDeleting) setDeleteTarget(null); }}
       />
     </div>
   );
