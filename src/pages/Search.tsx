@@ -263,7 +263,7 @@ const SearchPage = () => {
                             subTitle={j.caseNumber}
                           />
                         ))}
-                        <Pagination page={judgmentsPage} totalPages={judgmentsTotalPages} onPrev={() => setJudgmentsPage(p => p - 1)} onNext={() => setJudgmentsPage(p => p + 1)} />
+                        <Pagination page={judgmentsPage} totalPages={judgmentsTotalPages} onPrev={() => setJudgmentsPage(p => p - 1)} onNext={() => setJudgmentsPage(p => p + 1)} prevLabel={t('common.previous')} nextLabel={t('common.next')} pageLabel={t('common.page')} ofLabel={t('common.of')} />
                       </>
                     )}
                   </TabsContent>
@@ -289,7 +289,7 @@ const SearchPage = () => {
                             subTitle={n.noticeNumber}
                           />
                         ))}
-                        <Pagination page={noticesPage} totalPages={noticesTotalPages} onPrev={() => setNoticesPage(p => p - 1)} onNext={() => setNoticesPage(p => p + 1)} />
+                        <Pagination page={noticesPage} totalPages={noticesTotalPages} onPrev={() => setNoticesPage(p => p - 1)} onNext={() => setNoticesPage(p => p + 1)} prevLabel={t('common.previous')} nextLabel={t('common.next')} pageLabel={t('common.page')} ofLabel={t('common.of')} />
                       </>
                     )}
                   </TabsContent>
@@ -315,7 +315,7 @@ const SearchPage = () => {
                             subTitle={d.decreeNumber}
                           />
                         ))}
-                        <Pagination page={decreesPage} totalPages={decreesTotalPages} onPrev={() => setDecreesPage(p => p - 1)} onNext={() => setDecreesPage(p => p + 1)} />
+                        <Pagination page={decreesPage} totalPages={decreesTotalPages} onPrev={() => setDecreesPage(p => p - 1)} onNext={() => setDecreesPage(p => p + 1)} prevLabel={t('common.previous')} nextLabel={t('common.next')} pageLabel={t('common.page')} ofLabel={t('common.of')} />
                       </>
                     )}
                   </TabsContent>
