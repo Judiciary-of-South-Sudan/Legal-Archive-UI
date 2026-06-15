@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Upload, FileText } from 'lucide-react';
 import { useGetLawById, useUpdateLaw } from '@/hooks/useLaws';
+import { CitationSearch } from '@/components/CitationSearch';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, CreateLawRequest, Law } from '@/types/api';
 import { toast } from 'sonner';
@@ -32,9 +33,9 @@ interface EditLawForm {
   tags: string;
   language: string;
   fullText: string;
-  relatedLaws: string;
+  relatedLaws: string[];
   amendments: string;
-  amendmentIds: string;
+  amendmentIds: string[];
   repealedBy: string;
   repealDate: string;
   sourceUrl: string;
@@ -71,9 +72,9 @@ const EditLaw: React.FC = () => {
         tags: (law.tags || []).join(', '),
         language: law.language || 'English',
         fullText: law.fullText || '',
-        relatedLaws: (law.relatedLaws || []).join(', '),
+        relatedLaws: law.relatedLaws || [],
         amendments: (law.amendments || []).join(', '),
-        amendmentIds: (law.amendmentIds || []).join(', '),
+        amendmentIds: law.amendmentIds || [],
         repealedBy: law.repealedBy || '',
         repealDate: law.repealDate ? law.repealDate.split('T')[0] : '',
         sourceUrl: law.sourceUrl || '',
@@ -115,9 +116,9 @@ const EditLaw: React.FC = () => {
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         language: formData.language || undefined,
         fullText: formData.fullText || undefined,
-        relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        relatedLaws: formData.relatedLaws.length ? formData.relatedLaws : undefined,
         amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-        amendmentIds: formData.amendmentIds ? formData.amendmentIds.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        amendmentIds: formData.amendmentIds.length ? formData.amendmentIds : undefined,
         repealedBy: formData.repealedBy || undefined,
         repealDate: formData.repealDate || undefined,
         sourceUrl: formData.sourceUrl || undefined,
@@ -295,14 +296,22 @@ const EditLaw: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="relatedLaws">{t('admin.form.related_laws')}</Label>
-                  <Input id="relatedLaws" name="relatedLaws" value={formData.relatedLaws} onChange={handleInputChange} />
+                  <Label>{t('admin.form.related_laws')}</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.relatedLaws}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, relatedLaws: ids } : prev)}
+                  />
                 </div>
 
                 <div>
-                  <Label htmlFor="amendmentIds">Amending Law IDs (comma-separated)</Label>
-                  <Input id="amendmentIds" name="amendmentIds" value={formData.amendmentIds} onChange={handleInputChange}
-                    placeholder="MongoDB IDs of laws that amend this law" />
+                  <Label>Amending Laws</Label>
+                  <CitationSearch
+                    type="law"
+                    value={formData.amendmentIds}
+                    onChange={ids => setFormData(prev => prev ? { ...prev, amendmentIds: ids } : prev)}
+                    placeholder="Search for laws that amend this law…"
+                  />
                 </div>
 
                 <div className="md:col-span-2">
