@@ -387,6 +387,9 @@ export interface NoticeFilterParams extends PaginationParams {
 
 export interface SearchParams extends PaginationParams {
   query: string;
+  fromYear?: number;
+  toYear?: number;
+  sort?: string;
 }
 
 export interface DateRangeParams extends PaginationParams {
