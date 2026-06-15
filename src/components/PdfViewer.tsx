@@ -23,24 +23,28 @@ const PdfViewer: React.FC<Props> = ({ url, fullHeight = false, showThumbnails = 
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const pagesAreaRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState(0);
+  // Safe initial value prevents react-pdf <Page> from rendering at its natural PDF width
+  // (~595px) before the container is measured, which caused horizontal scroll on mobile.
+  const [containerWidth, setContainerWidth] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth - 32 : 300
+  );
   const thumbnailRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const pageRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
-  // Track the width of the pages area for responsive page sizing.
-  // Read the element's actual width on mount rather than window.innerWidth,
-  // which over-estimates when the viewer is rendered inside a constrained container.
+  // Set up ResizeObserver after the PDF loads (numPages > 0).
+  // react-pdf's Document does not render children while loading, so pagesAreaRef.current
+  // is null on first mount — the effect must re-run once children are in the DOM.
   useEffect(() => {
     const el = pagesAreaRef.current;
     if (!el) return;
-    const initial = el.getBoundingClientRect().width;
-    setContainerWidth(initial || (typeof window !== 'undefined' ? window.innerWidth - 32 : 300));
+    const measured = el.getBoundingClientRect().width;
+    if (measured > 0) setContainerWidth(measured);
     const observer = new ResizeObserver(([entry]) => {
       setContainerWidth(entry.contentRect.width);
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [numPages]);
 
   // IntersectionObserver: update active page as user scrolls
   useEffect(() => {
