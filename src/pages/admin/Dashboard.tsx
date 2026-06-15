@@ -77,6 +77,13 @@ interface DraftItem {
   updatedAt: string;
 }
 
+interface EditorStats {
+  total: number;
+  drafts: number;
+  underReview: number;
+  published: number;
+}
+
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const ACTION_CFG: Record<string, { label: string; cls: string }> = {
@@ -171,36 +178,47 @@ const AdminDashboard: React.FC = () => {
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery<DashboardStats>({
     queryKey: ['admin', 'stats'],
     queryFn: () => apiClient.get('/admin/dashboard').then(r => r.data.data),
+    enabled: isAdmin(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: activity, refetch: refetchActivity } = useQuery<ActivitySummary>({
     queryKey: ['admin', 'activity'],
     queryFn: () => apiClient.get('/admin/activity').then(r => r.data.data),
+    enabled: isAdmin(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: analytics, refetch: refetchAnalytics } = useQuery<AnalyticsSummary>({
     queryKey: ['admin', 'analytics'],
     queryFn: () => apiClient.get('/admin/analytics').then(r => r.data.data),
+    enabled: isAdmin(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: auditLog = [], refetch: refetchAudit } = useQuery<AuditEntry[]>({
     queryKey: ['admin', 'audit', auditLimit],
     queryFn: () => apiClient.get(`/admin/audit?limit=${auditLimit}`).then(r => r.data.data ?? []),
+    enabled: isAdmin(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: reviewQueue = [], isLoading: reviewQueueLoading, refetch: refetchReviewQueue } = useQuery<ReviewItem[]>({
     queryKey: ['admin', 'reviewQueue'],
     queryFn: () => apiClient.get('/admin/review-queue').then(r => r.data.data ?? []),
+    enabled: isAdmin(),
     staleTime: 5 * 60 * 1000,
   });
 
   const { data: myDrafts = [], isLoading: myDraftsLoading, refetch: refetchMyDrafts } = useQuery<DraftItem[]>({
     queryKey: ['editor', 'myDrafts'],
     queryFn: () => apiClient.get('/editor/my-drafts').then(r => r.data.data ?? []),
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const { data: editorStats, refetch: refetchEditorStats } = useQuery<EditorStats>({
+    queryKey: ['editor', 'myStats'],
+    queryFn: () => apiClient.get('/editor/my-stats').then(r => r.data.data),
     staleTime: 2 * 60 * 1000,
   });
 
@@ -221,7 +239,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const loading = statsLoading || reviewQueueLoading;
+  const loading = isAdmin() && (statsLoading || reviewQueueLoading);
 
   const handleReviewAction = async (item: ReviewItem, action: 'PUBLISHED' | 'UNDER_REVIEW' | 'DRAFT', comment = '') => {
     setReviewLoading(prev => ({ ...prev, [item.id]: true }));
@@ -247,6 +265,11 @@ const AdminDashboard: React.FC = () => {
           publishedJudgments:   action === 'PUBLISHED' && item.documentType === 'Judgment' ? prev.publishedJudgments + 1 : prev.publishedJudgments,
           publishedNotices:     action === 'PUBLISHED' && item.documentType === 'Notice'   ? prev.publishedNotices + 1   : prev.publishedNotices,
         } : prev);
+        // Declined doc returns to editor's My Drafts — invalidate so it shows up immediately
+        if (action === 'DRAFT') {
+          queryClient.invalidateQueries({ queryKey: ['editor', 'myDrafts'] });
+          queryClient.invalidateQueries({ queryKey: ['editor', 'myStats'] });
+        }
       }
       const toastMsg = action === 'PUBLISHED' ? `"${item.title}" published`
         : action === 'UNDER_REVIEW' ? `"${item.title}" submitted for review`
@@ -296,7 +319,11 @@ const AdminDashboard: React.FC = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([refetchStats(), refetchActivity(), refetchAnalytics(), refetchAudit(), refetchReviewQueue(), refetchMyDrafts()]);
+    const toRefetch: Promise<unknown>[] = [refetchMyDrafts(), refetchEditorStats()];
+    if (isAdmin()) {
+      toRefetch.push(refetchStats(), refetchActivity(), refetchAnalytics(), refetchAudit(), refetchReviewQueue());
+    }
+    await Promise.all(toRefetch);
     setRefreshing(false);
     toast.success('Dashboard refreshed');
   };
@@ -375,27 +402,27 @@ const AdminDashboard: React.FC = () => {
           {/* ──────────────── OVERVIEW TAB ──────────────── */}
           <TabsContent value="overview" className="space-y-6">
 
-            {/* Stat cards */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 ${isAdmin() ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
-              <StatCard
-                icon={<FileText className="h-4 w-4 text-blue-600" />}
-                label="Laws" total={stats?.totalLaws ?? 0}
-                published={stats?.publishedLaws ?? 0} underReview={stats?.underReviewLaws ?? 0}
-                thisYear={stats?.lawsThisYear ?? 0} color="bg-blue-50 dark:bg-blue-950"
-              />
-              <StatCard
-                icon={<Gavel className="h-4 w-4 text-purple-600" />}
-                label="Judgments" total={stats?.totalJudgments ?? 0}
-                published={stats?.publishedJudgments ?? 0} underReview={stats?.underReviewJudgments ?? 0}
-                thisYear={stats?.judgmentsThisYear ?? 0} color="bg-purple-50 dark:bg-purple-950"
-              />
-              <StatCard
-                icon={<FileWarning className="h-4 w-4 text-amber-600" />}
-                label="Notices" total={stats?.totalLegalNotices ?? 0}
-                published={stats?.publishedNotices ?? 0} underReview={stats?.underReviewNotices ?? 0}
-                thisYear={stats?.noticesThisYear ?? 0} color="bg-amber-50 dark:bg-amber-950"
-              />
-              {isAdmin() && (
+            {/* Admin global stat cards */}
+            {isAdmin() && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <StatCard
+                  icon={<FileText className="h-4 w-4 text-blue-600" />}
+                  label="Laws" total={stats?.totalLaws ?? 0}
+                  published={stats?.publishedLaws ?? 0} underReview={stats?.underReviewLaws ?? 0}
+                  thisYear={stats?.lawsThisYear ?? 0} color="bg-blue-50 dark:bg-blue-950"
+                />
+                <StatCard
+                  icon={<Gavel className="h-4 w-4 text-purple-600" />}
+                  label="Judgments" total={stats?.totalJudgments ?? 0}
+                  published={stats?.publishedJudgments ?? 0} underReview={stats?.underReviewJudgments ?? 0}
+                  thisYear={stats?.judgmentsThisYear ?? 0} color="bg-purple-50 dark:bg-purple-950"
+                />
+                <StatCard
+                  icon={<FileWarning className="h-4 w-4 text-amber-600" />}
+                  label="Notices" total={stats?.totalLegalNotices ?? 0}
+                  published={stats?.publishedNotices ?? 0} underReview={stats?.underReviewNotices ?? 0}
+                  thisYear={stats?.noticesThisYear ?? 0} color="bg-amber-50 dark:bg-amber-950"
+                />
                 <Card className="overflow-hidden">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">Registered Users</CardTitle>
@@ -411,10 +438,33 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Content Health + Recent Activity */}
+            {/* Editor personal submission stats */}
+            {!isAdmin() && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { label: 'Total',      value: editorStats?.total      ?? 0, color: 'text-foreground',    bg: 'bg-slate-50 dark:bg-slate-900/40',     icon: <FileText className="h-4 w-4 text-slate-500" /> },
+                  { label: 'Published',  value: editorStats?.published  ?? 0, color: 'text-green-600',     bg: 'bg-green-50 dark:bg-green-950/40',     icon: <CheckCircle2 className="h-4 w-4 text-green-600" /> },
+                  { label: 'In Review',  value: editorStats?.underReview ?? 0, color: 'text-blue-600',     bg: 'bg-blue-50 dark:bg-blue-950/40',       icon: <Clock className="h-4 w-4 text-blue-600" /> },
+                  { label: 'Drafts',     value: editorStats?.drafts     ?? myDrafts.length, color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-900/40', icon: <PenLine className="h-4 w-4 text-slate-400" /> },
+                ].map(({ label, value, color, bg, icon }) => (
+                  <Card key={label} className="overflow-hidden">
+                    <CardContent className="pt-5 pb-4 text-center space-y-2">
+                      <div className={`w-10 h-10 rounded-full ${bg} flex items-center justify-center mx-auto`}>
+                        {icon}
+                      </div>
+                      <div className={`text-3xl font-bold ${color}`}>{value}</div>
+                      <div className="text-xs text-muted-foreground">{label}</div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Content Health + Recent Activity (admin only) */}
+            {isAdmin() && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
               {/* Content Health */}
@@ -507,6 +557,7 @@ const AdminDashboard: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+            )}
 
             {/* Quick Actions */}
             <Card>
