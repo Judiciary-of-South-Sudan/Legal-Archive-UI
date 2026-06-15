@@ -94,6 +94,7 @@ export interface Law {
   tags?: string[];
   pdfUrl?: string;
   sourceUrl?: string;
+  sourceProvenance?: string;
   relatedLaws?: string[];
   amendments?: string[];
   repealedBy?: string;
@@ -133,6 +134,7 @@ export interface CreateLawRequest {
   tags?: string[];
   pdfUrl?: string;
   sourceUrl?: string;
+  sourceProvenance?: string;
   relatedLaws?: string[];
   amendments?: string[];
   repealedBy?: string;
@@ -159,6 +161,8 @@ export interface RepublicanDecree {
   frbrUri?: string;
   tags?: string[];
   language?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   verificationStatus?: string;
   createdBy?: string;
   updatedBy?: string;
@@ -184,6 +188,8 @@ export interface CreateDecreeRequest {
   frbrUri?: string;
   tags?: string[];
   language?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   verificationStatus?: string;
 }
 
@@ -219,6 +225,8 @@ export interface Judgment {
   jurisdiction?: string;
   language?: string;
   pdfUrl?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   status?: string;
   verificationStatus?: string;
   createdBy?: string;
@@ -249,6 +257,8 @@ export interface CreateJudgmentRequest {
   jurisdiction?: string;
   language?: string;
   pdfUrl?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   status?: string;
   verificationStatus?: string;
 }
@@ -277,6 +287,8 @@ export interface LegalNotice {
   jurisdiction?: string;
   language?: string;
   pdfUrl?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   status?: string;
   verificationStatus?: string;
   createdBy?: string;
@@ -308,6 +320,8 @@ export interface CreateLegalNoticeRequest {
   jurisdiction?: string;
   language?: string;
   pdfUrl?: string;
+  sourceUrl?: string;
+  sourceProvenance?: string;
   status?: string;
   verificationStatus?: string;
 }
