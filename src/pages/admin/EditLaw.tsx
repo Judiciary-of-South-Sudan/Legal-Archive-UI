@@ -34,6 +34,8 @@ interface EditLawForm {
   fullText: string;
   relatedLaws: string;
   amendments: string;
+  repealedBy: string;
+  repealDate: string;
 }
 
 const EditLaw: React.FC = () => {
@@ -68,6 +70,8 @@ const EditLaw: React.FC = () => {
         fullText: law.fullText || '',
         relatedLaws: (law.relatedLaws || []).join(', '),
         amendments: (law.amendments || []).join(', '),
+        repealedBy: law.repealedBy || '',
+        repealDate: law.repealDate ? law.repealDate.split('T')[0] : '',
       });
     }
   }, [law]);
@@ -107,6 +111,8 @@ const EditLaw: React.FC = () => {
         fullText: formData.fullText || undefined,
         relatedLaws: formData.relatedLaws ? formData.relatedLaws.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         amendments: formData.amendments ? formData.amendments.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        repealedBy: formData.repealedBy || undefined,
+        repealDate: formData.repealDate || undefined,
       };
 
       await updateMutation.mutateAsync({ id, data: payload });
@@ -211,6 +217,20 @@ const EditLaw: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {formData.status === 'Repealed' && (
+                  <>
+                    <div>
+                      <Label htmlFor="repealDate">Repeal Date</Label>
+                      <Input id="repealDate" name="repealDate" type="date" value={formData.repealDate} onChange={handleInputChange} />
+                    </div>
+                    <div>
+                      <Label htmlFor="repealedBy">Repealed By (Law ID)</Label>
+                      <Input id="repealedBy" name="repealedBy" value={formData.repealedBy} onChange={handleInputChange}
+                        placeholder="MongoDB ID of the repealing law" />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <Label htmlFor="jurisdiction">{t('admin.form.jurisdiction')}</Label>
