@@ -37,24 +37,28 @@ const JudgmentDetail: React.FC = () => {
 
   useEffect(() => {
     if (!judgment?.citedLaws?.length) return;
-    Promise.allSettled(judgment.citedLaws.map((lawId: string) => apiClient.get(`/laws/${lawId}`))).then(results => {
+    apiClient.get(`/laws/batch?ids=${judgment.citedLaws.join(',')}`).then(res => {
+      const laws: any[] = res.data?.data ?? [];
       const map: Record<string, string> = {};
-      results.forEach((r, i) => {
-        map[judgment.citedLaws[i]] = r.status === 'fulfilled' ? (r.value.data?.data?.title ?? judgment.citedLaws[i]) : judgment.citedLaws[i];
+      judgment.citedLaws.forEach((id: string) => {
+        const found = laws.find((l: any) => l.id === id);
+        map[id] = found?.title ?? id;
       });
       setCitedLawTitles(map);
-    });
+    }).catch(() => {});
   }, [judgment?.citedLaws?.join(',')]);
 
   useEffect(() => {
     if (!judgment?.citedCases?.length) return;
-    Promise.allSettled(judgment.citedCases.map((caseId: string) => apiClient.get(`/judgments/${caseId}`))).then(results => {
+    apiClient.get(`/judgments/batch?ids=${judgment.citedCases.join(',')}`).then(res => {
+      const cases: any[] = res.data?.data ?? [];
       const map: Record<string, string> = {};
-      results.forEach((r, i) => {
-        map[judgment.citedCases[i]] = r.status === 'fulfilled' ? (r.value.data?.data?.caseName ?? judgment.citedCases[i]) : judgment.citedCases[i];
+      judgment.citedCases.forEach((id: string) => {
+        const found = cases.find((c: any) => c.id === id);
+        map[id] = found?.caseName ?? id;
       });
       setCitedCaseTitles(map);
-    });
+    }).catch(() => {});
   }, [judgment?.citedCases?.join(',')]);
 
   useEffect(() => {
