@@ -40,7 +40,7 @@ const LawDetail: React.FC = () => {
     if (!id) return;
     setSubmitPending(true);
     try {
-      await apiClient.put(`/laws/${id}/submit`);
+      await apiClient.put(`/editor/laws/${id}/submit`);
       toast.success('Submitted for review');
       queryClient.invalidateQueries({ queryKey: lawKeys.detail(id) });
     } catch {
