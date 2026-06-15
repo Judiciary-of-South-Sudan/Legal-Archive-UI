@@ -34,6 +34,9 @@ const AdminUploadJudgment: React.FC = () => {
     tags: '',
     parties: '',
     fullText: '',
+    coram: '',
+    headnotes: '',
+    legalPrinciples: '',
     citedLaws: [] as string[],
     citedCases: [] as string[],
     jurisdiction: 'South Sudan',
@@ -72,6 +75,9 @@ const AdminUploadJudgment: React.FC = () => {
         tags: formData.tags ? formData.tags.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         parties: formData.parties || undefined,
         fullText: formData.fullText || undefined,
+        coram: formData.coram || undefined,
+        headnotes: formData.headnotes || undefined,
+        legalPrinciples: formData.legalPrinciples ? formData.legalPrinciples.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
         citedLaws: formData.citedLaws.length ? formData.citedLaws : undefined,
         citedCases: formData.citedCases.length ? formData.citedCases : undefined,
         jurisdiction: formData.jurisdiction,
@@ -168,6 +174,24 @@ const AdminUploadJudgment: React.FC = () => {
                 <div className="md:col-span-2">
                   <Label htmlFor="fullText">{t('admin.form.full_text')}</Label>
                   <Textarea id="fullText" name="fullText" value={formData.fullText} onChange={handleInputChange} rows={6} />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="coram">Coram</Label>
+                  <Input id="coram" name="coram" value={formData.coram} onChange={handleInputChange}
+                    placeholder="e.g., Justice Majok, Justice Deng" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="headnotes">Headnotes</Label>
+                  <Textarea id="headnotes" name="headnotes" value={formData.headnotes} onChange={handleInputChange} rows={3}
+                    placeholder="Key legal points from this judgment…" />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label htmlFor="legalPrinciples">Legal Principles (comma-separated)</Label>
+                  <Input id="legalPrinciples" name="legalPrinciples" value={formData.legalPrinciples} onChange={handleInputChange}
+                    placeholder="e.g., Presumption of innocence, Right to fair trial" />
                 </div>
 
                 <div className="md:col-span-2">
