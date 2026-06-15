@@ -334,7 +334,13 @@
     "type_law": "Law",
     "type_judgment": "Judgment",
     "type_notice": "Notice",
-    "type_decree": "Decree"
+    "type_decree": "Decree",
+    "from_year": "From year",
+    "to_year": "To year",
+    "sort": "Sort",
+    "sort_relevance": "Relevance",
+    "sort_newest": "Newest first",
+    "sort_oldest": "Oldest first"
   },
   "library": {
     "title": "My Library",

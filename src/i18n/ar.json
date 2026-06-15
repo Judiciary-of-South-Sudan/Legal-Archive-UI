@@ -334,7 +334,13 @@
     "type_law": "قانون",
     "type_judgment": "حكم",
     "type_notice": "إشعار",
-    "type_decree": "مرسوم"
+    "type_decree": "مرسوم",
+    "from_year": "من سنة",
+    "to_year": "إلى سنة",
+    "sort": "ترتيب",
+    "sort_relevance": "الأكثر صلة",
+    "sort_newest": "الأحدث أولاً",
+    "sort_oldest": "الأقدم أولاً"
   },
   "library": {
     "title": "مكتبتي",
