@@ -1,4 +1,5 @@
 import { Scale, Mail, Phone, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const Footer = () => {
@@ -17,7 +18,7 @@ const Footer = () => {
     { name: t("footer.supreme_court"), href: "/judgments/supreme-court" },
     { name: t("footer.court_of_appeal"), href: "/judgments/court-of-appeal" },
     { name: t("footer.high_court"), href: "/judgments/high-court" },
-    { name: t("footer.county_court"), href: "/judgments/county-court" },
+    { name: t("footer.county_court"), href: "/judgments" },
     { name: t("footer.constitution"), href: "/laws/constitution" },
     { name: t("footer.acts"), href: "/laws/acts" },
     { name: t("footer.decrees"), href: "/decrees" },
@@ -61,9 +62,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {legalSections.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-primary-foreground/80 hover:text-accent transition-colors text-sm">
+                  <Link to={link.href} className="text-primary-foreground/80 hover:text-accent transition-colors text-sm">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -75,9 +76,9 @@ const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-primary-foreground/80 hover:text-accent transition-colors text-sm">
+                  <Link to={link.href} className="text-primary-foreground/80 hover:text-accent transition-colors text-sm">
                     {link.name}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
