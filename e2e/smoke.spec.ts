@@ -73,12 +73,21 @@ test('admin login → upload law form accessible', async ({ page }) => {
 
 // ─── T4: Rate limiting ────────────────────────────────────────────────────────
 
-test('6 failed logins → account locked or rate-limit error shown', async ({ page }) => {
-  // Use a dedicated test username that won't collide with real accounts
-  const lockUser = process.env.E2E_LOCKOUT_USER ?? `locktest_${Date.now()}`;
-  const badPass  = 'definitely_wrong_password_xyz';
+test('5 failed logins on a real account → account locked, 429 ACCOUNT_LOCKED shown', async ({ page }) => {
+  // AuthService.login() only locks out *existing* usernames (user != null check) — a
+  // nonexistent username never reaches the lockout branch, so this test requires a real,
+  // disposable test account to be pre-seeded in the target environment.
+  const lockUser = process.env.E2E_LOCKOUT_USER;
+  if (!lockUser) {
+    throw new Error(
+      'E2E_LOCKOUT_USER env var is required for the lockout test — it must be a real, ' +
+      'pre-seeded account (a nonexistent username never triggers AccountLockedException).'
+    );
+  }
+  const badPass = 'definitely_wrong_password_xyz';
 
-  for (let attempt = 1; attempt <= 6; attempt++) {
+  // AuthService.MAX_ATTEMPTS = 5 — the 5th bad attempt locks the account for 15 minutes.
+  for (let attempt = 1; attempt <= 5; attempt++) {
     await page.goto('/login');
 
     await page
@@ -91,7 +100,7 @@ test('6 failed logins → account locked or rate-limit error shown', async ({ pa
     await page.waitForTimeout(200);
   }
 
-  // After 6 attempts the UI should surface a lock / rate-limit message
+  // After 5 attempts the UI should surface a lock / rate-limit message
   const lockMessage = page.locator(
     'text=/locked|too many|rate|429/i'
   );
