@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  # Playwright e2e is intentionally not run here — it needs a live backend with a
+  # seeded E2E_LOCKOUT_USER account, which this build-only pipeline doesn't have.
+  # Run `npm run test:e2e` against a staging deployment as a separate, manual step.
