@@ -51,6 +51,7 @@ const SearchPage = () => {
   const [noticesPage, setNoticesPage] = useState(0);
   const [decreesPage, setDecreesPage] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [syntaxHelpOpen, setSyntaxHelpOpen] = useState(false);
   const [fromYear, setFromYear] = useState<number | undefined>();
   const [toYear, setToYear] = useState<number | undefined>();
   const [sort, setSort] = useState("relevance");
@@ -201,6 +202,23 @@ const SearchPage = () => {
                   {t("searchbar.clear_all")}
                 </Button>
               )}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setSyntaxHelpOpen((o) => !o)}
+            className="mt-2 text-xs text-muted-foreground hover:text-primary underline-offset-2 hover:underline"
+          >
+            Advanced search syntax
+          </button>
+          {syntaxHelpOpen && (
+            <div className="mt-1.5 rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+              <p><code className="font-mono text-foreground">"exact phrase"</code> — match an exact phrase</p>
+              <p><code className="font-mono text-foreground">land OR water</code> — match either term</p>
+              <p><code className="font-mono text-foreground">-customary</code> or <code className="font-mono text-foreground">NOT customary</code> — exclude a term</p>
+              <p><code className="font-mono text-foreground">title:constitution</code> — restrict a term to one field</p>
+              <p>Combine freely, e.g. <code className="font-mono text-foreground">title:"land act" -repealed</code></p>
             </div>
           )}
         </div>
