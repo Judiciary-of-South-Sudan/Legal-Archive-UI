@@ -64,6 +64,7 @@ interface ReviewItem {
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  completeness: number;
 }
 
 interface DraftItem {
@@ -75,6 +76,7 @@ interface DraftItem {
   year: number;
   createdAt: string;
   updatedAt: string;
+  completeness: number;
 }
 
 interface EditorStats {
@@ -99,6 +101,22 @@ const TYPE_CLS: Record<string, string> = {
   Judgment: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300',
   Notice:   'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300',
 };
+
+// Visual indicator of how much optional provenance/quality metadata (gazette reference,
+// source URL, summary, etc.) a document has — see DocumentQualityService on the backend.
+const CompletenessBadge = ({ value }: { value: number }) => (
+  <span className="inline-flex items-center gap-1.5" title={`${value}% of optional metadata fields populated`}>
+    <span className="h-1.5 w-12 rounded-full bg-muted overflow-hidden">
+      <span
+        className={`h-full block rounded-full ${
+          value >= 75 ? 'bg-green-500' : value >= 40 ? 'bg-amber-500' : 'bg-red-500'
+        }`}
+        style={{ width: `${value}%` }}
+      />
+    </span>
+    <span className="text-xs text-muted-foreground">{value}%</span>
+  </span>
+);
 
 const fmtDate = (iso: string) => {
   if (!iso) return '—';
@@ -705,6 +723,7 @@ const AdminDashboard: React.FC = () => {
                               <span className="text-xs text-muted-foreground flex items-center gap-1">
                                 <Clock className="h-3 w-3" /> Uploaded by {item.createdBy || 'unknown'}
                               </span>
+                              <CompletenessBadge value={item.completeness} />
                             </div>
                           </div>
 
@@ -839,6 +858,7 @@ const AdminDashboard: React.FC = () => {
                                   <Clock className="h-3 w-3" /> Last edited {fmtDate(item.updatedAt)}
                                 </span>
                               )}
+                              <CompletenessBadge value={item.completeness} />
                             </div>
                           </div>
 
