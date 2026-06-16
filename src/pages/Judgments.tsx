@@ -18,7 +18,7 @@ import { JudgmentFilterParams } from "@/types/api";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 
-const COURT_LEVELS = ["Supreme Court", "Court of Appeal", "High Court", "Magistrate Court"];
+const COURT_LEVELS = ["Supreme Court", "Court of Appeal", "High Court", "County Court", "Magistrate Court"];
 const CASE_TYPES = ["Civil", "Criminal", "Constitutional", "Commercial", "Family", "Administrative"];
 const STATUSES = ["Final", "Under Appeal", "Overturned"];
 
