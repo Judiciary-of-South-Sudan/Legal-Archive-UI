@@ -191,7 +191,7 @@ export default function Profile() {
                       />
                     </div>
                     <Button type="submit" className="w-full" disabled={savingProfile}>
-                      {savingProfile ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Check className="h-4 w-4 mr-2" />}
+                      {savingProfile ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <Check className="h-4 w-4 me-2" />}
                       {t('profile.save_btn')}
                     </Button>
                   </form>
@@ -246,7 +246,7 @@ export default function Profile() {
                       className="w-full"
                       disabled={savingPassword || !oldPassword || !newPassword || newPassword !== confirmPassword}
                     >
-                      {savingPassword ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Lock className="h-4 w-4 mr-2" />}
+                      {savingPassword ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : <Lock className="h-4 w-4 me-2" />}
                       {t('profile.change_pwd_btn')}
                     </Button>
                   </form>
