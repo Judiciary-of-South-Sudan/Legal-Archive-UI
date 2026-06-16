@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ListCardSkeleton from '@/components/ListCardSkeleton';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { BulkDownloadLink } from '@/components/BulkDownloadLink';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -84,6 +85,9 @@ const Decrees = () => {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground md:text-3xl">{t('decrees.page_title')}</h1>
           <p className="mt-1 text-muted-foreground">{t('decrees.page_subtitle')}</p>
+          <div className="mt-2">
+            <BulkDownloadLink type="decrees" label="Download all decrees (ZIP)" />
+          </div>
         </div>
 
         <div className="mb-4 flex gap-2">
