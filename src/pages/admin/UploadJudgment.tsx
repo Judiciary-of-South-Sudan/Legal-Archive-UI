@@ -147,6 +147,7 @@ const AdminUploadJudgment: React.FC = () => {
                       <SelectItem value="Supreme Court">Supreme Court</SelectItem>
                       <SelectItem value="Court of Appeal">Court of Appeal</SelectItem>
                       <SelectItem value="High Court">High Court</SelectItem>
+                      <SelectItem value="County Court">County Court</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
