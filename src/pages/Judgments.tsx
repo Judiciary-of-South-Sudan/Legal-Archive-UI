@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DocStatusDropdown from "@/components/DocStatusDropdown";
+import { BulkDownloadLink } from "@/components/BulkDownloadLink";
 import { useGetJudgments, useSearchJudgments } from "@/hooks/useJudgments";
 import { Link } from 'react-router-dom';
 import { JudgmentFilterParams } from "@/types/api";
@@ -64,6 +65,9 @@ const Judgments = () => {
         <div className="mb-4 md:mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-1 md:text-3xl md:mb-4">{t("judgments.page_title")}</h1>
           <p className="text-muted-foreground text-sm md:text-base">{t("judgments.page_subtitle")}</p>
+          <div className="mt-2">
+            <BulkDownloadLink type="judgments" label="Download all judgments (ZIP)" />
+          </div>
         </div>
 
         <Card className="mb-6">
