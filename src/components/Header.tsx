@@ -15,13 +15,13 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBandwidth } from "@/contexts/BandwidthContext";
 import { useTranslation } from "react-i18next";
+import { SearchSuggestField } from "@/components/SearchSuggestField";
 import apiClient from "@/lib/apiClient";
 import {
   DropdownMenu,
@@ -37,8 +37,8 @@ const Header = () => {
   const { isAuthenticated, user, logout, isAdmin, isEditor } = useAuth();
   const { lowBandwidth, toggle: toggleBandwidth } = useBandwidth();
   const navigate = useNavigate();
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const [desktopQuery, setDesktopQuery] = useState("");
+  const [mobileQuery, setMobileQuery] = useState("");
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
@@ -81,11 +81,12 @@ const Header = () => {
     document.documentElement.dir = newLang === "ar" ? "rtl" : "ltr";
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = (searchInputRef.current?.value || mobileSearchRef.current?.value || "").trim();
-    if (q) navigate(`/search?q=${encodeURIComponent(q)}`);
+  const submitSearch = (q: string) => {
+    const trimmed = q.trim();
+    if (trimmed) navigate(`/search?q=${encodeURIComponent(trimmed)}`);
   };
+  const handleDesktopSearch = (e: React.FormEvent) => { e.preventDefault(); submitSearch(desktopQuery); };
+  const handleMobileSearch = (e: React.FormEvent) => { e.preventDefault(); submitSearch(mobileQuery); };
 
   const handleLogout = async () => {
     await logout();
@@ -133,15 +134,13 @@ const Header = () => {
             </div>
           </Link>
 
-          <form onSubmit={handleSearch} className="hidden w-full max-w-md items-center gap-2 lg:flex">
-            <div className="relative flex-1">
-              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                ref={searchInputRef}
-                placeholder={t("header.search_placeholder")}
-                className="h-10 rounded-md border-border bg-background ps-10"
-              />
-            </div>
+          <form onSubmit={handleDesktopSearch} className="hidden w-full max-w-md items-center gap-2 lg:flex">
+            <SearchSuggestField
+              value={desktopQuery}
+              onChange={setDesktopQuery}
+              placeholder={t("header.search_placeholder")}
+              inputClassName="h-10 rounded-md border-border bg-background ps-10"
+            />
             <Button type="submit" size="sm">{t("header.search")}</Button>
           </form>
 
@@ -296,18 +295,14 @@ const Header = () => {
           </div>
         </nav>
 
-        <form onSubmit={handleSearch} className={`${isMenuOpen ? "block" : "hidden"} pb-4 lg:hidden`}>
+        <form onSubmit={handleMobileSearch} className={`${isMenuOpen ? "block" : "hidden"} pb-4 lg:hidden`}>
           <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                ref={mobileSearchRef}
-                type="search"
-                enterKeyHint="search"
-                placeholder={t("header.search_placeholder")}
-                className="h-10 rounded-md bg-background ps-10"
-              />
-            </div>
+            <SearchSuggestField
+              value={mobileQuery}
+              onChange={setMobileQuery}
+              placeholder={t("header.search_placeholder")}
+              inputClassName="h-10 rounded-md bg-background ps-10"
+            />
             <Button type="submit" size="icon" className="h-10 w-10 shrink-0">
               <Search className="h-4 w-4" />
             </Button>
