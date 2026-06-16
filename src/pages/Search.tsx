@@ -17,6 +17,17 @@ import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 20;
 
+// Maps the Hero search-scope `type` param to a Search.tsx tab. "agreements" has no
+// dedicated tab — peace agreements are modeled as Law records (type: Agreement/Treaty) —
+// so it opens the "laws" tab, which is where they'll actually appear.
+const TYPE_TO_TAB: Record<string, string> = {
+  laws: "laws",
+  judgments: "judgments",
+  notices: "notices",
+  decrees: "decrees",
+  agreements: "laws",
+};
+
 const Pagination = ({ page, totalPages, onPrev, onNext, prevLabel, nextLabel, pageLabel, ofLabel }: {
   page: number; totalPages: number; onPrev: () => void; onNext: () => void;
   prevLabel: string; nextLabel: string; pageLabel: string; ofLabel: string;
@@ -43,6 +54,7 @@ const SearchPage = () => {
   const [fromYear, setFromYear] = useState<number | undefined>();
   const [toYear, setToYear] = useState<number | undefined>();
   const [sort, setSort] = useState("relevance");
+  const [activeTab, setActiveTab] = useState(TYPE_TO_TAB[searchParams.get("type") ?? ""] ?? "all");
 
   const query = searchParams.get("q") || "";
   const lastRecordedQuery = useRef("");
@@ -64,6 +76,7 @@ const SearchPage = () => {
   useEffect(() => {
     setInputValue(query);
     resetPages();
+    setActiveTab(TYPE_TO_TAB[searchParams.get("type") ?? ""] ?? "all");
   }, [query]);
 
   useEffect(() => {
@@ -211,7 +224,7 @@ const SearchPage = () => {
                   <span className="font-semibold text-foreground">"{query}"</span>
                 </p>
 
-                <Tabs defaultValue="all">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="mb-6 flex w-full overflow-x-auto no-scrollbar gap-0">
                     <TabsTrigger value="all" className="flex-none sm:flex-1 whitespace-nowrap gap-1.5">
                       {t("search.tab_all")} <Badge variant="secondary" className="ms-1.5">{totalCount}</Badge>
