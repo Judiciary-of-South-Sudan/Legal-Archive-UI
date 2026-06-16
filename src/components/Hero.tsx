@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ArrowRight, BookOpen, FileText, Gavel, Landmark, ScrollText, Search, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpen, FileText, Gavel, Landmark, ScrollText, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { SearchSuggestField } from "@/components/SearchSuggestField";
 
 const Hero = () => {
   const [query, setQuery] = useState("");
@@ -94,17 +94,13 @@ const Hero = () => {
 
             <form onSubmit={handleSearch} className="mt-8 max-w-4xl rounded-md border border-border bg-card p-3 shadow-sm">
               <div className="flex flex-col gap-3 md:flex-row">
-                <div className="relative flex-1">
-                  <Search className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={t("hero.search_placeholder")}
-                    className="h-12 rounded-md border-border bg-background ps-12 text-base"
-                    type="search"
-                    enterKeyHint="search"
-                  />
-                </div>
+                <SearchSuggestField
+                  value={query}
+                  onChange={setQuery}
+                  placeholder={t("hero.search_placeholder")}
+                  inputClassName="h-12 rounded-md border-border bg-background ps-12 text-base"
+                  iconClassName="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
+                />
                 <Button type="submit" size="lg" className="h-12 px-6">
                   {t("hero.search_btn")}
                   <ArrowRight className="h-4 w-4" />
