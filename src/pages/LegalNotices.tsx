@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DocStatusDropdown from "@/components/DocStatusDropdown";
+import { BulkDownloadLink } from "@/components/BulkDownloadLink";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
@@ -78,6 +79,9 @@ const LegalNotices = () => {
         <div className="mb-4 md:mb-8">
           <h1 className="text-2xl font-bold text-foreground mb-1 md:text-3xl md:mb-4">{t("notices.page_title")}</h1>
           <p className="text-muted-foreground text-sm md:text-base">{t("notices.page_subtitle")}</p>
+          <div className="mt-2">
+            <BulkDownloadLink type="notices" label="Download all notices (ZIP)" />
+          </div>
         </div>
 
         <Tabs defaultValue="notices" className="w-full">
