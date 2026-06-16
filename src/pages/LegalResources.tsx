@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { FileText } from "lucide-react";
@@ -42,10 +43,10 @@ const LegalResources = () => {
           {resources.map((resource, index) => (
             <Card key={index}>
               <CardContent className="p-6">
-                <a href={resource.link} className="text-xl font-semibold text-blue-700 hover:underline flex items-center gap-2">
+                <Link to={resource.link} className="text-xl font-semibold text-blue-700 hover:underline flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   {resource.title}
-                </a>
+                </Link>
                 <p className="mt-2 text-slate-700">{resource.description}</p>
               </CardContent>
             </Card>
