@@ -30,11 +30,11 @@ const LegalResources = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-slate-800">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
       <main className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-6 text-blue-800">Citizen's Guide</h1>
+        <h1 className="text-3xl font-bold mb-6 text-primary">Citizen's Guide</h1>
         <p className="text-muted-foreground mb-6">
           Browse a curated list of foundational legal documents and references relevant to law, governance, and civic awareness in South Sudan.
         </p>
@@ -43,11 +43,11 @@ const LegalResources = () => {
           {resources.map((resource, index) => (
             <Card key={index}>
               <CardContent className="p-6">
-                <Link to={resource.link} className="text-xl font-semibold text-blue-700 hover:underline flex items-center gap-2">
+                <Link to={resource.link} className="text-xl font-semibold text-primary hover:underline flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   {resource.title}
                 </Link>
-                <p className="mt-2 text-slate-700">{resource.description}</p>
+                <p className="mt-2 text-foreground">{resource.description}</p>
               </CardContent>
             </Card>
           ))}
