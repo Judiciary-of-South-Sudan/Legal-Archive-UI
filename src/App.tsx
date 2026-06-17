@@ -51,7 +51,6 @@ const EditJudgment     = React.lazy(() => import('./pages/admin/EditJudgment'));
 const EditNotice       = React.lazy(() => import('./pages/admin/EditNotice'));
 const AdminUsers       = React.lazy(() => import('./pages/admin/Users'));
 const BulkImport       = React.lazy(() => import('./pages/admin/BulkImport'));
-const SentryTest       = React.lazy(() => import('./pages/admin/SentryTest'));
 const UploadDecree     = React.lazy(() => import('./pages/admin/UploadDecree'));
 const EditDecree       = React.lazy(() => import('./pages/admin/EditDecree'));
 const NotFound         = React.lazy(() => import('./pages/NotFound'));
@@ -208,9 +207,6 @@ const App = () => (
                 } />
                 <Route path="/admin/bulk-import" element={
                   <ProtectedRoute requireAdmin={true}><BulkImport /></ProtectedRoute>
-                } />
-                <Route path="/admin/sentry-test" element={
-                  <ProtectedRoute requireAdmin={true}><SentryTest /></ProtectedRoute>
                 } />
 
                 <Route path="*" element={<NotFound />} />
