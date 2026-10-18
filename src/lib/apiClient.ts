@@ -46,12 +46,16 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response) {
       if (error.response.status === 401) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-        // Don't redirect during the startup token validation call
-        const isAuthCheck = error.config?.url?.includes('/auth/me');
-        if (!isAuthCheck) {
-          window.location.href = '/login';
+        const requestUrl = error.config?.url ?? '';
+        const isLoginRequest = requestUrl.includes('/auth/login');
+        if (!isLoginRequest) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_user');
+          // Don't redirect during the startup token validation call
+          const isAuthCheck = requestUrl.includes('/auth/me');
+          if (!isAuthCheck) {
+            window.location.href = '/login';
+          }
         }
       }
       const errorMessage = error.response.data?.message || error.response.data?.error || 'An error occurred';
@@ -66,4 +70,3 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
-

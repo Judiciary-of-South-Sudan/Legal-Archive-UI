@@ -374,7 +374,9 @@
     "register_link": "Register here",
     "back_home": "Back to Home",
     "success": "Login successful",
-    "error": "Login failed. Please check your credentials.",
+    "error": "We couldn't sign you in. Please try again.",
+    "invalid_credentials": "We couldn't sign you in with those details. Check your username and password, then try again.",
+    "connection_error": "We couldn't reach the sign-in service. Please try again in a moment.",
     "forgot_password": "Forgot your password?"
   },
   "forgot_password": {

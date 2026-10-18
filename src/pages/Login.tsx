@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { isAxiosError } from "axios";
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as any)?.from?.pathname || "/";
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,10 +31,21 @@ const Login: React.FC = () => {
       await login({ username, password });
       toast.success(t("login.success"));
       navigate(from, { replace: true });
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.response?.data?.error || t("login.error");
+    } catch (err: unknown) {
+      let errorMessage = t("login.error");
+      if (isAxiosError<{ message?: unknown; error?: unknown }>(err)) {
+        const responseData = err.response?.data;
+        if (err.response?.status === 401) {
+          errorMessage = t("login.invalid_credentials");
+        } else if (!err.response) {
+          errorMessage = t("login.connection_error");
+        } else if (typeof responseData?.message === "string") {
+          errorMessage = responseData.message;
+        } else if (typeof responseData?.error === "string") {
+          errorMessage = responseData.error;
+        }
+      }
       setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +72,10 @@ const Login: React.FC = () => {
                 type="text"
                 placeholder={t("login.username_placeholder")}
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError("");
+                }}
                 required
                 disabled={isLoading}
                 autoComplete="username"
@@ -75,7 +90,10 @@ const Login: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder={t("login.password_placeholder")}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
                   required
                   disabled={isLoading}
                   autoComplete="current-password"
