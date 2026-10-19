@@ -50,6 +50,6 @@ The first persisted Maven scan found 31 advisory records across the resolved gra
 - Final CVE scan of the four patched direct dependencies: no known CVEs found.
 - API `mvnw.cmd -B clean verify` on Java 17: build passed; the repository Maven config skips tests by default.
 - API `FileStorageServiceTest`: 10 security regression tests passed after a clean compile. The full suite, when explicitly enabled with CORS/JWT test properties, reports 19 tests with 8 errors: seven context errors from a missing `JavaMailSender` bean and unavailable local MongoDB, plus one `LawServiceTest.updateLaw_persistsEveryOptionalField` error (`Law not found with id: law-1`).
-- Full UI `npm run lint`: not clean; it reports 39 errors and 22 warnings across the project. This was not expanded into unrelated lint cleanup.
+- Full UI `npm run lint`: not clean; the latest PR CI reports 38 errors and 22 warnings across the project. This was not expanded into unrelated lint cleanup.
 
 The npm CVE scan and `npm audit` are dependency checks, not a guarantee against undiscovered vulnerabilities. The final CVE scan covered the listed direct packages; the full resolved dependency tree was checked separately by `npm audit`.
