@@ -10,14 +10,16 @@ The assessment completed 59 CWE checklist rules: 4 were marked found and 55 not 
 
 The initial npm advisory scan identified 48 CVE matches in Axios 1.11.0, PostCSS 8.4.47, and Vite 5.4.10: 15 high, 30 medium, and 3 low. Those packages were upgraded, along with related toolchain dependencies. The final advisory scan reported no known CVEs for Axios 1.20.0, PostCSS 8.5.23, Vite 6.4.3, and React Router DOM 7.18.4; `npm audit` reported zero vulnerabilities in the resolved dependency tree.
 
-The code and dependency changes described here were present in the local worktrees when this report was prepared. This commit contains only this report; it does not commit the remediation changes in either repository.
+The API's Maven assessment also found 31 advisory records in the first persisted full dependency scan (30 CVEs and one GHSA), plus four Spring Boot 3.4.1 findings from an earlier scan whose identifiers were not retained. The recorded findings in Log4j, Tomcat, Spring Framework, Jackson, Commons Lang, and Netty were remediated. A full scan of 161 resolved runtime dependencies after the Spring Boot 4 migration identified seven remaining Jackson advisories in each of the Jackson 2 and 3 lines; both lines were upgraded and the final scan found no known CVEs. The API's detailed CVE/version table and scan history are in the [API Maven CVE fix summary](https://github.com/Judiciary-of-South-Sudan/Legal-Archive-API/blob/security/file-upload-hardening/.github/modernize/assessment/engines/security/cve-fix-summary.md).
+
+The UI remediation and API dependency/upload changes are committed to their respective security PR branches; neither PR changes a default branch.
 
 ## Code findings
 
 | Severity | CWE | Finding | Remediation |
 |---|---|---|---|
 | High | CWE-22, CWE-23, CWE-99 | Public file operations accepted paths without ensuring that their normalized destination stayed under the upload root, allowing traversal outside the intended directory. | `Legal-Archive-API/src/main/java/com/legalarchive/service/FileStorageService.java` normalizes and resolves paths and rejects destinations outside the upload root. Category names are validated; file controllers return HTTP 400 for rejected paths. |
-| Medium | CWE-434 | The upload allowlist accepted `text/html`, permitting active HTML content to be stored and served. PDF content could also be identified by its declared MIME type alone. | HTML is no longer allowed, and uploads declared as PDF must have a `%PDF-` signature. Regression coverage is in `Legal-Archive-API/src/test/java/com/legalarchive/service/FileStorageServiceTest.java`. |
+| Medium | CWE-434 | The upload allowlist accepted `text/html`, permitting active HTML content to be stored and served. PDF content could also be identified by its declared MIME type alone. | Uploads are restricted to matching PDF/DOC/DOCX/text types with format checks; HTML is rejected. PDFs are signature-checked before being served inline, while other files are attachments with `nosniff`. Regression coverage is in `Legal-Archive-API/src/test/java/com/legalarchive/service/FileStorageServiceTest.java`. |
 
 ## Dependency findings
 
@@ -36,13 +38,18 @@ The following CVEs were reported against the original direct dependency versions
 
 Additional dependency changes included React Router DOM 6 to 7.18.4, Tailwind CSS 3 to 4.3.3, the Tailwind v4 PostCSS plugin, and `@vitejs/plugin-react-swc` 3.11.0. Unused `@tailwindcss/typography` and the development-only `lovable-tagger` were removed. Compatible transitive dependencies were updated with `npm audit fix`.
 
+### API Maven dependency findings
+
+The first persisted Maven scan found 31 advisory records across the resolved graph. Subsequent scans identified three critical Tomcat advisories, two critical Spring Framework advisories, and a critical Netty SNI-routing advisory, along with high- and medium-severity findings in Log4j, Jackson, Commons Lang, and Netty. Spring Boot 4.1.1 manages Spring Framework 7.0.9; Tomcat was set to 11.0.25, Log4j to 2.25.5, Commons Lang to 3.20.0, Netty to 4.2.17.Final, Jackson 2 to 2.21.7, and Jackson 3 to 3.1.7. The migration required moving the MVC starter to `spring-boot-starter-webmvc` and updating Springdoc, Sentry, and Spring Security integration APIs. The [API Maven CVE fix summary](https://github.com/Judiciary-of-South-Sudan/Legal-Archive-API/blob/security/file-upload-hardening/.github/modernize/assessment/engines/security/cve-fix-summary.md) contains every advisory ID retained by the scanner, the recommended versions, and the numbered reports.
+
 ## Validation and limitations
 
 - `npm run build` in the UI repository: passed.
 - Focused ESLint for the modified Vite and Tailwind configuration: passed.
 - `npm audit --audit-level=low`: zero vulnerabilities.
 - Final CVE scan of the four patched direct dependencies: no known CVEs found.
-- `mvnw.cmd clean -DskipTests=false -Dmaven.test.skip=false -Dtest=FileStorageServiceTest test` in the API repository: 5 tests passed.
+- API `mvnw.cmd -B clean verify` on Java 17: build passed; the repository Maven config skips tests by default.
+- API `FileStorageServiceTest`: 10 security regression tests passed after a clean compile. The full suite, when explicitly enabled with CORS/JWT test properties, reports 19 tests with 8 errors: seven context errors from a missing `JavaMailSender` bean and unavailable local MongoDB, plus one `LawServiceTest.updateLaw_persistsEveryOptionalField` error (`Law not found with id: law-1`).
 - Full UI `npm run lint`: not clean; it reports 39 errors and 22 warnings across the project. This was not expanded into unrelated lint cleanup.
 
 The npm CVE scan and `npm audit` are dependency checks, not a guarantee against undiscovered vulnerabilities. The final CVE scan covered the listed direct packages; the full resolved dependency tree was checked separately by `npm audit`.
