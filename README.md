@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# South Sudan Legal Archive
 
-## Project info
+The South Sudan Legal Archive is a digital library for discovering and reading legal materials, including legislation and court decisions. It brings the Judiciary of South Sudan's archive into a searchable, accessible web application.
 
-**URL**: https://lovable.dev/projects/c2c7acec-fdb9-46be-8ec4-502893e4f68e
+**Live application:** [legal-archive-ruby.vercel.app](https://legal-archive-ruby.vercel.app)
 
-## How can I edit this code?
+## What you can do
 
-There are several ways of editing your application.
+- Browse laws, including the Constitution, and filter by category, type, status, or year.
+- Find judgments and narrow results by court, case type, or status.
+- Explore legal notices and decrees.
+- Search and browse document records, open available PDFs, and download documents.
+- Create an account to manage a personal library of bookmarked documents.
+- Use the archive in English or Arabic.
+- Authorized administrators can manage archive records and users, including document uploads and bulk imports.
 
-**Use Lovable**
+Available records and documents depend on what has been published to the archive.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c2c7acec-fdb9-46be-8ec4-502893e4f68e) and start prompting.
+## Technology
 
-Changes made via Lovable will be committed automatically to this repo.
+The web application is built with React, TypeScript, Vite, Tailwind CSS, and shadcn/ui. It uses a backend API for archive data and account features; the API is maintained separately from this repository.
 
-**Use your preferred IDE**
+## Run locally
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Requirements
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js and npm
+- A running archive backend API for live records and account features
 
-Follow these steps:
+### Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/Judiciary-of-South-Sudan/Legal-Archive-UI.git
+cd Legal-Archive-UI
+npm ci
+cp .env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Set `VITE_API_BASE_URL` in `.env` to the backend API URL. The example uses `http://localhost:8080/api/v1`.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Start the development server:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Vite prints the local address when the server starts. Without a reachable backend, API-powered records and account features will not load.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Available commands
 
-**Use GitHub Codespaces**
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the local development server |
+| `npm run build` | Create a production build in `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
+| `npm run test:e2e` | Run the Playwright end-to-end tests |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Configuration
 
-## What technologies are used for this project?
+| Variable | Purpose | Example |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Base URL for the archive backend API | `http://localhost:8080/api/v1` |
 
-This project is built with:
+Use `.env.example` as the local template. Do not commit credentials or secrets in environment files.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Repository layout
 
-## How can I deploy this project?
+- `src/pages/` — archive, search, account, and administration pages
+- `src/components/` — shared interface components
+- `src/hooks/` — data fetching and archive hooks
+- `src/contexts/` — authentication and bandwidth preferences
+- `src/i18n/` — English and Arabic translations
+- `public/` — static assets and bundled public documents
+- `e2e/` — Playwright end-to-end tests
+- `backenddocs/` — backend API reference material
 
-Simply open [Lovable](https://lovable.dev/projects/c2c7acec-fdb9-46be-8ec4-502893e4f68e) and click on Share -> Publish.
+## Contributing
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Changes to this repository update the archive's web interface. Keep documentation and user-facing behavior aligned with the backend API, and run the relevant lint, build, or end-to-end checks before submitting changes.
