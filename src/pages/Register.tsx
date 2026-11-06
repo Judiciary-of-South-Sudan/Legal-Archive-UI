@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { getApiErrorMessage } from '@/lib/apiClient';
 
 const Register: React.FC = () => {
   const { t } = useTranslation();
@@ -56,8 +57,8 @@ const Register: React.FC = () => {
       await register(registerData);
       toast.success(t("register.success"));
       navigate('/login');
-    } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || err?.response?.data?.error || t("register.error");
+    } catch (err: unknown) {
+      const errorMessage = getApiErrorMessage(err, t("register.error"));
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

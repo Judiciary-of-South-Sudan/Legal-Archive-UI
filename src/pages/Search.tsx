@@ -58,6 +58,7 @@ const SearchPage = () => {
   const [activeTab, setActiveTab] = useState(TYPE_TO_TAB[searchParams.get("type") ?? ""] ?? "all");
 
   const query = searchParams.get("q") || "";
+  const searchType = searchParams.get("type") ?? "";
   const lastRecordedQuery = useRef("");
 
   const resetPages = () => {
@@ -77,8 +78,8 @@ const SearchPage = () => {
   useEffect(() => {
     setInputValue(query);
     resetPages();
-    setActiveTab(TYPE_TO_TAB[searchParams.get("type") ?? ""] ?? "all");
-  }, [query]);
+    setActiveTab(TYPE_TO_TAB[searchType] ?? "all");
+  }, [query, searchType]);
 
   useEffect(() => {
     if (query && query !== lastRecordedQuery.current) {

@@ -34,9 +34,11 @@ const NoticeDetail: React.FC = () => {
   const { data: bookmarked } = useIsBookmarked(id || '');
   const { mutate: toggleBookmark, isPending: bookmarkPending } = useToggleBookmark();
   const [lawTitles, setLawTitles] = useState<Record<string, string>>({});
+  const relatedLawIds = notice?.relatedLaws?.join(',') ?? '';
+  const amendedLawIds = notice?.amendsLaws?.join(',') ?? '';
 
   useEffect(() => {
-    const allIds = [...(notice?.relatedLaws ?? []), ...(notice?.amendsLaws ?? [])];
+    const allIds = [...relatedLawIds.split(',').filter(Boolean), ...amendedLawIds.split(',').filter(Boolean)];
     if (!allIds.length) return;
     Promise.allSettled(allIds.map((lawId: string) => apiClient.get(`/laws/${lawId}`))).then(results => {
       const map: Record<string, string> = {};
@@ -45,14 +47,14 @@ const NoticeDetail: React.FC = () => {
       });
       setLawTitles(map);
     });
-  }, [notice?.relatedLaws?.join(','), notice?.amendsLaws?.join(',')]);
+  }, [relatedLawIds, amendedLawIds]);
 
   useEffect(() => {
     if (id && countedViewForId.current !== id) {
       countedViewForId.current = id;
       incrementView(id);
     }
-  }, [id]);
+  }, [id, incrementView]);
 
   const handleSubmitForReview = async () => {
     if (!id) return;

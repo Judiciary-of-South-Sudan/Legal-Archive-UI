@@ -55,7 +55,7 @@ const Decrees = () => {
 
   const searchResult = useQuery({
     queryKey: ['decrees', 'search', searchQuery, page],
-    queryFn: () => decreeService.searchDecrees(searchQuery, page, size),
+    queryFn: () => decreeService.searchDecrees({ query: searchQuery, page, size }),
     enabled: searchQuery.length > 1,
   });
 

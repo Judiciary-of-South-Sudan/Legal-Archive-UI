@@ -3,8 +3,10 @@ import { X, Search, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import apiClient from '@/lib/apiClient';
+import type { ApiResponse, PaginatedResponse } from '@/types/api';
 
 interface Item { id: string; label: string; }
+interface CitationDocument { id: string; title?: string; caseName?: string; }
 
 interface CitationSearchProps {
   type: 'law' | 'judgment';
@@ -42,11 +44,12 @@ export const CitationSearch = ({ type, value, onChange, placeholder }: CitationS
       ? `/laws/batch?ids=${newIds.join(',')}`
       : `/judgments/batch?ids=${newIds.join(',')}`;
 
-    apiClient.get(endpoint).then(res => {
-      const docs: any[] = res.data?.data ?? [];
+    apiClient.get<ApiResponse<CitationDocument[]>>(endpoint).then(res => {
+      const docs = res.data?.data ?? [];
       const resolved: Item[] = newIds.map(id => {
-        const found = docs.find((d: any) => d.id === id);
-        return { id, label: found ? (type === 'law' ? found.title : found.caseName) : id };
+        const found = docs.find(document => document.id === id);
+        const label = type === 'law' ? found?.title : found?.caseName;
+        return { id, label: label ?? id };
       });
       setSelectedItems(prev => [
         ...prev.filter(i => value.includes(i.id)),
@@ -68,11 +71,11 @@ export const CitationSearch = ({ type, value, onChange, placeholder }: CitationS
       setSearching(true);
       try {
         const endpoint = type === 'law' ? '/laws/search' : '/judgments/search';
-        const res = await apiClient.get(endpoint, { params: { query: query.trim(), size: 8, page: 0 } });
-        const docs: any[] = res.data?.data?.content ?? [];
-        setResults(docs.map((d: any) => ({
-          id: d.id,
-          label: type === 'law' ? d.title : d.caseName,
+        const res = await apiClient.get<ApiResponse<PaginatedResponse<CitationDocument>>>(endpoint, { params: { query: query.trim(), size: 8, page: 0 } });
+        const docs = res.data?.data?.content ?? [];
+        setResults(docs.map(document => ({
+          id: document.id,
+          label: (type === 'law' ? document.title : document.caseName) ?? document.id,
         })));
       } catch {
         setResults([]);

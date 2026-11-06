@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useBandwidth } from '@/contexts/BandwidthContext';
 import LowBandwidthBanner from '@/components/LowBandwidthBanner';
+import type { ApiResponse, Law, LawCitations } from '@/types/api';
 
 const LawDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -33,9 +34,10 @@ const LawDetail: React.FC = () => {
   const { mutate: trackDownload } = useIncrementLawDownload();
   const [relatedLawTitles, setRelatedLawTitles] = useState<{ id: string; title: string }[]>([]);
   const [amendmentLawTitles, setAmendmentLawTitles] = useState<{ id: string; title: string }[]>([]);
-  const [citedBy, setCitedBy] = useState<{ judgments: any[]; notices: any[] } | null>(null);
+  const [citedBy, setCitedBy] = useState<LawCitations | null>(null);
   const [submitPending, setSubmitPending] = useState(false);
   const queryClient = useQueryClient();
+  const amendmentIds = law?.amendmentIds?.join(',') ?? '';
 
   const handleSubmitForReview = async () => {
     if (!id) return;
@@ -53,29 +55,34 @@ const LawDetail: React.FC = () => {
 
   useEffect(() => {
     if (!id || !law) return;
+    const relatedLaws: Promise<Law[]> = law.relatedLaws?.length
+      ? apiClient.get<ApiResponse<Law[]>>(`/laws/${id}/related`).then(response => response.data?.data ?? [])
+      : Promise.resolve([]);
+    const lawCitations: Promise<LawCitations> = apiClient
+      .get<ApiResponse<LawCitations>>(`/laws/${id}/cited-by`)
+      .then(response => response.data?.data ?? { judgments: [], notices: [] });
     Promise.all([
-      law.relatedLaws?.length
-        ? apiClient.get(`/laws/${id}/related`).then(r => r.data?.data ?? [])
-        : Promise.resolve([]),
-      apiClient.get(`/laws/${id}/cited-by`).then(r => r.data?.data ?? { judgments: [], notices: [] }),
-    ]).then(([related, citedByData]) => {
-      setRelatedLawTitles((related as any[]).map(l => ({ id: l.id, title: l.title })));
-      setCitedBy(citedByData as { judgments: any[]; notices: any[] });
+      relatedLaws,
+      lawCitations,
+    ]).then(([related, citations]) => {
+      setRelatedLawTitles(related.map(relatedLaw => ({ id: relatedLaw.id, title: relatedLaw.title })));
+      setCitedBy(citations);
     }).catch(() => {});
-  }, [id, law?.id]);
+  }, [id, law]);
 
   useEffect(() => {
-    if (!law?.amendmentIds?.length) return;
-    apiClient.get(`/laws/batch?ids=${law.amendmentIds.join(',')}`).then(res => {
-      const laws: any[] = res.data?.data ?? [];
+    if (!amendmentIds) return;
+    const ids = amendmentIds.split(',');
+    apiClient.get<ApiResponse<Law[]>>(`/laws/batch?ids=${amendmentIds}`).then(res => {
+      const laws = res.data?.data ?? [];
       setAmendmentLawTitles(
-        law.amendmentIds!.map(lid => ({
+        ids.map(lid => ({
           id: lid,
-          title: laws.find((l: any) => l.id === lid)?.title ?? lid,
+          title: laws.find(amendment => amendment.id === lid)?.title ?? lid,
         }))
       );
     }).catch(() => {});
-  }, [law?.amendmentIds?.join(',')]);
+  }, [amendmentIds]);
 
   const copyCitation = () => {
     if (!law) return;
@@ -390,7 +397,7 @@ const LawDetail: React.FC = () => {
                     <div>
                       <p className="text-xs text-muted-foreground mb-2">{t('laws.cited_by_judgments')}</p>
                       <div className="flex flex-wrap gap-2">
-                        {citedBy.judgments.map((j: any) => (
+                        {citedBy.judgments.map(j => (
                           <Link key={j.id} to={`/judgments/${j.id}`}>
                             <Badge variant="outline" className="cursor-pointer hover:bg-muted">{j.caseName ?? j.id}</Badge>
                           </Link>
@@ -402,7 +409,7 @@ const LawDetail: React.FC = () => {
                     <div>
                       <p className="text-xs text-muted-foreground mb-2">{t('laws.cited_by_notices')}</p>
                       <div className="flex flex-wrap gap-2">
-                        {citedBy.notices.map((n: any) => (
+                        {citedBy.notices.map(n => (
                           <Link key={n.id} to={`/notices/${n.id}`}>
                             <Badge variant="outline" className="cursor-pointer hover:bg-muted">{n.title ?? n.id}</Badge>
                           </Link>

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { judgmentService } from '@/services/judgmentService';
 import { CreateJudgmentRequest, JudgmentFilterParams, PaginationParams, SearchParams, DateRangeParams } from '@/types/api';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/lib/apiClient';
 
 export const judgmentKeys = {
   all: ['judgments'] as const,
@@ -82,8 +83,8 @@ export const useCreateJudgment = () => {
       queryClient.invalidateQueries({ queryKey: judgmentKeys.lists() });
       toast.success('Judgment created successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to create judgment');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to create judgment'));
     },
   });
 };
@@ -99,8 +100,8 @@ export const useUpdateJudgment = () => {
       queryClient.invalidateQueries({ queryKey: judgmentKeys.detail(variables.id) });
       toast.success('Judgment updated successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to update judgment');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to update judgment'));
     },
   });
 };
@@ -114,8 +115,8 @@ export const useDeleteJudgment = () => {
       queryClient.invalidateQueries({ queryKey: judgmentKeys.lists() });
       toast.success('Judgment deleted successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to delete judgment');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to delete judgment'));
     },
   });
 };

@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/apiClient';
 import { ApiResponse, Law } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { getApiErrorMessage } from '@/lib/apiClient';
 
 const AdminUploadLaw: React.FC = () => {
   const { t } = useTranslation();
@@ -91,8 +92,8 @@ const AdminUploadLaw: React.FC = () => {
       }
 
       navigate('/admin/dashboard');
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to upload law');
+    } catch (error: unknown) {
+      toast.error(getApiErrorMessage(error, 'Failed to upload law'));
     } finally {
       setIsUploading(false);
     }

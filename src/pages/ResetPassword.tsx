@@ -9,6 +9,7 @@ import { Loader2, Scale, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { getApiErrorMessage } from '@/lib/apiClient';
 
 const ResetPassword: React.FC = () => {
   const { t } = useTranslation();
@@ -40,8 +41,8 @@ const ResetPassword: React.FC = () => {
       setDone(true);
       toast.success(t('reset_password.success_toast'));
       setTimeout(() => navigate('/login'), 2500);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || t('reset_password.error'));
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, t('reset_password.error')));
     } finally {
       setIsLoading(false);
     }

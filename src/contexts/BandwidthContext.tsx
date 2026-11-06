@@ -7,6 +7,8 @@ interface BandwidthContextValue {
 
 const BandwidthContext = createContext<BandwidthContextValue>({ lowBandwidth: false, toggle: () => {} });
 
+// Context providers and their consuming hook are intentionally colocated.
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBandwidth = () => useContext(BandwidthContext);
 
 export const BandwidthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

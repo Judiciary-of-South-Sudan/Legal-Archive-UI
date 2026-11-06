@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import type { ApiResponse } from '@/types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
@@ -25,6 +26,11 @@ const apiClient: AxiosInstance = axios.create({
   },
   timeout: 30000,
 });
+
+export function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (!axios.isAxiosError<ApiResponse<unknown>>(error)) return fallback;
+  return error.response?.data?.message || error.response?.data?.error || fallback;
+}
 
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(

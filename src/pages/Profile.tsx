@@ -50,7 +50,7 @@ export default function Profile() {
       })
       .catch(() => toast({ title: t('profile.loading_error'), variant: 'destructive' }))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t, toast]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();

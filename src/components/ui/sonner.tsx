@@ -26,4 +26,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
+// The toast helper is intentionally exported alongside its provider component.
+// eslint-disable-next-line react-refresh/only-export-components
 export { Toaster, toast }

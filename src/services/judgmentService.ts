@@ -5,6 +5,7 @@ import {
   Judgment,
   CreateJudgmentRequest,
   JudgmentFilterParams,
+  PaginationParams,
   SearchParams,
   DateRangeParams
 } from '@/types/api';
@@ -69,4 +70,3 @@ export const judgmentService = {
     return response.data.data!;
   },
 };
-

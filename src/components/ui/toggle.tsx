@@ -40,4 +40,6 @@ const Toggle = React.forwardRef<
 
 Toggle.displayName = TogglePrimitive.Root.displayName
 
+// The variant helper is intentionally exported alongside the component.
+// eslint-disable-next-line react-refresh/only-export-components
 export { Toggle, toggleVariants }

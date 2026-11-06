@@ -18,6 +18,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      - run: npm run typecheck
       - run: npm run build
 
   # Playwright e2e is intentionally not run here — it needs a live backend with a

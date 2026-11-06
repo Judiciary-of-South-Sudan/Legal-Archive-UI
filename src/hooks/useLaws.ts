@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { lawService } from '@/services/lawService';
 import { CreateLawRequest, LawFilterParams, SearchParams } from '@/types/api';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/lib/apiClient';
 export const lawKeys = {
   all: ['laws'] as const,
   lists: () => [...lawKeys.all, 'list'] as const,
@@ -73,8 +74,8 @@ export const useCreateLaw = () => {
       queryClient.invalidateQueries({ queryKey: lawKeys.lists() });
       toast.success('Law created successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to create law');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to create law'));
     },
   });
 };
@@ -87,8 +88,8 @@ export const useUpdateLaw = () => {
       queryClient.invalidateQueries({ queryKey: lawKeys.detail(variables.id) });
       toast.success('Law updated successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to update law');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to update law'));
     },
   });
 };
@@ -100,8 +101,8 @@ export const useDeleteLaw = () => {
       queryClient.invalidateQueries({ queryKey: lawKeys.lists() });
       toast.success('Law deleted successfully');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || 'Failed to delete law');
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, 'Failed to delete law'));
     },
   });
 };

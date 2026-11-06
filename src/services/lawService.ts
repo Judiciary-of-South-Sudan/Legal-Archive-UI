@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { ApiResponse, PaginatedResponse, Law, CreateLawRequest, LawStats, LawFilterParams, SearchParams } from '@/types/api';
+import { ApiResponse, PaginatedResponse, Law, CreateLawRequest, LawStats, LawFilterParams, SearchParams, LawCitations } from '@/types/api';
 
 export const lawService = {
   async getAllLaws(params?: LawFilterParams): Promise<PaginatedResponse<Law>> {
@@ -69,8 +69,8 @@ export const lawService = {
     const response = await apiClient.get<ApiResponse<Law[]>>('/laws/recent', { params: { limit } });
     return response.data.data!;
   },
-  async getCitedBy(id: string): Promise<{ judgments: any[]; notices: any[] }> {
-    const response = await apiClient.get<ApiResponse<{ judgments: any[]; notices: any[] }>>(`/laws/${id}/cited-by`);
+  async getCitedBy(id: string): Promise<LawCitations> {
+    const response = await apiClient.get<ApiResponse<LawCitations>>(`/laws/${id}/cited-by`);
     return response.data.data!;
   },
 };

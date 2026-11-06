@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { decreeService, DecreeFilterParams } from '@/services/decreeService';
 import { CreateDecreeRequest, SearchParams } from '@/types/api';
 import { toast } from 'sonner';
+import { getApiErrorMessage } from '@/lib/apiClient';
 
 export const decreeKeys = {
   all: ['decrees'] as const,
@@ -37,7 +38,7 @@ export const useCreateDecree = () => {
   return useMutation({
     mutationFn: (data: CreateDecreeRequest) => decreeService.createDecree(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: decreeKeys.lists() }); toast.success('Decree created'); },
-    onError: (error: any) => { toast.error(error?.response?.data?.message || 'Failed to create decree'); },
+    onError: (error: unknown) => { toast.error(getApiErrorMessage(error, 'Failed to create decree')); },
   });
 };
 
@@ -50,7 +51,7 @@ export const useUpdateDecree = () => {
       queryClient.invalidateQueries({ queryKey: decreeKeys.detail(variables.id) });
       toast.success('Decree updated');
     },
-    onError: (error: any) => { toast.error(error?.response?.data?.message || 'Failed to update decree'); },
+    onError: (error: unknown) => { toast.error(getApiErrorMessage(error, 'Failed to update decree')); },
   });
 };
 
@@ -59,7 +60,7 @@ export const useDeleteDecree = () => {
   return useMutation({
     mutationFn: (id: string) => decreeService.deleteDecree(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: decreeKeys.lists() }); toast.success('Decree deleted'); },
-    onError: (error: any) => { toast.error(error?.response?.data?.message || 'Failed to delete decree'); },
+    onError: (error: unknown) => { toast.error(getApiErrorMessage(error, 'Failed to delete decree')); },
   });
 };
 

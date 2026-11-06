@@ -1,6 +1,6 @@
 // API Response Types based on backend documentation
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
@@ -311,6 +311,11 @@ export interface LegalNotice {
   downloadCount: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LawCitations {
+  judgments: Pick<Judgment, 'id' | 'caseName'>[];
+  notices: Pick<LegalNotice, 'id' | 'title'>[];
 }
 
 export interface CreateLegalNoticeRequest {

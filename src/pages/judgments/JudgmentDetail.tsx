@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import { useBandwidth } from '@/contexts/BandwidthContext';
 import LowBandwidthBanner from '@/components/LowBandwidthBanner';
+import type { ApiResponse, Judgment, Law } from '@/types/api';
 
 const JudgmentDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -33,37 +34,41 @@ const JudgmentDetail: React.FC = () => {
   const queryClient = useQueryClient();
   const [citedLawTitles, setCitedLawTitles] = useState<Record<string, string>>({});
   const [citedCaseTitles, setCitedCaseTitles] = useState<Record<string, string>>({});
-  const [casesCircitedBy, setCasesCircitedBy] = useState<any[]>([]);
+  const [casesCircitedBy, setCasesCircitedBy] = useState<Judgment[]>([]);
+  const citedLawIds = judgment?.citedLaws?.join(',') ?? '';
+  const citedCaseIds = judgment?.citedCases?.join(',') ?? '';
 
   useEffect(() => {
-    if (!judgment?.citedLaws?.length) return;
-    apiClient.get(`/laws/batch?ids=${judgment.citedLaws.join(',')}`).then(res => {
-      const laws: any[] = res.data?.data ?? [];
+    if (!citedLawIds) return;
+    const ids = citedLawIds.split(',');
+    apiClient.get<ApiResponse<Law[]>>(`/laws/batch?ids=${citedLawIds}`).then(res => {
+      const laws = res.data?.data ?? [];
       const map: Record<string, string> = {};
-      judgment.citedLaws.forEach((id: string) => {
-        const found = laws.find((l: any) => l.id === id);
+      ids.forEach(id => {
+        const found = laws.find(law => law.id === id);
         map[id] = found?.title ?? id;
       });
       setCitedLawTitles(map);
     }).catch(() => {});
-  }, [judgment?.citedLaws?.join(',')]);
+  }, [citedLawIds]);
 
   useEffect(() => {
-    if (!judgment?.citedCases?.length) return;
-    apiClient.get(`/judgments/batch?ids=${judgment.citedCases.join(',')}`).then(res => {
-      const cases: any[] = res.data?.data ?? [];
+    if (!citedCaseIds) return;
+    const ids = citedCaseIds.split(',');
+    apiClient.get<ApiResponse<Judgment[]>>(`/judgments/batch?ids=${citedCaseIds}`).then(res => {
+      const cases = res.data?.data ?? [];
       const map: Record<string, string> = {};
-      judgment.citedCases.forEach((id: string) => {
-        const found = cases.find((c: any) => c.id === id);
+      ids.forEach(id => {
+        const found = cases.find(judgment => judgment.id === id);
         map[id] = found?.caseName ?? id;
       });
       setCitedCaseTitles(map);
     }).catch(() => {});
-  }, [judgment?.citedCases?.join(',')]);
+  }, [citedCaseIds]);
 
   useEffect(() => {
     if (!id) return;
-    apiClient.get(`/judgments/${id}/cited-by`).then(res => {
+    apiClient.get<ApiResponse<Judgment[]>>(`/judgments/${id}/cited-by`).then(res => {
       setCasesCircitedBy(res.data?.data ?? []);
     }).catch(() => {});
   }, [id]);
@@ -401,7 +406,7 @@ const JudgmentDetail: React.FC = () => {
                 <div className="border-t border-border pt-5">
                   <h3 className="archive-section-label mb-3">{t('judgments.cited_by_cases')}</h3>
                   <div className="flex flex-wrap gap-2">
-                    {casesCircitedBy.map((j: any) => (
+                    {casesCircitedBy.map(j => (
                       <Link key={j.id} to={`/judgments/${j.id}`}>
                         <Badge variant="outline" className="cursor-pointer hover:bg-muted">{j.caseName ?? j.id}</Badge>
                       </Link>
